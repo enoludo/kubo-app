@@ -1,0 +1,47 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg:          #FFFFFF;
+  --bg-2:        #f5f4f9;
+  --bg-3:        #eeedf5;
+  --text:        #111111;
+  --text-2:      #555566;
+  --text-3:      #9999aa;
+  --border:      rgba(0, 0, 0, 0.07);
+  --border-m:    rgba(0, 0, 0, 0.11);
+  --shadow-s:    0 1px 4px rgba(0, 0, 0, 0.07), 0 2px 8px rgba(0, 0, 0, 0.05);
+  --shadow-m:    0 4px 16px rgba(0, 0, 0, 0.10), 0 1px 4px rgba(0, 0, 0, 0.06);
+  --accent:      #7C6FCD;
+  --accent-l:    #a095e0;
+  --accent-sub:  rgba(124, 111, 205, 0.12);
+
+  --hour-h:      56px;
+  --sidebar-w:   232px;
+  --header-h:    60px;
+  --footer-h:    88px;
+  --time-w:      54px;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  background: var(--bg-2);
+  color: var(--text);
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-size: 13px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+}
+
+button { font-family: inherit; cursor: pointer; }
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--bg-3); border-radius: 3px; }
