@@ -28,6 +28,7 @@ function weekKeyOf(dateStr) {
 }
 
 function effectiveH(s) {
+  if ((s.type ?? 'work') !== 'work') return 0
   return Math.max(0, (s.endHour - s.startHour) - (s.pause ?? 0))
 }
 
@@ -60,13 +61,13 @@ function fmtDDMM(date) {
   return `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}`
 }
 
-function computeWeekBalance(shifts, employeeId, weekDates) {
+function computeWeekBalance(shifts, employeeId, weekDates, contract = WEEKLY_CONTRACT) {
   const strs      = new Set(weekDates.map(d => dateToStr(d)))
   const prev      = shifts.filter(s => s.employeeId === employeeId && !strs.has(s.date))
   const prevHours = prev.reduce((sum, s) => sum + effectiveH(s), 0)
   const prevWeeks = new Set(prev.map(s => weekKeyOf(s.date))).size
-  const prevBal   = prevHours - prevWeeks * WEEKLY_CONTRACT
-  const objective = WEEKLY_CONTRACT - prevBal
+  const prevBal   = prevHours - prevWeeks * contract
+  const objective = contract - prevBal
   const weekHrs   = shifts
     .filter(s => s.employeeId === employeeId && strs.has(s.date))
     .reduce((sum, s) => sum + effectiveH(s), 0)
@@ -95,7 +96,7 @@ export function buildIndividualMailto(employee, weekDates, shifts) {
   const sunday    = weekDates[6]
   const wn        = isoWeekNum(getMondayOf(monday))
   const firstName = employee.name.split(' ')[0]
-  const wb        = computeWeekBalance(shifts, employee.id, weekDates)
+  const wb        = computeWeekBalance(shifts, employee.id, weekDates, employee.contract ?? WEEKLY_CONTRACT)
 
   const subject = `Votre planning Kubo P\u00e2tisserie \u2014 Semaine ${wn} du ${fmtDDMM(monday)} au ${fmtDDMM(sunday)}`
 
@@ -133,7 +134,7 @@ export function buildTeamMailto(team, weekDates, shifts) {
   let body = `Bonjour \u00e0 tous,\n\nVoici le planning de la semaine ${wn} :\n`
 
   for (const emp of activeTeam) {
-    const wb = computeWeekBalance(shifts, emp.id, weekDates)
+    const wb = computeWeekBalance(shifts, emp.id, weekDates, emp.contract ?? WEEKLY_CONTRACT)
     body +=
       `\n\u2500\u2500 ${emp.name} (${emp.role}) \u2500\u2500\n` +
       `${buildDayLines(emp.id, weekDates, shifts)}\n` +

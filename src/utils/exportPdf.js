@@ -33,6 +33,7 @@ function isoWeekNum(monday) {
 }
 
 function effectiveH(s) {
+  if ((s.type ?? 'work') !== 'work') return 0
   return Math.max(0, (s.endHour - s.startHour) - (s.pause ?? 0))
 }
 
@@ -65,13 +66,13 @@ function setBalanceColor(pdf, value) {
   else                pdf.setTextColor(76, 175, 80)
 }
 
-function computeWeekBalance(shifts, employeeId, weekDates) {
+function computeWeekBalance(shifts, employeeId, weekDates, contract = WEEKLY_CONTRACT) {
   const strs     = new Set(weekDates.map(d => dateToStr(d)))
   const prevShifts = shifts.filter(s => s.employeeId === employeeId && !strs.has(s.date))
   const prevHours  = prevShifts.reduce((sum, s) => sum + effectiveH(s), 0)
   const prevWeeks  = new Set(prevShifts.map(s => weekKeyOf(s.date))).size
-  const prevBalance = prevHours - prevWeeks * WEEKLY_CONTRACT
-  const weekObjective = WEEKLY_CONTRACT - prevBalance
+  const prevBalance = prevHours - prevWeeks * contract
+  const weekObjective = contract - prevBalance
   const weekHrs = shifts
     .filter(s => s.employeeId === employeeId && strs.has(s.date))
     .reduce((sum, s) => sum + effectiveH(s), 0)
@@ -161,7 +162,7 @@ export async function generatePdf(captures, team, shifts) {
     // Data rows
     pdf.setFontSize(8)
     for (const emp of activeTeam) {
-      const wb = computeWeekBalance(shifts, emp.id, weekDates)
+      const wb = computeWeekBalance(shifts, emp.id, weekDates, emp.contract ?? WEEKLY_CONTRACT)
 
       pdf.setFillColor(255, 255, 255)
       pdf.rect(MARGIN, y, CW, ROW_H, 'F')
@@ -184,7 +185,7 @@ export async function generatePdf(captures, team, shifts) {
       pdf.text(fmtDur(wb.weekHours), cx, y + ROW_H - 1.8)
       cx += colW[1]
 
-      pdf.text(fmtDur(WEEKLY_CONTRACT), cx, y + ROW_H - 1.8)
+      pdf.text(fmtDur(emp.contract ?? WEEKLY_CONTRACT), cx, y + ROW_H - 1.8)
       cx += colW[2]
 
       setBalanceColor(pdf, wb.weekBalance)

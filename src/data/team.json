@@ -1,7 +1,7 @@
 [
-  { "id": 1, "name": "Marie Leblanc",  "role": "Chef Pâtissière", "color": "#F5A7B8", "initials": "ML", "contract": 35, "archived": false, "email": "marie.leblanc@kubo-patisserie.fr" },
-  { "id": 2, "name": "Thomas Bernard", "role": "Boulanger",        "color": "#A7C4F5", "initials": "TB", "contract": 35, "archived": false, "email": "thomas.bernard@kubo-patisserie.fr" },
-  { "id": 3, "name": "Léa Martin",     "role": "Vendeuse",         "color": "#A8D5B5", "initials": "LM", "contract": 35, "archived": false, "email": "lea.martin@kubo-patisserie.fr" },
-  { "id": 4, "name": "Paul Dubois",    "role": "Commis",           "color": "#C5B4E8", "initials": "PD", "contract": 35, "archived": false, "email": "paul.dubois@kubo-patisserie.fr" },
-  { "id": 5, "name": "Sophie Moreau",  "role": "Caissière",        "color": "#F5CFA7", "initials": "SM", "contract": 35, "archived": false, "email": "" }
+  { "id": 1,  "name": "Hélène",    "role": "Cheffe Pâtissière", "color": "#F5A7B8", "initials": "ML", "contract": 35, "archived": false, "email": "marie.leblanc@kubo-patisserie.fr" },
+  { "id": 2,  "name": "Juliette",   "role": "Pâtissière",        "color": "#A7C4F5", "initials": "TB", "contract": 35, "archived": false, "email": "thomas.bernard@kubo-patisserie.fr" },
+  { "id": 3,  "name": "Maxime",       "role": "Pâtissier",         "color": "#A8D5B5", "initials": "LM", "contract": 35, "archived": false, "email": "lea.martin@kubo-patisserie.fr" },
+  { "id": 4,  "name": "Nadia",      "role": "Vendeuse",           "color": "#C5B4E8", "initials": "PD", "contract": 35, "archived": false, "email": "paul.dubois@kubo-patisserie.fr" },
+  { "id": 5,  "name": "Carolina",    "role": "Vendeuse",        "color": "#F5CFA7", "initials": "SM", "contract": 35, "archived": false, "email": "" }
 ]

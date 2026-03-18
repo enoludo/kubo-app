@@ -1,16 +1,14 @@
 import { useState } from 'react'
-import Header           from './components/Header'
-import Sidebar          from './components/Sidebar'
-import Calendar         from './components/Calendar'
-import ShiftModal       from './components/ShiftModal'
-import EmployeeModal    from './components/EmployeeModal'
-import ArchiveModal     from './components/ArchiveModal'
-import WeekPickerPanel  from './components/WeekPickerPanel'
-import PrintCalendars   from './components/PrintCalendars'
+import Header                from './components/Header'
+import ShiftModal            from './components/ShiftModal'
+import EmployeeModal         from './components/EmployeeModal'
+import EmployeeProfileModal  from './components/EmployeeProfileModal'
+import WeekPickerPanel       from './components/WeekPickerPanel'
+import TableView             from './components/TableView'
 import { useSchedule, dateToStr } from './hooks/useSchedule'
 import { exportToExcel }          from './utils/exportExcel'
 import { generatePdf }            from './utils/exportPdf'
-import { buildIndividualMailto, buildTeamMailto } from './utils/emailPlanning'
+import { buildTeamMailto }        from './utils/emailPlanning'
 import { useWeek }                from './hooks/useWeek'
 import initialTeam from './data/team.json'
 import './App.css'
@@ -19,32 +17,22 @@ export default function App() {
   const schedule = useSchedule()
   const week     = useWeek()
 
-  const [team,       setTeam]       = useState(initialTeam)
-  const [empFilter,  setEmpFilter]  = useState('active')
-  const [shiftModal, setShiftModal] = useState(null)
-  const [empModal,   setEmpModal]   = useState(null)   // null | { employee: obj|null }
-  const [archModal,  setArchModal]  = useState(null)   // null | { employee: obj }
-  const [pickerOpen, setPickerOpen] = useState(false)
-  const [printWeeks,    setPrintWeeks]    = useState(null)   // null | number[]
+  const [team,         setTeam]         = useState(initialTeam)
+  const [shiftModal,   setShiftModal]   = useState(null)
+  const [profileModal, setProfileModal] = useState(null)   // null | employee
+  const [empModal,     setEmpModal]     = useState(null)   // null | { employee: obj|null }
+  const [pickerOpen,   setPickerOpen]   = useState(false)
   const [pdfGenerating, setPdfGenerating] = useState(false)
+  const [toast,         setToast]         = useState(null)
 
-  // IDs visibles dans le calendrier selon le filtre
-  const archivedIds = new Set(team.filter(e => e.archived).map(e => e.id))
-  const visibleIds  = new Set(
-    team.filter(e => {
-      if (empFilter === 'active')   return !e.archived
-      if (empFilter === 'archived') return  e.archived
-      return true
-    }).map(e => e.id)
-  )
+  function showToast(msg, color) {
+    setToast({ msg, color })
+    setTimeout(() => setToast(null), 3000)
+  }
+
+  const visibleIds = new Set(team.filter(e => !e.archived).map(e => e.id))
 
   // ── Shift handlers ────────────────────────────────────────────────────────
-
-  function handleDropEmployee(employeeId, date, startHour) {
-    const employee = team.find(e => e.id === employeeId)
-    if (!employee || employee.archived) return
-    setShiftModal({ employee, date, startHour, shift: null })
-  }
 
   function handleEditShift(shiftId) {
     const shift    = schedule.shifts.find(s => s.id === shiftId)
@@ -54,13 +42,19 @@ export default function App() {
     setShiftModal({ employee, date, startHour: shift.startHour, shift })
   }
 
-  function handleSaveShift(startHour, endHour, pause) {
+  function handleSaveShift(startHour, endHour, pause, type, extra = {}) {
     if (shiftModal.shift) {
-      schedule.updateShift(shiftModal.shift.id, startHour, endHour, pause)
+      schedule.updateShift(shiftModal.shift.id, startHour, endHour, pause, type, extra)
     } else {
-      schedule.addShift(shiftModal.employee.id, dateToStr(shiftModal.date), startHour, endHour, pause)
+      schedule.addShift(shiftModal.employee.id, dateToStr(shiftModal.date), startHour, endHour, pause, type, extra)
     }
     setShiftModal(null)
+  }
+
+  function handleAddForDay(employeeId, date, defaultType) {
+    const employee = team.find(e => e.id === employeeId)
+    if (!employee || employee.archived) return
+    setShiftModal({ employee, date, startHour: 9, shift: null, ...(defaultType ? { defaultType } : {}) })
   }
 
   function handleDeleteShift() {
@@ -69,15 +63,6 @@ export default function App() {
   }
 
   // ── Email ─────────────────────────────────────────────────────────────────
-
-  function handleSendEmail(emp) {
-    if (!emp.email) {
-      setEmpModal({ employee: emp })
-      return
-    }
-    const href = buildIndividualMailto(emp, week.dates, schedule.shifts)
-    if (href) window.location.href = href
-  }
 
   function handleSendToAll() {
     const href = buildTeamMailto(team, week.dates, schedule.shifts)
@@ -89,31 +74,26 @@ export default function App() {
   async function handlePdfExport(offsets) {
     if (pdfGenerating || !offsets.length) return
     setPdfGenerating(true)
-    const sorted      = [...offsets].sort((a, b) => a - b)
-    const origOffset  = week.weekOffset
-    const captures    = []
+    const sorted     = [...offsets].sort((a, b) => a - b)
+    const origOffset = week.weekOffset
+    const captures   = []
     try {
       const html2canvas = (await import('html2canvas')).default
       for (const offset of sorted) {
         week.goTo(offset)
         await new Promise(resolve => setTimeout(resolve, 600))
-        const calEl = document.querySelector('.calendar-wrap')
+        const calEl = document.querySelector('.table-view')
         if (!calEl) continue
         const canvas = await html2canvas(calEl, {
-          scale: 1.5,
-          useCORS: true,
-          allowTaint: true,
-          backgroundColor: '#ffffff',
-          logging: false,
+          scale: 1.5, useCORS: true, allowTaint: true,
+          backgroundColor: '#ffffff', logging: false,
           ignoreElements: el =>
             el.classList?.contains('modal-overlay') ||
             el.classList?.contains('week-picker-overlay'),
         })
         captures.push({ imgData: canvas.toDataURL('image/png'), offset })
       }
-      if (captures.length > 0) {
-        await generatePdf(captures, team, schedule.shifts)
-      }
+      if (captures.length > 0) await generatePdf(captures, team, schedule.shifts)
     } catch (err) {
       console.error('PDF generation failed:', err)
     } finally {
@@ -126,39 +106,37 @@ export default function App() {
 
   function handleSaveEmployee(data) {
     if (empModal.employee) {
-      // Edit
       setTeam(prev => prev.map(e =>
         e.id === empModal.employee.id
-          ? { ...e, name: data.name, role: data.role, email: data.email, color: data.color, initials: data.initials }
+          ? { ...e, name: data.name, role: data.role, email: data.email,
+              contract: data.contract, color: data.color, initials: data.initials,
+              startBalance: data.startBalance ?? 0 }
           : e
       ))
     } else {
-      // Add
       const newId = Math.max(0, ...team.map(e => e.id)) + 1
       setTeam(prev => [...prev, {
-        id: newId,
-        name: data.name,
-        role: data.role,
-        email: data.email,
-        color: data.color,
-        initials: data.initials,
-        contract: 35,
-        archived: false,
+        id: newId, name: data.name, role: data.role, email: data.email,
+        contract: data.contract ?? 35, color: data.color, initials: data.initials,
+        archived: false, startBalance: data.startBalance ?? 0,
       }])
     }
     setEmpModal(null)
   }
 
-  function handleConfirmAction() {
-    if (archModal.mode === 'delete') {
-      schedule.removeEmployeeShifts(archModal.employee.id)
-      setTeam(prev => prev.filter(e => e.id !== archModal.employee.id))
-    } else {
-      setTeam(prev => prev.map(e =>
-        e.id === archModal.employee.id ? { ...e, archived: true } : e
-      ))
-    }
-    setArchModal(null)
+  function handleArchiveEmployee() {
+    if (!empModal?.employee) return
+    setTeam(prev => prev.map(e =>
+      e.id === empModal.employee.id ? { ...e, archived: true } : e
+    ))
+    setEmpModal(null)
+  }
+
+  function handleDeleteEmployee() {
+    if (!empModal?.employee) return
+    schedule.removeEmployeeShifts(empModal.employee.id)
+    setTeam(prev => prev.filter(e => e.id !== empModal.employee.id))
+    setEmpModal(null)
   }
 
   return (
@@ -172,26 +150,16 @@ export default function App() {
         onSendToAll={handleSendToAll}
       />
       <div className="app-body">
-        <Sidebar
+        <TableView
           team={team}
           schedule={schedule}
           weekDates={week.dates}
-          empFilter={empFilter}
-          setEmpFilter={setEmpFilter}
-          onAddEmployee={() => setEmpModal({ employee: null })}
-          onEditEmployee={emp => setEmpModal({ employee: emp })}
-          onArchiveEmployee={emp => setArchModal({ employee: emp, mode: 'archive' })}
-          onDeleteEmployee={emp => setArchModal({ employee: emp, mode: 'delete' })}
-          onSendEmail={handleSendEmail}
-        />
-        <Calendar
-          team={team}
-          schedule={schedule}
-          dates={week.dates}
           visibleIds={visibleIds}
-          archivedIds={archivedIds}
-          onDropEmployee={handleDropEmployee}
+          onAddForDay={handleAddForDay}
           onEditShift={handleEditShift}
+          onToggleValidated={schedule.toggleValidated}
+          onEmployeeClick={emp => setProfileModal(emp)}
+          onAddEmployee={() => setEmpModal({ employee: null })}
         />
       </div>
 
@@ -201,23 +169,29 @@ export default function App() {
           onSave={handleSaveShift}
           onDelete={handleDeleteShift}
           onCancel={() => setShiftModal(null)}
+          onToggleValidated={schedule.toggleValidated}
           schedule={schedule}
           weekDates={week.dates}
         />
       )}
+
+      {profileModal && (
+        <EmployeeProfileModal
+          employee={profileModal}
+          weekDates={week.dates}
+          schedule={schedule}
+          onEdit={() => { setEmpModal({ employee: profileModal }); setProfileModal(null) }}
+          onClose={() => setProfileModal(null)}
+        />
+      )}
+
       {empModal && (
         <EmployeeModal
           employee={empModal.employee}
           onSave={handleSaveEmployee}
           onCancel={() => setEmpModal(null)}
-        />
-      )}
-      {archModal && (
-        <ArchiveModal
-          employee={archModal.employee}
-          mode={archModal.mode}
-          onConfirm={handleConfirmAction}
-          onCancel={() => setArchModal(null)}
+          onArchive={handleArchiveEmployee}
+          onDelete={handleDeleteEmployee}
         />
       )}
 
@@ -229,10 +203,7 @@ export default function App() {
           onSelect={offset => { week.goTo(offset); setPickerOpen(false) }}
           onClose={() => setPickerOpen(false)}
           pdfGenerating={pdfGenerating}
-          onPdfSelection={offsets => {
-            setPickerOpen(false)
-            handlePdfExport(offsets)
-          }}
+          onPdfSelection={offsets => { setPickerOpen(false); handlePdfExport(offsets) }}
           onExportSelection={offsets => {
             const todayMonday = (() => {
               const d = new Date(); const day = d.getDay()
@@ -250,25 +221,19 @@ export default function App() {
             exportToExcel(schedule.shifts.filter(s => dateStrs.has(s.date)), team)
             setPickerOpen(false)
           }}
-          onPrintSelection={offsets => {
+          onPrintSelection={() => {
             setPickerOpen(false)
-            setPrintWeeks(offsets)
             document.body.classList.add('printing-selection')
             setTimeout(() => {
               window.print()
               document.body.classList.remove('printing-selection')
-              setPrintWeeks(null)
             }, 100)
           }}
         />
       )}
 
-      {printWeeks && (
-        <PrintCalendars
-          weekOffsets={printWeeks}
-          shifts={schedule.shifts}
-          team={team}
-        />
+      {toast && (
+        <div className="toast" style={{ borderLeftColor: toast.color }}>{toast.msg}</div>
       )}
     </div>
   )

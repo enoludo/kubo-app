@@ -8,6 +8,13 @@ export const END_HOUR        = 20
 export const TOTAL_HOURS     = END_HOUR - START_HOUR   // 13
 export const WEEKLY_CONTRACT = 35
 
+// Durée effective d'un shift selon son type
+// Seul 'work' contribue aux heures — tous les autres types sont des marqueurs visuels
+export function shiftEffective(s) {
+  if ((s.type ?? 'work') !== 'work') return 0
+  return Math.max(0, (s.endHour - s.startHour) - (s.pause ?? 0))
+}
+
 // Début du planning — lundi il y a 4 semaines
 export const PLANNING_START  = new Date('2026-02-16T00:00:00')
 
@@ -193,10 +200,10 @@ const DEMO = [
 export function useSchedule() {
   const [shifts, setShifts] = useState(DEMO)
 
-  function addShift(employeeId, dateStr, startHour, endHour, pause = 0) {
+  function addShift(employeeId, dateStr, startHour, endHour, pause = 0, type = 'work', extra = {}) {
     setShifts(prev => [
       ...prev,
-      { id: Date.now(), employeeId, date: dateStr, startHour, endHour, pause },
+      { id: Date.now(), employeeId, date: dateStr, startHour, endHour, pause, type, ...extra },
     ])
   }
 
@@ -218,9 +225,15 @@ export function useSchedule() {
     setShifts(prev => prev.filter(s => s.employeeId !== employeeId))
   }
 
-  function updateShift(shiftId, startHour, endHour, pause = 0) {
+  function updateShift(shiftId, startHour, endHour, pause = 0, type = 'work', extra = {}) {
     setShifts(prev => prev.map(s =>
-      s.id === shiftId ? { ...s, startHour, endHour, pause } : s
+      s.id === shiftId ? { ...s, startHour, endHour, pause, type, ...extra } : s
+    ))
+  }
+
+  function toggleValidated(shiftId) {
+    setShifts(prev => prev.map(s =>
+      s.id === shiftId ? { ...s, validated: !s.validated } : s
     ))
   }
 
@@ -228,7 +241,7 @@ export function useSchedule() {
   function getTotalHours(employeeId) {
     return shifts
       .filter(s => s.employeeId === employeeId)
-      .reduce((sum, s) => sum + (s.endHour - s.startHour) - (s.pause ?? 0), 0)
+      .reduce((sum, s) => sum + shiftEffective(s), 0)
   }
 
   // Heures sur une semaine précise (tableau de 7 Date)
@@ -236,7 +249,7 @@ export function useSchedule() {
     const strs = new Set(dates.map(dateToStr))
     return shifts
       .filter(s => s.employeeId === employeeId && strs.has(s.date))
-      .reduce((sum, s) => sum + (s.endHour - s.startHour) - (s.pause ?? 0), 0)
+      .reduce((sum, s) => sum + shiftEffective(s), 0)
   }
 
   // Nombre de semaines distinctes où l'employé a au moins un shift
@@ -247,24 +260,24 @@ export function useSchedule() {
     return keys.size
   }
 
-  // Solde contractuel global : heures totales − (activeWeeks × 35h)
-  function getBalance(employeeId) {
-    return getTotalHours(employeeId) - getActiveWeeks(employeeId) * WEEKLY_CONTRACT
+  // Solde contractuel global : heures totales − (activeWeeks × contrat)
+  function getBalance(employeeId, contract = WEEKLY_CONTRACT, startBalance = 0) {
+    return getTotalHours(employeeId) - getActiveWeeks(employeeId) * contract + startBalance
   }
 
   // Solde semaine courante en tenant compte du report des semaines précédentes
   // Retourne { prevBalance, weekObjective, weekBalance, weekHours, prevHours, prevWeeks }
-  function getWeekBalance(employeeId, weekDates) {
+  function getWeekBalance(employeeId, weekDates, contract = WEEKLY_CONTRACT, startBalance = 0) {
     const strs = new Set(weekDates.map(dateToStr))
 
     // Shifts hors de la semaine visible
     const prevShifts  = shifts.filter(s => s.employeeId === employeeId && !strs.has(s.date))
-    const prevHours   = prevShifts.reduce((sum, s) => sum + (s.endHour - s.startHour) - (s.pause ?? 0), 0)
+    const prevHours   = prevShifts.reduce((sum, s) => sum + shiftEffective(s), 0)
     const prevWeeks   = new Set(prevShifts.map(s => weekKeyOf(s.date))).size
-    const prevBalance = prevHours - prevWeeks * WEEKLY_CONTRACT
+    const prevBalance = prevHours - prevWeeks * contract + startBalance
 
     // Objectif de la semaine ajusté du report
-    const weekObjective = WEEKLY_CONTRACT - prevBalance
+    const weekObjective = contract - prevBalance
     const weekHrs       = getWeekHours(employeeId, weekDates)
     const weekBalance   = weekHrs - weekObjective
 
@@ -273,6 +286,7 @@ export function useSchedule() {
 
   return {
     shifts, addShift, moveShift, updateShift, removeShift, removeEmployeeShifts,
+    toggleValidated,
     getTotalHours, getWeekHours, getActiveWeeks, getBalance, getWeekBalance,
   }
 }

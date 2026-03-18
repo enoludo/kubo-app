@@ -15,15 +15,20 @@
   --border-m:    rgba(0, 0, 0, 0.11);
   --shadow-s:    0 1px 4px rgba(0, 0, 0, 0.07), 0 2px 8px rgba(0, 0, 0, 0.05);
   --shadow-m:    0 4px 16px rgba(0, 0, 0, 0.10), 0 1px 4px rgba(0, 0, 0, 0.06);
-  --accent:      #7C6FCD;
+  --accent:      #111;
   --accent-l:    #a095e0;
   --accent-sub:  rgba(124, 111, 205, 0.12);
 
   --hour-h:      56px;
   --sidebar-w:   232px;
-  --header-h:    60px;
+  --header-h:    118px;
   --footer-h:    88px;
   --time-w:      54px;
+
+  /* Responsive layout tokens — synced between header and table */
+  --tv-emp-col:  200px;
+  --gap:         12px;
+  --pad-h:       24px;
 }
 
 html, body, #root {

@@ -28,7 +28,7 @@ export default function Sidebar({
 
       <div className="sidebar-list">
         {visibleTeam.map(emp => {
-          const wb = schedule.getWeekBalance(emp.id, weekDates)
+          const wb = schedule.getWeekBalance(emp.id, weekDates, emp.contract ?? 35)
           return (
             <EmployeeCard
               key={emp.id}
@@ -47,6 +47,12 @@ export default function Sidebar({
       <button className="sidebar-add-btn" onClick={onAddEmployee}>
         + Ajouter un employé
       </button>
+
+      <div className="sidebar-legend">
+        <span className="legend-item legend-work">■ Présent</span>
+        <span className="legend-item legend-absent">░ Absent</span>
+        <span className="legend-item legend-leave">□ Congés</span>
+      </div>
     </aside>
   )
 }
