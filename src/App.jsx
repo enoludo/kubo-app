@@ -1,12 +1,15 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Header                from './components/Header'
 import ShiftModal            from './components/ShiftModal'
 import EmployeeModal         from './components/EmployeeModal'
 import EmployeeProfileModal  from './components/EmployeeProfileModal'
 import WeekPickerPanel       from './components/WeekPickerPanel'
 import TableView             from './components/TableView'
+import NavSidebar            from './components/NavSidebar'
 import { useSchedule, dateToStr } from './hooks/useSchedule'
+import { useGoogleSync }          from './hooks/useGoogleSync'
 import { exportToExcel }          from './utils/exportExcel'
+import { sessionSave, sessionLoad, sessionClear, sessionHasData } from './utils/session'
 import { generatePdf }            from './utils/exportPdf'
 import { buildTeamMailto }        from './utils/emailPlanning'
 import { useWeek }                from './hooks/useWeek'
@@ -17,20 +20,66 @@ export default function App() {
   const schedule = useSchedule()
   const week     = useWeek()
 
-  const [team,         setTeam]         = useState(initialTeam)
-  const [shiftModal,   setShiftModal]   = useState(null)
-  const [profileModal, setProfileModal] = useState(null)   // null | employee
-  const [empModal,     setEmpModal]     = useState(null)   // null | { employee: obj|null }
-  const [pickerOpen,   setPickerOpen]   = useState(false)
+  const [team,          setTeam]         = useState(() => sessionLoad('team') ?? initialTeam)
+  const [shiftModal,    setShiftModal]   = useState(null)
+  const [profileModal,  setProfileModal] = useState(null)
+  const [empModal,      setEmpModal]     = useState(null)
+  const [pickerOpen,    setPickerOpen]   = useState(false)
   const [pdfGenerating, setPdfGenerating] = useState(false)
   const [toast,         setToast]         = useState(null)
+  const [copiedPlan,    setCopiedPlan]    = useState(null)
+  const [templates,     setTemplates]     = useState([])
+  const [dataSource,    setDataSource]    = useState(() => sessionHasData() ? 'session' : 'demo')
+
+  const teamSaveTimer = useRef(null)
 
   function showToast(msg, color) {
     setToast({ msg, color })
     setTimeout(() => setToast(null), 3000)
   }
 
+  // Auto-save de l'équipe dans sessionStorage (debounce 500ms)
+  useEffect(() => {
+    clearTimeout(teamSaveTimer.current)
+    teamSaveTimer.current = setTimeout(() => sessionSave('team', team), 500)
+    return () => clearTimeout(teamSaveTimer.current)
+  }, [team])
+
+  // Toast au premier montage si des données de session ont été restaurées
+  useEffect(() => {
+    if (sessionHasData()) {
+      showToast('Planning restauré depuis votre session précédente', '#7C6FCD')
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── Synchronisation Google Sheets ─────────────────────────────────────────
+  const sync = useGoogleSync({
+    shifts:              schedule.shifts,
+    team,
+    weekDates:           week.dates,
+    setTeam,
+    replaceWeekShifts:   schedule.replaceWeekShifts,
+    onToast:             showToast,
+  })
+
+  // Suivi de la source de données selon l'état de la sync
+  useEffect(() => {
+    if (sync.status === 'synced') {
+      setDataSource('synced')
+    } else if (dataSource === 'synced') {
+      setDataSource('session')
+    }
+  }, [sync.status]) // eslint-disable-line react-hooks/exhaustive-deps
+
   const visibleIds = new Set(team.filter(e => !e.archived).map(e => e.id))
+
+  // ── Réinitialisation aux données de démo ─────────────────────────────────
+  function handleReset() {
+    sessionClear()
+    schedule.resetShifts()
+    setTeam(initialTeam)
+    setDataSource('demo')
+  }
 
   // ── Shift handlers ────────────────────────────────────────────────────────
 
@@ -60,6 +109,51 @@ export default function App() {
   function handleDeleteShift() {
     schedule.removeShift(shiftModal.shift.id)
     setShiftModal(null)
+  }
+
+  // ── Copy / Paste / Templates ──────────────────────────────────────────────
+
+  function extractRelativeShifts() {
+    return schedule.shifts
+      .filter(s => week.dates.some(d => dateToStr(d) === s.date))
+      .map(s => {
+        const dayOffset = week.dates.findIndex(d => dateToStr(d) === s.date)
+        return {
+          employeeId: s.employeeId, dayOffset,
+          startHour: s.startHour, endHour: s.endHour,
+          pause: s.pause ?? 0, type: s.type ?? 'work',
+        }
+      })
+  }
+
+  function handleCopyPlan() {
+    const shifts    = extractRelativeShifts()
+    const d0        = week.dates[0]
+    const d6        = week.dates[6]
+    const weekLabel = `${d0.getDate()}/${d0.getMonth() + 1} – ${d6.getDate()}/${d6.getMonth() + 1}`
+    setCopiedPlan({ weekLabel, shifts })
+  }
+
+  function handlePastePlan() {
+    if (!copiedPlan) return
+    copiedPlan.shifts.forEach(s => {
+      const date = week.dates[s.dayOffset]
+      if (date) schedule.addShift(s.employeeId, dateToStr(date), s.startHour, s.endHour, s.pause, s.type)
+    })
+  }
+
+  function handleSaveTemplate(name) {
+    const shifts = extractRelativeShifts()
+    setTemplates(prev => [...prev, { id: Date.now(), name, shifts }])
+  }
+
+  function handleLoadTemplate(templateId) {
+    const tpl = templates.find(t => t.id === templateId)
+    if (!tpl) return
+    tpl.shifts.forEach(s => {
+      const date = week.dates[s.dayOffset]
+      if (date) schedule.addShift(s.employeeId, dateToStr(date), s.startHour, s.endHour, s.pause, s.type)
+    })
   }
 
   // ── Email ─────────────────────────────────────────────────────────────────
@@ -140,14 +234,34 @@ export default function App() {
   }
 
   return (
+    <div className="app-shell">
+    <NavSidebar activeModule="planning" />
+    {sync.loading && (
+      <div className="app-loading-overlay">
+        <span className="app-loading-spinner" />
+        <span>Chargement du planning…</span>
+      </div>
+    )}
     <div className="app">
       <Header
         week={week}
-        onExport={() => exportToExcel(schedule.shifts, team)}
         onOpenPicker={() => setPickerOpen(v => !v)}
         onPdfExport={() => handlePdfExport([week.weekOffset])}
         pdfGenerating={pdfGenerating}
         onSendToAll={handleSendToAll}
+        copiedPlan={copiedPlan}
+        templates={templates}
+        onCopyPlan={handleCopyPlan}
+        onPastePlan={handlePastePlan}
+        onSaveTemplate={handleSaveTemplate}
+        onLoadTemplate={handleLoadTemplate}
+        syncStatus={sync.status}
+        syncError={sync.errMsg}
+        onSyncConnect={sync.connect}
+        onSyncDisconnect={sync.disconnect}
+        onSyncRetry={sync.retry}
+        dataSource={dataSource}
+        onReset={handleReset}
       />
       <div className="app-body">
         <TableView
@@ -232,9 +346,28 @@ export default function App() {
         />
       )}
 
+      {sync.status === 'expired' && (
+        <div className="sync-expired-banner" onClick={sync.connect} role="button" tabIndex={0}>
+          ⚠ Session Google expirée — Cliquez pour reconnecter
+        </div>
+      )}
+
+      {sync.conflict && (
+        <div className="sync-conflict-banner">
+          <span className="sync-conflict-msg">
+            ⚡ Conflit — le Sheet a été modifié en même temps que l'app
+          </span>
+          <div className="sync-conflict-actions">
+            <button onClick={() => sync.resolveConflict('local')}>Garder l'App</button>
+            <button onClick={() => sync.resolveConflict('remote')}>Garder le Sheet</button>
+          </div>
+        </div>
+      )}
+
       {toast && (
         <div className="toast" style={{ borderLeftColor: toast.color }}>{toast.msg}</div>
       )}
+    </div>
     </div>
   )
 }

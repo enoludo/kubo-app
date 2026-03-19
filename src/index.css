@@ -8,9 +8,11 @@
   --bg:          #FFFFFF;
   --bg-2:        #f5f4f9;
   --bg-3:        #eeedf5;
+  --bg-4:        #000; 
   --text:        #111111;
   --text-2:      #555566;
   --text-3:      #9999aa;
+  --hover:        #E9E7F1;
   --border:      rgba(0, 0, 0, 0.07);
   --border-m:    rgba(0, 0, 0, 0.11);
   --shadow-s:    0 1px 4px rgba(0, 0, 0, 0.07), 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -21,6 +23,7 @@
 
   --hour-h:      56px;
   --sidebar-w:   232px;
+  --nav-w:       auto;
   --header-h:    118px;
   --footer-h:    88px;
   --time-w:      54px;

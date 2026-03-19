@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
+import { sessionSave, sessionLoad } from '../utils/session'
 
 // Convention collective : max heures/jour
 export const MAX_HOURS_PER_DAY = 10
@@ -198,12 +199,32 @@ const DEMO = [
 // ─── Hook ──────────────────────────────────────────────────────────────────
 
 export function useSchedule() {
-  const [shifts, setShifts] = useState(DEMO)
+  // Priorité : sessionStorage → données démo
+  const [shifts, setShifts] = useState(() => sessionLoad('shifts') ?? DEMO)
+
+  // Compteur d'ID unique — évite les collisions quand plusieurs shifts
+  // sont ajoutés dans le même tick (ex : coller un planning entier)
+  const nextId    = useRef(null)
+  const saveTimer = useRef(null)
+
+  // Initialise nextId d'après les shifts courants (session ou démo)
+  if (nextId.current === null) {
+    const cur = shifts.length ? Math.max(...shifts.map(s => s.id)) : 0
+    nextId.current = cur + 1
+  }
+
+  // Auto-save : debounce 500ms après chaque modification
+  useEffect(() => {
+    clearTimeout(saveTimer.current)
+    saveTimer.current = setTimeout(() => sessionSave('shifts', shifts), 500)
+    return () => clearTimeout(saveTimer.current)
+  }, [shifts])
 
   function addShift(employeeId, dateStr, startHour, endHour, pause = 0, type = 'work', extra = {}) {
+    const id = nextId.current++
     setShifts(prev => [
       ...prev,
-      { id: Date.now(), employeeId, date: dateStr, startHour, endHour, pause, type, ...extra },
+      { id, employeeId, date: dateStr, startHour, endHour, pause, type, ...extra },
     ])
   }
 
@@ -235,6 +256,21 @@ export function useSchedule() {
     setShifts(prev => prev.map(s =>
       s.id === shiftId ? { ...s, validated: !s.validated } : s
     ))
+  }
+
+  // Remplace tous les shifts d'une semaine par de nouveaux (utilisé par le sync Sheets)
+  function replaceWeekShifts(weekDates, newShifts) {
+    const strs = new Set(weekDates.map(dateToStr))
+    setShifts(prev => [
+      ...prev.filter(s => !strs.has(s.date)),
+      ...newShifts,
+    ])
+  }
+
+  // Réinitialise aux données de démonstration (après confirmation utilisateur)
+  function resetShifts() {
+    nextId.current = Math.max(...DEMO.map(s => s.id)) + 1
+    setShifts(DEMO)
   }
 
   // Cumul total toutes semaines confondues
@@ -286,7 +322,7 @@ export function useSchedule() {
 
   return {
     shifts, addShift, moveShift, updateShift, removeShift, removeEmployeeShifts,
-    toggleValidated,
+    toggleValidated, replaceWeekShifts, resetShifts,
     getTotalHours, getWeekHours, getActiveWeeks, getBalance, getWeekBalance,
   }
 }
