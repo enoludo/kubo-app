@@ -5,14 +5,15 @@
 }
 
 :root {
+  /* ── Couleurs de base ─────────────────────────── */
   --bg:          #FFFFFF;
   --bg-2:        #f5f4f9;
   --bg-3:        #eeedf5;
-  --bg-4:        #000; 
+  --bg-4:        #000;
   --text:        #111111;
   --text-2:      #555566;
   --text-3:      #9999aa;
-  --hover:        #E9E7F1;
+  --hover:       #E9E7F1;
   --border:      rgba(0, 0, 0, 0.07);
   --border-m:    rgba(0, 0, 0, 0.11);
   --shadow-s:    0 1px 4px rgba(0, 0, 0, 0.07), 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -21,14 +22,49 @@
   --accent-l:    #a095e0;
   --accent-sub:  rgba(124, 111, 205, 0.12);
 
-  --hour-h:      56px;
-  --sidebar-w:   232px;
+  /* ── Couleurs sémantiques ─────────────────────── */
+  --color-error:        #E05555;
+  --color-error-bg:     #FFF0F0;
+  --color-error-dark:   #A52B2B;
+  --color-success:      #4CAF50;
+  --color-success-bg:   #F0FAF4;
+  --color-success-dark: #2E7D32;
+  --color-warn:         #F5A623;
+  --color-warn-bg:      #FFF8EC;
+  --color-warn-dark:    #B06A00;
+  --color-holiday-bg:   #FFF8E7;
+  --color-holiday-cell: #FFFCF2;
+  --color-holiday-text: #B8860B;
+
+  /* ── Border-radius ────────────────────────────── */
+  --radius-sm:   8px;
+  --radius-md:   12px;
+  --radius-lg:   16px;
+  --radius-full: 50%;
+
+  /* ── Transitions ──────────────────────────────── */
+  --t-fast: 0.12s ease;
+  --t-base: 0.15s ease;
+  --t-slow: 0.3s ease;
+
+  /* ── Z-index ──────────────────────────────────── */
+  --z-header:   30;
+  --z-sticky:   90;
+  --z-dropdown: 100;
+  --z-panel-bg: 200;
+  --z-panel:    201;
+  --z-picker:   300;
+  --z-banner:   400;
+  --z-overlay:  9000;
+  --z-toast:    9999;
+
+  /* ── Layout tokens ────────────────────────────── */
   --nav-w:       auto;
   --header-h:    118px;
+  --sidebar-w:   232px;
   --footer-h:    88px;
-  --time-w:      54px;
 
-  /* Responsive layout tokens — synced between header and table */
+  /* ── Responsive layout ────────────────────────── */
   --tv-emp-col:  200px;
   --gap:         12px;
   --pad-h:       24px;

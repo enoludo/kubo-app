@@ -108,7 +108,7 @@ export default function NavSidebar({ activeModule = 'planning' }) {
       {/* Logo */}
       <div className="nav-logo">
         <svg xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" width="36" height="36" viewBox="0 0 48 47.999" fill="currentColor">
-          <defs><clipPath id="clip-path"><rect width="48" height="47.999"/></clipPath></defs>
+          <defs><clipPath id="clip-path"><rect width="48px" height="48px"/></clipPath></defs>
           <g transform="translate(0 0.004)">
             <path d="M320.276,279.849l1.649-1.648,4.237,5.562h2.589l-5.349-7.038,5.273-5.273h-1.155l-7.248,7.248v-7.248h-2.065v12.31h2.067Z" transform="translate(-306.901 -261.809)"/>
             <g transform="translate(0 -0.004)">
