@@ -191,6 +191,16 @@ function SyncButton({ status, error, onConnect, onDisconnect, onRetry }) {
   )
 }
 
+function TodayIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10"/>
+      <polyline points="12 6 12 12 16 14"/>
+    </svg>
+  )
+}
+
 function SheetsIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
@@ -215,7 +225,7 @@ export default function Header({
   week, onOpenPicker, onPdfExport, pdfGenerating, onSendToAll,
   copiedPlan, templates, onCopyPlan, onPastePlan, onSaveTemplate, onLoadTemplate,
   syncStatus, syncError, onSyncConnect, onSyncDisconnect, onSyncRetry,
-  dataSource, onReset,
+  dataSource, onReset, onTodayOpen,
 }) {
   const { dates, prev, next } = week
   const [menuOpen, setMenuOpen] = useState(false)
@@ -308,6 +318,14 @@ export default function Header({
             onDisconnect={onSyncDisconnect}
             onRetry={onSyncRetry}
           />
+          <button
+            className="header-menu-btn"
+            onClick={onTodayOpen}
+            aria-label="Qui est là aujourd'hui"
+            title="Aujourd'hui"
+          >
+            <TodayIcon />
+          </button>
           <button
             ref={btnRef}
             className={`header-menu-btn${menuOpen ? ' active' : ''}`}

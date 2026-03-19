@@ -6,6 +6,7 @@ import EmployeeProfileModal from './components/EmployeeProfileModal'
 import WeekPickerPanel      from './components/WeekPickerPanel'
 import TableView            from './components/TableView'
 import NavSidebar           from './components/NavSidebar'
+import TodayPanel           from './components/TodayPanel'
 import { useSchedule }      from './hooks/useSchedule'
 import { useGoogleSync }    from './hooks/useGoogleSync'
 import { useWeek }          from './hooks/useWeek'
@@ -23,6 +24,7 @@ export default function App() {
 
   const [toast,      setToast]      = useState(null)
   const [dataSource, setDataSource] = useState(() => sessionHasData() ? 'session' : 'demo')
+  const [todayOpen,  setTodayOpen]  = useState(false)
 
   function showToast(msg, color) {
     setToast({ msg, color })
@@ -84,6 +86,7 @@ export default function App() {
           onSyncRetry={sync.retry}
           dataSource={dataSource}
           onReset={teamCtx.handleReset}
+          onTodayOpen={() => setTodayOpen(true)}
         />
         <div className="app-body">
           <TableView
@@ -144,6 +147,13 @@ export default function App() {
             onPrintSelection={exportCtx.handlePrintSelection}
           />
         )}
+
+        <TodayPanel
+          team={teamCtx.team}
+          shifts={schedule.shifts}
+          open={todayOpen}
+          onClose={() => setTodayOpen(false)}
+        />
 
         {sync.status === 'expired' && (
           <div className="sync-expired-banner" onClick={sync.connect} role="button" tabIndex={0}>

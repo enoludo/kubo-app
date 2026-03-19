@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { TIME_OPTIONS, fmtH, WEEKLY_CONTRACT, MAX_HOURS_PER_DAY, END_HOUR, weeksElapsed, dateToStr, shiftEffective } from '../hooks/useSchedule'
+import { getHolidayName } from '../utils/frenchHolidays'
 
 function fmtDur(h) {
   const totalMin = Math.round(Math.abs(h) * 60)
@@ -158,6 +159,8 @@ export default function ShiftModal({ info, onSave, onDelete, onCancel, onToggleV
     setStart(h)
     if (end <= h) setEnd(Math.min(h + 4, 20))
   }
+
+  const holidayName = getHolidayName(info.date)
 
   const dateLabel = info.date.toLocaleDateString('fr-FR', {
     weekday: 'long', day: 'numeric', month: 'long',
@@ -373,6 +376,17 @@ export default function ShiftModal({ info, onSave, onDelete, onCancel, onToggleV
               <div className="modal-day-alert-sub">
                 Chevauchement avec le shift {fmtH(leaveConflict.startHour)}–{fmtH(leaveConflict.endHour)}
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Avertissement jour férié */}
+        {holidayName && type === 'work' && (
+          <div className="modal-holiday-alert">
+            <span>🎉</span>
+            <div>
+              <div className="modal-holiday-alert-title">{holidayName}</div>
+              <div className="modal-holiday-alert-sub">Ce jour est un jour férié</div>
             </div>
           </div>
         )}

@@ -7,7 +7,7 @@
 // les stale closures dans les callbacks asynchrones de useGoogleSync.
 
 import {
-  writeWeekToSheet, readWeekFromSheet,
+  writeWeekAtomically, readWeekFromSheet,
   writeTeamToSheet, readTeamFromSheet,
   listSheets,
 } from '../googleSheets'
@@ -41,7 +41,7 @@ export class GoogleSheetsAdapter {
   // ── Écriture bulk (utilisée par useGoogleSync) ─────────────────────────────
 
   async saveWeekShifts(weekDates, allShifts, team) {
-    return writeWeekToSheet(this.token, weekDates, allShifts, team)
+    return writeWeekAtomically(this.token, weekDates, allShifts, team)
   }
 
   async saveEmployees(team) {

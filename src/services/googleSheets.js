@@ -12,6 +12,9 @@
 //  Colonnes K–AS masquées, groupées, éditables manuellement si besoin.
 
 import { START_HOUR, END_HOUR } from '../hooks/useSchedule'
+import { dateToStr, fmtTime, mondayOf, weekDatesFromMonday, weekSheetName } from '../utils/date'
+
+export { mondayOf, weekDatesFromMonday, weekSheetName } from '../utils/date'
 
 const SHEET_ID    = import.meta.env.VITE_GOOGLE_SHEET_ID
 const BASE        = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}`
@@ -128,11 +131,6 @@ function shiftBgColor(type, validated) {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-function fmtH(h) {
-  if (h == null) return ''
-  return `${String(Math.floor(h)).padStart(2, '0')}h${h % 1 === 0.5 ? '30' : '00'}`
-}
-
 function parseH(s) {
   if (s == null || s === '') return 0
   const str = String(s)
@@ -160,35 +158,6 @@ function parsePause(str) {
   return 0
 }
 
-// ─── Date helpers ─────────────────────────────────────────────────────────────
-
-function dateToStr(d) {
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
-}
-
-function isoWeek(date) {
-  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()))
-  d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7))
-  const y1 = new Date(Date.UTC(d.getUTCFullYear(), 0, 1))
-  return Math.ceil(((d - y1) / 86400000 + 1) / 7)
-}
-
-export function mondayOf(dateStr) {
-  const d = new Date(dateStr + 'T00:00:00'), day = d.getDay(), mon = new Date(d)
-  mon.setDate(d.getDate() + (day === 0 ? -6 : 1 - day))
-  return dateToStr(mon)
-}
-
-export function weekDatesFromMonday(mondayStr) {
-  const mon = new Date(mondayStr + 'T00:00:00')
-  return Array.from({ length: 7 }, (_, i) => { const d = new Date(mon); d.setDate(mon.getDate() + i); return d })
-}
-
-export function weekSheetName(weekDates) {
-  const mon = weekDates[0]
-  return `Semaine ${isoWeek(mon)} - ${String(mon.getDate()).padStart(2,'0')}/${String(mon.getMonth()+1).padStart(2,'0')}/${mon.getFullYear()}`
-}
-
 // ─── Column letter helper ─────────────────────────────────────────────────────
 
 function colLetter(index) {
@@ -204,7 +173,7 @@ function shiftToHiddenCols(shift) {
   if (!shift) return ['', '', '', 'Aucune', false]
   const label = TYPE_TO_LABEL[shift.type ?? 'work'] ?? 'Travaillé'
   if ((shift.type ?? 'work') === 'work') {
-    return [label, fmtH(shift.startHour), fmtH(shift.endHour), fmtPause(shift.pause), shift.validated ?? false]
+    return [label, fmtTime(shift.startHour), fmtTime(shift.endHour), fmtPause(shift.pause), shift.validated ?? false]
   }
   return [label, '', '', 'Aucune', shift.validated ?? false]
 }
@@ -234,7 +203,7 @@ function shiftCellText(shift) {
   const lines = []
   if (type === 'work') {
     lines.push(label)
-    lines.push(`${fmtH(shift.startHour)} − ${fmtH(shift.endHour)}`)
+    lines.push(`${fmtTime(shift.startHour)} − ${fmtTime(shift.endHour)}`)
     if (shift.pause) lines.push(`Pause ${fmtPause(shift.pause)}`)
   } else if (type === 'vacation') {
     lines.push('Congés — Journée entière')
@@ -527,58 +496,105 @@ async function formatTeamSheet(token, sheetId, team) {
 
 // ─── High-level operations ────────────────────────────────────────────────────
 
-export async function writeWeekToSheet(token, weekDates, allShifts, team) {
-  const name       = weekSheetName(weekDates)
-  const sheetId    = await ensureSheet(token, name)
+const SYNC_BUFFER_SHEET = 'SYNC_BUFFER'
+
+// Écrit toutes les valeurs (sans formatting) vers un onglet nommé. Retourne le sheetId.
+async function _writeWeekValues(token, weekDates, allShifts, team, sheetTitle) {
+  const sheetId    = await ensureSheet(token, sheetTitle)
   const activeTeam = team.filter(e => !e.archived)
   const LAST_COL   = colLetter(HIDDEN_END - 1)   // "AS"
   const strs       = new Set(weekDates.map(dateToStr))
 
-  await clearRange(token, `${name}!A:${LAST_COL}`)
+  await clearRange(token, `${sheetTitle}!A:${LAST_COL}`)
 
-  // Ligne 1 : en-têtes visibles (A-J)
   const header = [
     '',
     ...weekDates.map((d, i) => `${DAYS_FR[i]} ${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}`),
     'Balance semaine', 'Solde cumulé',
   ]
-  await writeValues(token, `${name}!A1`, [header])
+  await writeValues(token, `${sheetTitle}!A1`, [header])
 
   if (activeTeam.length > 0) {
-    // Colonne A : info employés
-    await writeValues(token, `${name}!A2`,
+    await writeValues(token, `${sheetTitle}!A2`,
       activeTeam.map(emp => [[emp.name, emp.role, emp.contract ? `${emp.contract}h` : null].filter(Boolean).join(' / ')]))
 
-    // Colonnes B-H : texte formaté écrit directement (pas de formule)
     const wkShiftsVisible = allShifts.filter(s => strs.has(s.date))
-    await writeValues(token, `${name}!B2`,
+    await writeValues(token, `${sheetTitle}!B2`,
       activeTeam.map(emp => weekDates.map(date => {
         const shift = wkShiftsVisible.find(s => s.employeeId === emp.id && s.date === dateToStr(date))
         return shift ? shiftCellText(shift) : ''
       })))
 
-    // Colonnes I-J : balances
-    await writeValues(token, `${name}!I2`,
+    await writeValues(token, `${sheetTitle}!I2`,
       activeTeam.map(emp => [
         formatBalance(computeWeeklyBalance(emp, weekDates, allShifts), 'Semaine équilibrée'),
         formatBalance(computeCumulativeBalance(emp, allShifts)),
       ]))
 
-    // En-têtes colonnes cachées (ligne 1, K1)
     const hiddenHeaders = []
     for (let d = 0; d < 7; d++) {
       hiddenHeaders.push(
         `${DAYS_FR[d]} - Type`, `${DAYS_FR[d]} - Début`, `${DAYS_FR[d]} - Fin`,
         `${DAYS_FR[d]} - Pause`, `${DAYS_FR[d]} - Validé`)
     }
-    await writeValues(token, `${name}!K1`, [hiddenHeaders])
-
-    // Colonnes K+ : données cachées (USER_ENTERED pour les booleans checkbox)
-    await writeValues(token, `${name}!K2`,
+    await writeValues(token, `${sheetTitle}!K1`, [hiddenHeaders])
+    await writeValues(token, `${sheetTitle}!K2`,
       buildHiddenColValues(activeTeam, weekDates, allShifts), 'USER_ENTERED')
   }
 
+  return sheetId
+}
+
+export async function writeWeekToSheet(token, weekDates, allShifts, team) {
+  const name    = weekSheetName(weekDates)
+  const sheetId = await _writeWeekValues(token, weekDates, allShifts, team, name)
   await formatWeekSheet(token, sheetId, team, weekDates, allShifts)
+}
+
+// Écriture atomique via feuille tampon SYNC_BUFFER :
+//  1. Écrire dans SYNC_BUFFER (la cible reste intacte)
+//  2. Copier SYNC_BUFFER → cible en un seul batchUpdate (atomique)
+//  3. Nettoyer SYNC_BUFFER
+// 3 tentatives, puis throw avec isSyncFailure = true
+export async function writeWeekAtomically(token, weekDates, allShifts, team) {
+  const targetName = weekSheetName(weekDates)
+  const LAST_COL   = colLetter(HIDDEN_END - 1)
+  const MAX_RETRIES = 3
+
+  for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+    try {
+      // Étape 1 — écrire dans le buffer (cible non touchée)
+      const bufId    = await _writeWeekValues(token, weekDates, allShifts, team, SYNC_BUFFER_SHEET)
+      const targetId = await ensureSheet(token, targetName)
+
+      // Étape 2 — remplacer la cible depuis le buffer en une seule opération
+      await clearRange(token, `${targetName}!A:${LAST_COL}`)
+      await call('POST', ':batchUpdate', token, {
+        requests: [{
+          copyPaste: {
+            source:      { sheetId: bufId,    startRowIndex: 0, endRowIndex: 200, startColumnIndex: 0, endColumnIndex: HIDDEN_END },
+            destination: { sheetId: targetId, startRowIndex: 0, endRowIndex: 200, startColumnIndex: 0, endColumnIndex: HIDDEN_END },
+            pasteType: 'PASTE_VALUES',
+            pasteOrientation: 'NORMAL',
+          },
+        }],
+      })
+
+      // Étape 3 — formatage cible + nettoyage buffer
+      await formatWeekSheet(token, targetId, team, weekDates, allShifts)
+      await clearRange(token, `${SYNC_BUFFER_SHEET}!A:${LAST_COL}`)
+      return
+
+    } catch (err) {
+      try { await clearRange(token, `${SYNC_BUFFER_SHEET}!A:Z`) } catch {}
+      if (attempt >= MAX_RETRIES - 1) {
+        const e = new Error('Sync échouée — données locales préservées')
+        e.isSyncFailure = true
+        throw e
+      }
+      await new Promise(r => setTimeout(r, 1000 * (attempt + 1)))
+    }
+  }
 }
 
 export async function readWeekFromSheet(token, weekDates, team) {

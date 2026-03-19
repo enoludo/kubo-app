@@ -1,4 +1,5 @@
 import { dateToStr } from '../hooks/useSchedule'
+import { getHolidayName } from '../utils/frenchHolidays'
 import DayCard      from './DayCard'
 import EmployeeCard from './EmployeeCard'
 
@@ -25,18 +26,27 @@ export default function TableView({
             <span className="tv-add-label">Employé</span>
           </button>
         </div>
-        {weekDates.map((date, i) => (
-          <div
-            key={i}
-            className={`tv-day-header${i === 0 || i === 6 ? ' tv-weekend' : ''}`}
-            style={{ flex: DAY_FLEX[i] }}
-          >
-            <span className="tv-hdr-name">{DAY_NAMES[i]}</span>
-            <span className="tv-hdr-date">
-              {String(date.getDate()).padStart(2, '0')}/{String(date.getMonth() + 1).padStart(2, '0')}
-            </span>
-          </div>
-        ))}
+        {weekDates.map((date, i) => {
+          const holiday = getHolidayName(date)
+          return (
+            <div
+              key={i}
+              className={`tv-day-header${i === 0 || i === 6 ? ' tv-weekend' : ''}${holiday ? ' tv-holiday' : ''}`}
+              style={{ flex: DAY_FLEX[i] }}
+            >
+              <span className="tv-hdr-name">{DAY_NAMES[i]}</span>
+              <span className="tv-hdr-date">
+                {String(date.getDate()).padStart(2, '0')}/{String(date.getMonth() + 1).padStart(2, '0')}
+              </span>
+              {holiday && (
+                <span className="tv-hdr-holiday" title={holiday}>
+                  <span className="tv-hdr-holiday-dot" />
+                  {holiday}
+                </span>
+              )}
+            </div>
+          )
+        })}
       </div>
 
       {/* Lignes employés */}
@@ -60,13 +70,14 @@ export default function TableView({
               {/* Cards par jour */}
               {weekDates.map((date, i) => {
                 const dateStr   = dateToStr(date)
+                const holiday   = getHolidayName(date)
                 const dayShifts = schedule.shifts.filter(
                   s => s.employeeId === emp.id && s.date === dateStr
                 )
                 return (
                   <div
                     key={i}
-                    className={`tv-day-cell${i === 0 || i === 6 ? ' tv-weekend' : ''}`}
+                    className={`tv-day-cell${i === 0 || i === 6 ? ' tv-weekend' : ''}${holiday ? ' tv-holiday' : ''}`}
                     style={{ flex: DAY_FLEX[i] }}
                   >
                     <DayCard

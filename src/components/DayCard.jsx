@@ -1,6 +1,4 @@
-function fmtTime(h) {
-  return `${String(Math.floor(h)).padStart(2, '0')}h${h % 1 === 0.5 ? '30' : '00'}`
-}
+import { fmtTime } from '../utils/date'
 
 function fmtDur(h) {
   const m  = Math.round(h * 60)

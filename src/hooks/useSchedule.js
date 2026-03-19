@@ -1,6 +1,9 @@
 import { useState, useRef, useEffect } from 'react'
 import { sessionSave, sessionLoad } from '../utils/session'
 import demoShifts from '../data/demoShifts'
+import { dateToStr, mondayOf } from '../utils/date'
+
+export { dateToStr, fmtH } from '../utils/date'
 
 // Convention collective : max heures/jour
 export const MAX_HOURS_PER_DAY = 10
@@ -20,14 +23,6 @@ export function shiftEffective(s) {
 // Début du planning — lundi il y a 4 semaines
 export const PLANNING_START  = new Date('2026-02-16T00:00:00')
 
-// "YYYY-MM-DD" en heure locale (évite les décalages UTC)
-export function dateToStr(d) {
-  const y  = d.getFullYear()
-  const m  = String(d.getMonth() + 1).padStart(2, '0')
-  const dd = String(d.getDate()).padStart(2, '0')
-  return `${y}-${m}-${dd}`
-}
-
 // Nombre de semaines écoulées depuis PLANNING_START (min 1)
 export function weeksElapsed() {
   const ms = Date.now() - PLANNING_START.getTime()
@@ -39,19 +34,6 @@ export const TIME_OPTIONS = []
 for (let h = START_HOUR; h <= END_HOUR; h++) {
   TIME_OPTIONS.push(h)
   if (h < END_HOUR) TIME_OPTIONS.push(h + 0.5)
-}
-
-// Lundi de la semaine d'une date ISO "YYYY-MM-DD"
-function weekKeyOf(dateStr) {
-  const d   = new Date(dateStr + 'T00:00:00')
-  const day = d.getDay()
-  const mon = new Date(d)
-  mon.setDate(d.getDate() + (day === 0 ? -6 : 1 - day))
-  return dateToStr(mon)
-}
-
-export function fmtH(h) {
-  return `${String(Math.floor(h)).padStart(2, '0')}:${h % 1 === 0.5 ? '30' : '00'}`
 }
 
 // ─── Hook ──────────────────────────────────────────────────────────────────
@@ -139,7 +121,7 @@ export function useSchedule() {
   // Nombre de semaines distinctes où l'employé a au moins un shift
   function getActiveWeeks(employeeId) {
     const keys = new Set(
-      shifts.filter(s => s.employeeId === employeeId).map(s => weekKeyOf(s.date))
+      shifts.filter(s => s.employeeId === employeeId).map(s => mondayOf(s.date))
     )
     return keys.size
   }
@@ -157,7 +139,7 @@ export function useSchedule() {
     // Shifts hors de la semaine visible
     const prevShifts  = shifts.filter(s => s.employeeId === employeeId && !strs.has(s.date))
     const prevHours   = prevShifts.reduce((sum, s) => sum + shiftEffective(s), 0)
-    const prevWeeks   = new Set(prevShifts.map(s => weekKeyOf(s.date))).size
+    const prevWeeks   = new Set(prevShifts.map(s => mondayOf(s.date))).size
     const prevBalance = prevHours - prevWeeks * contract + startBalance
 
     // Objectif de la semaine ajusté du report

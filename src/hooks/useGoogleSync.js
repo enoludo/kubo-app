@@ -19,6 +19,7 @@ import {
 import {
   weekSheetName, mondayOf, weekDatesFromMonday, shiftsSig,
 } from '../services/googleSheets'
+import { dateToStr } from '../utils/date'
 import { getDataService, setDataService, clearDataService } from '../services/DataService'
 import { GoogleSheetsAdapter } from '../services/adapters/GoogleSheetsAdapter'
 
@@ -26,13 +27,6 @@ const DEBOUNCE_MS          = 1_000
 const POLL_MS              = 30_000
 const TOKEN_CHECK_MS       = 45 * 60 * 1_000  // vérification proactive toutes les 45min
 const TOKEN_EXPIRY_WARN_MS =  5 * 60 * 1_000  // refresh si moins de 5min restantes
-
-function dateToStr(d) {
-  const y  = d.getFullYear()
-  const m  = String(d.getMonth() + 1).padStart(2, '0')
-  const dd = String(d.getDate()).padStart(2, '0')
-  return `${y}-${m}-${dd}`
-}
 
 function isAuthError(err) {
   return err?.status === 401 || err?.status === 403
@@ -289,6 +283,9 @@ export function useGoogleSync({
     } catch (err) {
       if (isAuthError(err)) {
         await handleAuthError(pushAll)  // retry après refresh
+      } else if (err.isSyncFailure) {
+        onToast('Sync échouée — données locales préservées', '#E05555')
+        setStatus('session')
       } else {
         setErrMsg(err.message)
         setStatus('error')

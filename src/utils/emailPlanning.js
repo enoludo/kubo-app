@@ -1,4 +1,5 @@
-import { dateToStr, WEEKLY_CONTRACT } from '../hooks/useSchedule'
+import { WEEKLY_CONTRACT } from '../hooks/useSchedule'
+import { dateToStr, mondayOf, fmtTime } from '../utils/date'
 
 // ── Helpers ───────────────────────────────────────────────────────────────
 
@@ -19,21 +20,9 @@ function isoWeekNum(monday) {
   return 1 + Math.round(((d - jan4) / 86400000 - 3 + (jan4.getDay() + 6) % 7) / 7)
 }
 
-function weekKeyOf(dateStr) {
-  const d   = new Date(dateStr + 'T00:00:00')
-  const day = d.getDay()
-  const mon = new Date(d)
-  mon.setDate(d.getDate() + (day === 0 ? -6 : 1 - day))
-  return dateToStr(mon)
-}
-
 function effectiveH(s) {
   if ((s.type ?? 'work') !== 'work') return 0
   return Math.max(0, (s.endHour - s.startHour) - (s.pause ?? 0))
-}
-
-function fmtTime(h) {
-  return `${String(Math.floor(h)).padStart(2, '0')}h${h % 1 === 0.5 ? '30' : '00'}`
 }
 
 function fmtDur(h) {
@@ -65,7 +54,7 @@ function computeWeekBalance(shifts, employeeId, weekDates, contract = WEEKLY_CON
   const strs      = new Set(weekDates.map(d => dateToStr(d)))
   const prev      = shifts.filter(s => s.employeeId === employeeId && !strs.has(s.date))
   const prevHours = prev.reduce((sum, s) => sum + effectiveH(s), 0)
-  const prevWeeks = new Set(prev.map(s => weekKeyOf(s.date))).size
+  const prevWeeks = new Set(prev.map(s => mondayOf(s.date))).size
   const prevBal   = prevHours - prevWeeks * contract
   const objective = contract - prevBal
   const weekHrs   = shifts

@@ -2,6 +2,7 @@
 // Ce composant fait partie du shell global de l'application.
 // Il sera partagé par tous les modules (Planning, Hygiène, Commandes, etc.)
 // Active module : 'planning' (hardcodé jusqu'à l'ajout du routing)
+import { ENABLED_MODULES } from '../config/modules'
 
 function IconPlanning() {
   return (
@@ -123,7 +124,7 @@ export default function NavSidebar({ activeModule = 'planning' }) {
 
       {/* Modules */}
       <div className="nav-modules">
-        {MODULES.map(mod => {
+        {MODULES.filter(mod => ENABLED_MODULES.includes(mod.id)).map(mod => {
           const Icon = mod.icon
           const isActive = mod.id === activeModule
           return (

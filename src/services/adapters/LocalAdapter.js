@@ -7,17 +7,7 @@
 // Écriture : no-op — useSchedule + session.js gèrent déjà la persistance locale.
 
 import { sessionLoad } from '../../utils/session'
-
-function mondayStr(dateStr) {
-  const d = new Date(dateStr + 'T00:00:00'), day = d.getDay()
-  const mon = new Date(d)
-  mon.setDate(d.getDate() + (day === 0 ? -6 : 1 - day))
-  return `${mon.getFullYear()}-${String(mon.getMonth() + 1).padStart(2, '0')}-${String(mon.getDate()).padStart(2, '0')}`
-}
-
-function dateToStr(d) {
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
-}
+import { dateToStr, mondayOf } from '../../utils/date'
 
 export class LocalAdapter {
   // ── Lecture ────────────────────────────────────────────────────────────────
@@ -35,7 +25,7 @@ export class LocalAdapter {
 
   async getWeeks() {
     const allShifts = sessionLoad('shifts') ?? []
-    return [...new Set(allShifts.map(s => mondayStr(s.date)))]
+    return [...new Set(allShifts.map(s => mondayOf(s.date)))]
   }
 
   // ── Écriture unitaire ──────────────────────────────────────────────────────
