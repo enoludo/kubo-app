@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { TIME_OPTIONS, fmtH, WEEKLY_CONTRACT, MAX_HOURS_PER_DAY, weeksElapsed, dateToStr, shiftEffective } from '../hooks/useSchedule'
+import { TIME_OPTIONS, fmtH, WEEKLY_CONTRACT, MAX_HOURS_PER_DAY, END_HOUR, weeksElapsed, dateToStr, shiftEffective } from '../hooks/useSchedule'
 
 function fmtDur(h) {
   const totalMin = Math.round(Math.abs(h) * 60)
@@ -283,7 +283,7 @@ export default function ShiftModal({ info, onSave, onDelete, onCancel, onToggleV
               <div className="modal-field">
                 <label>Début</label>
                 <select value={start} onChange={e => handleStartChange(e.target.value)}>
-                  {TIME_OPTIONS.filter(h => h < 20).map(h => (
+                  {TIME_OPTIONS.filter(h => h < END_HOUR).map(h => (
                     <option key={h} value={h}>{fmtH(h)}</option>
                   ))}
                 </select>
@@ -292,7 +292,7 @@ export default function ShiftModal({ info, onSave, onDelete, onCancel, onToggleV
               <div className="modal-field">
                 <label>Fin</label>
                 <select value={end} onChange={e => setEnd(Number(e.target.value))}>
-                  {TIME_OPTIONS.filter(h => h > start && h <= 20).map(h => (
+                  {TIME_OPTIONS.filter(h => h > start && h <= END_HOUR).map(h => (
                     <option key={h} value={h}>{fmtH(h)}</option>
                   ))}
                 </select>

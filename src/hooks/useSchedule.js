@@ -1,12 +1,13 @@
 import { useState, useRef, useEffect } from 'react'
 import { sessionSave, sessionLoad } from '../utils/session'
+import demoShifts from '../data/demoShifts'
 
 // Convention collective : max heures/jour
 export const MAX_HOURS_PER_DAY = 10
 
-export const START_HOUR      = 7
-export const END_HOUR        = 20
-export const TOTAL_HOURS     = END_HOUR - START_HOUR   // 13
+export const START_HOUR      = 4
+export const END_HOUR        = 21
+export const TOTAL_HOURS     = END_HOUR - START_HOUR   // 17
 export const WEEKLY_CONTRACT = 35
 
 // Durée effective d'un shift selon son type
@@ -53,165 +54,13 @@ export function fmtH(h) {
   return `${String(Math.floor(h)).padStart(2, '0')}:${h % 1 === 0.5 ? '30' : '00'}`
 }
 
-// ─── Données de démonstration sur 4 semaines ───────────────────────────────
-// Semaine 0 : 2026-02-16 (Lun) → 2026-02-22 (Dim)
-// Semaine 1 : 2026-02-23 (Lun) → 2026-03-01 (Dim)
-// Semaine 2 : 2026-03-02 (Lun) → 2026-03-08 (Dim)
-// Semaine 3 : 2026-03-09 (Lun) → 2026-03-15 (Dim)  ← semaine courante
-//
-// Soldes cumulés (semaines 0+1+2, hors semaine courante) :
-//   Emp 1 : 36.5 + 36 + 36.5 = 109h → +4h00  (en avance)
-//   Emp 2 : 33   + 33.5 + 34  = 100.5h → −4h30  (en retard)
-//   Emp 3 : 35   + 35.5 + 35.5 = 106h → +1h00  (proche équilibre)
-//   Emp 4 : 37   + 37   + 37   = 111h → +6h00  (en avance)
-//   Emp 5 : 34   + 33.5 + 34.5 = 102h → −3h00  (en retard)
-
-const DEMO = [
-  // ── Semaine 0 : 16/02 – 22/02, Mar–Sam ──────────────────────────────────
-  // Emp 1 — 36.5h
-  { id:  1, employeeId: 1, date: '2026-02-17', startHour:  7,   endHour: 14.5 },
-  { id:  2, employeeId: 1, date: '2026-02-18', startHour:  7,   endHour: 14   },
-  { id:  3, employeeId: 1, date: '2026-02-19', startHour:  8,   endHour: 15.5 },
-  { id:  4, employeeId: 1, date: '2026-02-20', startHour:  8,   endHour: 15   },
-  { id:  5, employeeId: 1, date: '2026-02-21', startHour:  8,   endHour: 15.5 },
-  // Emp 2 — 33h
-  { id:  6, employeeId: 2, date: '2026-02-17', startHour:  7,   endHour: 12   },
-  { id:  7, employeeId: 2, date: '2026-02-18', startHour:  8,   endHour: 15   },
-  { id:  8, employeeId: 2, date: '2026-02-19', startHour:  9,   endHour: 16   },
-  { id:  9, employeeId: 2, date: '2026-02-20', startHour:  8,   endHour: 14   },
-  { id: 10, employeeId: 2, date: '2026-02-21', startHour:  8,   endHour: 16   },
-  // Emp 3 — 35h
-  { id: 11, employeeId: 3, date: '2026-02-17', startHour:  9,   endHour: 16   },
-  { id: 12, employeeId: 3, date: '2026-02-18', startHour: 10,   endHour: 17   },
-  { id: 13, employeeId: 3, date: '2026-02-19', startHour:  9,   endHour: 16   },
-  { id: 14, employeeId: 3, date: '2026-02-20', startHour: 10,   endHour: 17   },
-  { id: 15, employeeId: 3, date: '2026-02-21', startHour:  9,   endHour: 16   },
-  // Emp 4 — 37h
-  { id: 16, employeeId: 4, date: '2026-02-17', startHour:  7,   endHour: 15   },
-  { id: 17, employeeId: 4, date: '2026-02-18', startHour:  7,   endHour: 14.5 },
-  { id: 18, employeeId: 4, date: '2026-02-19', startHour:  7,   endHour: 14.5 },
-  { id: 19, employeeId: 4, date: '2026-02-20', startHour:  7,   endHour: 14   },
-  { id: 20, employeeId: 4, date: '2026-02-21', startHour:  7,   endHour: 14   },
-  // Emp 5 — 34h
-  { id: 21, employeeId: 5, date: '2026-02-17', startHour: 12,   endHour: 19   },
-  { id: 22, employeeId: 5, date: '2026-02-18', startHour: 12,   endHour: 18   },
-  { id: 23, employeeId: 5, date: '2026-02-19', startHour: 13,   endHour: 20   },
-  { id: 24, employeeId: 5, date: '2026-02-20', startHour: 12,   endHour: 19   },
-  { id: 25, employeeId: 5, date: '2026-02-21', startHour: 13,   endHour: 20   },
-
-  // ── Semaine 1 : 23/02 – 01/03, Mar–Sam ──────────────────────────────────
-  // Emp 1 — 36h
-  { id: 26, employeeId: 1, date: '2026-02-24', startHour:  7.5, endHour: 14.5 },
-  { id: 27, employeeId: 1, date: '2026-02-25', startHour:  7,   endHour: 14   },
-  { id: 28, employeeId: 1, date: '2026-02-26', startHour:  8,   endHour: 16   },
-  { id: 29, employeeId: 1, date: '2026-02-27', startHour:  7,   endHour: 14   },
-  { id: 30, employeeId: 1, date: '2026-02-28', startHour:  8,   endHour: 15   },
-  // Emp 2 — 33.5h
-  { id: 31, employeeId: 2, date: '2026-02-24', startHour:  7,   endHour: 12   },
-  { id: 32, employeeId: 2, date: '2026-02-25', startHour:  8,   endHour: 15   },
-  { id: 33, employeeId: 2, date: '2026-02-26', startHour:  8.5, endHour: 15   },
-  { id: 34, employeeId: 2, date: '2026-02-27', startHour:  8,   endHour: 15   },
-  { id: 35, employeeId: 2, date: '2026-02-28', startHour:  8,   endHour: 16   },
-  // Emp 3 — 35.5h
-  { id: 36, employeeId: 3, date: '2026-02-24', startHour:  9,   endHour: 16.5 },
-  { id: 37, employeeId: 3, date: '2026-02-25', startHour: 10,   endHour: 17   },
-  { id: 38, employeeId: 3, date: '2026-02-26', startHour:  9,   endHour: 16   },
-  { id: 39, employeeId: 3, date: '2026-02-27', startHour:  9.5, endHour: 16.5 },
-  { id: 40, employeeId: 3, date: '2026-02-28', startHour:  9,   endHour: 16   },
-  // Emp 4 — 37h
-  { id: 41, employeeId: 4, date: '2026-02-24', startHour:  7,   endHour: 15   },
-  { id: 42, employeeId: 4, date: '2026-02-25', startHour:  7,   endHour: 15   },
-  { id: 43, employeeId: 4, date: '2026-02-26', startHour:  7,   endHour: 14   },
-  { id: 44, employeeId: 4, date: '2026-02-27', startHour:  7,   endHour: 14   },
-  { id: 45, employeeId: 4, date: '2026-02-28', startHour:  7,   endHour: 14   },
-  // Emp 5 — 33.5h
-  { id: 46, employeeId: 5, date: '2026-02-24', startHour: 12,   endHour: 18.5 },
-  { id: 47, employeeId: 5, date: '2026-02-25', startHour: 13,   endHour: 20   },
-  { id: 48, employeeId: 5, date: '2026-02-26', startHour: 12,   endHour: 19   },
-  { id: 49, employeeId: 5, date: '2026-02-27', startHour: 13,   endHour: 20   },
-  { id: 50, employeeId: 5, date: '2026-02-28', startHour: 13,   endHour: 19   },
-
-  // ── Semaine 2 : 02/03 – 08/03, Mar–Sam ──────────────────────────────────
-  // Emp 1 — 36.5h
-  { id: 51, employeeId: 1, date: '2026-03-03', startHour:  7,   endHour: 14.5 },
-  { id: 52, employeeId: 1, date: '2026-03-04', startHour:  7.5, endHour: 15   },
-  { id: 53, employeeId: 1, date: '2026-03-05', startHour:  7,   endHour: 14   },
-  { id: 54, employeeId: 1, date: '2026-03-06', startHour:  8,   endHour: 15   },
-  { id: 55, employeeId: 1, date: '2026-03-07', startHour:  8.5, endHour: 16   },
-  // Emp 2 — 34h
-  { id: 56, employeeId: 2, date: '2026-03-03', startHour:  7,   endHour: 12   },
-  { id: 57, employeeId: 2, date: '2026-03-04', startHour:  8,   endHour: 15   },
-  { id: 58, employeeId: 2, date: '2026-03-05', startHour:  8,   endHour: 15   },
-  { id: 59, employeeId: 2, date: '2026-03-06', startHour:  8,   endHour: 15   },
-  { id: 60, employeeId: 2, date: '2026-03-07', startHour:  8,   endHour: 16   },
-  // Emp 3 — 35.5h
-  { id: 61, employeeId: 3, date: '2026-03-03', startHour:  9,   endHour: 16   },
-  { id: 62, employeeId: 3, date: '2026-03-04', startHour: 10,   endHour: 17.5 },
-  { id: 63, employeeId: 3, date: '2026-03-05', startHour:  9,   endHour: 16   },
-  { id: 64, employeeId: 3, date: '2026-03-06', startHour: 10,   endHour: 17   },
-  { id: 65, employeeId: 3, date: '2026-03-07', startHour:  9,   endHour: 16   },
-  // Emp 4 — 37h
-  { id: 66, employeeId: 4, date: '2026-03-03', startHour:  7,   endHour: 15   },
-  { id: 67, employeeId: 4, date: '2026-03-04', startHour:  7,   endHour: 14.5 },
-  { id: 68, employeeId: 4, date: '2026-03-05', startHour:  7,   endHour: 14   },
-  { id: 69, employeeId: 4, date: '2026-03-06', startHour:  7,   endHour: 14   },
-  { id: 70, employeeId: 4, date: '2026-03-07', startHour:  7.5, endHour: 15   },
-  // Emp 5 — 34.5h
-  { id: 71, employeeId: 5, date: '2026-03-03', startHour: 12,   endHour: 19   },
-  { id: 72, employeeId: 5, date: '2026-03-04', startHour: 12,   endHour: 19.5 },
-  { id: 73, employeeId: 5, date: '2026-03-05', startHour: 13,   endHour: 20   },
-  { id: 74, employeeId: 5, date: '2026-03-06', startHour: 12,   endHour: 19   },
-  { id: 75, employeeId: 5, date: '2026-03-07', startHour: 13,   endHour: 19   },
-
-  // ── Semaine 3 (courante) : 09/03 – 15/03, Mar–Sam ───────────────────────
-  // Emp 1 — 35h
-  { id: 76, employeeId: 1, date: '2026-03-10', startHour:  7,   endHour: 14   },
-  { id: 77, employeeId: 1, date: '2026-03-11', startHour:  7.5, endHour: 14.5 },
-  { id: 78, employeeId: 1, date: '2026-03-12', startHour:  8,   endHour: 15   },
-  { id: 79, employeeId: 1, date: '2026-03-13', startHour:  7,   endHour: 14   },
-  { id: 80, employeeId: 1, date: '2026-03-14', startHour:  8,   endHour: 15   },
-  // Emp 2 — 34h
-  { id: 81, employeeId: 2, date: '2026-03-10', startHour:  7,   endHour: 12   },
-  { id: 82, employeeId: 2, date: '2026-03-11', startHour:  8,   endHour: 15   },
-  { id: 83, employeeId: 2, date: '2026-03-12', startHour:  9,   endHour: 16   },
-  { id: 84, employeeId: 2, date: '2026-03-13', startHour:  8,   endHour: 15   },
-  { id: 85, employeeId: 2, date: '2026-03-14', startHour:  8,   endHour: 16   },
-  // Emp 3 — 35h
-  { id: 86, employeeId: 3, date: '2026-03-10', startHour:  9,   endHour: 16   },
-  { id: 87, employeeId: 3, date: '2026-03-11', startHour: 10,   endHour: 17   },
-  { id: 88, employeeId: 3, date: '2026-03-12', startHour:  9.5, endHour: 16.5 },
-  { id: 89, employeeId: 3, date: '2026-03-13', startHour: 10,   endHour: 17   },
-  { id: 90, employeeId: 3, date: '2026-03-14', startHour:  9,   endHour: 16   },
-  // Emp 4 — 36h
-  { id: 91, employeeId: 4, date: '2026-03-10', startHour:  7,   endHour: 15   },
-  { id: 92, employeeId: 4, date: '2026-03-11', startHour:  7,   endHour: 14   },
-  { id: 93, employeeId: 4, date: '2026-03-12', startHour:  7,   endHour: 14   },
-  { id: 94, employeeId: 4, date: '2026-03-13', startHour:  7,   endHour: 14   },
-  { id: 95, employeeId: 4, date: '2026-03-14', startHour:  7.5, endHour: 14.5 },
-  // Emp 5 — 35h
-  { id: 96, employeeId: 5, date: '2026-03-10', startHour: 12,   endHour: 19   },
-  { id: 97, employeeId: 5, date: '2026-03-11', startHour: 13,   endHour: 20   },
-  { id: 98, employeeId: 5, date: '2026-03-12', startHour: 12,   endHour: 19   },
-  { id: 99, employeeId: 5, date: '2026-03-13', startHour: 12,   endHour: 19   },
-  { id: 100, employeeId: 5, date: '2026-03-14', startHour: 13,  endHour: 20   },
-]
-
 // ─── Hook ──────────────────────────────────────────────────────────────────
 
 export function useSchedule() {
   // Priorité : sessionStorage → données démo
-  const [shifts, setShifts] = useState(() => sessionLoad('shifts') ?? DEMO)
+  const [shifts, setShifts] = useState(() => sessionLoad('shifts') ?? demoShifts)
 
-  // Compteur d'ID unique — évite les collisions quand plusieurs shifts
-  // sont ajoutés dans le même tick (ex : coller un planning entier)
-  const nextId    = useRef(null)
   const saveTimer = useRef(null)
-
-  // Initialise nextId d'après les shifts courants (session ou démo)
-  if (nextId.current === null) {
-    const cur = shifts.length ? Math.max(...shifts.map(s => s.id)) : 0
-    nextId.current = cur + 1
-  }
 
   // Auto-save : debounce 500ms après chaque modification
   useEffect(() => {
@@ -221,7 +70,7 @@ export function useSchedule() {
   }, [shifts])
 
   function addShift(employeeId, dateStr, startHour, endHour, pause = 0, type = 'work', extra = {}) {
-    const id = nextId.current++
+    const id = crypto.randomUUID()
     setShifts(prev => [
       ...prev,
       { id, employeeId, date: dateStr, startHour, endHour, pause, type, ...extra },
@@ -269,8 +118,7 @@ export function useSchedule() {
 
   // Réinitialise aux données de démonstration (après confirmation utilisateur)
   function resetShifts() {
-    nextId.current = Math.max(...DEMO.map(s => s.id)) + 1
-    setShifts(DEMO)
+    setShifts(demoShifts)
   }
 
   // Cumul total toutes semaines confondues

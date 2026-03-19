@@ -1,6 +1,6 @@
 [
   {
-    "id": 1,
+    "id": "e1a2b3c4-d5e6-4f7a-8b9c-0d1e2f3a4b5c",
     "name": "Hélène",
     "first_name": "Hélène",
     "last_name": "",
@@ -15,7 +15,7 @@
     "archived": false
   },
   {
-    "id": 2,
+    "id": "e2b3c4d5-e6f7-4a8b-9c0d-1e2f3a4b5c6d",
     "name": "Juliette",
     "first_name": "Juliette",
     "last_name": "",
@@ -30,7 +30,7 @@
     "archived": false
   },
   {
-    "id": 3,
+    "id": "e3c4d5e6-f7a8-4b9c-ad1e-2f3a4b5c6d7e",
     "name": "Maxime",
     "first_name": "Maxime",
     "last_name": "",
@@ -45,7 +45,7 @@
     "archived": false
   },
   {
-    "id": 4,
+    "id": "e4d5e6f7-a8b9-4c0d-be2f-3a4b5c6d7e8f",
     "name": "Nadia",
     "first_name": "Nadia",
     "last_name": "",
@@ -60,7 +60,7 @@
     "archived": false
   },
   {
-    "id": 5,
+    "id": "e5e6f7a8-b9c0-4d1e-8f3a-4b5c6d7e8f9a",
     "name": "Carolina",
     "first_name": "Carolina",
     "last_name": "",

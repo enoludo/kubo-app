@@ -104,6 +104,16 @@ Design is important, but must not break architecture.
 
 ---
 
+## Demo Data
+
+Données de démonstration — modifier uniquement ici :
+- Shifts : `src/data/demoShifts.js` (tableau + UUIDs fixes des employés)
+- Équipe : `src/data/team.json`
+
+Ne pas mettre de données dans les hooks ou composants.
+
+---
+
 ## Current Priority
 
 Focus on improving the scheduling module,

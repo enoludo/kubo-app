@@ -5,11 +5,13 @@
 //  Visible  — A (employé) | B-H (formules jour) | I (balance) | J (solde cumulé)
 //  Caché    — Pour chaque jour d (0-6) :
 //             col 10+d*5+0 : Type    (dropdown)
-//             col 10+d*5+1 : Début   (dropdown 07h00→20h00 ½h)
+//             col 10+d*5+1 : Début   (dropdown 04h00→21h00 ½h)
 //             col 10+d*5+2 : Fin     (dropdown)
 //             col 10+d*5+3 : Pause   (dropdown)
 //             col 10+d*5+4 : Validé  (checkbox BOOLEAN)
 //  Colonnes K–AS masquées, groupées, éditables manuellement si besoin.
+
+import { START_HOUR, END_HOUR } from '../hooks/useSchedule'
 
 const SHEET_ID    = import.meta.env.VITE_GOOGLE_SHEET_ID
 const BASE        = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}`
@@ -23,9 +25,9 @@ const TYPE_OPTIONS  = ['Travaillé', 'Congés', 'Repos', 'Arrêt maladie', 'Éco
 const PAUSE_OPTIONS = ['Aucune', '15min', '30min', '45min', '1h', '1h30', '2h']
 const TIME_OPTIONS  = (() => {
   const opts = []
-  for (let h = 7; h <= 20; h++) {
+  for (let h = START_HOUR; h <= END_HOUR; h++) {
     opts.push(`${String(h).padStart(2, '0')}h00`)
-    if (h < 20) opts.push(`${String(h).padStart(2, '0')}h30`)
+    if (h < END_HOUR) opts.push(`${String(h).padStart(2, '0')}h30`)
   }
   return opts
 })()
@@ -262,7 +264,6 @@ function parseHiddenRows(empRows, hiddenRows, team, weekDates) {
   if (!empRows || empRows.length < 2) return []
   const colDates = weekDates.map(dateToStr)
   const shifts   = []
-  let   idSeed   = Date.now()
 
   for (let ri = 1; ri < empRows.length; ri++) {
     const empCell = empRows[ri]?.[0]
@@ -275,7 +276,7 @@ function parseHiddenRows(empRows, hiddenRows, team, weekDates) {
     for (let di = 0; di < 7; di++) {
       const cols  = hiddenRow.slice(di * COLS_PER_DAY, di * COLS_PER_DAY + COLS_PER_DAY)
       if (!cols[0]) continue
-      const shift = hiddenColsToShift(cols, emp.id, colDates[di], idSeed++)
+      const shift = hiddenColsToShift(cols, emp.id, colDates[di], crypto.randomUUID())
       if (shift) shifts.push(shift)
     }
   }
@@ -318,7 +319,7 @@ function balanceColors(balance) {
 export function shiftsSig(shifts) {
   return JSON.stringify(
     [...shifts]
-      .sort((a, b) => a.employeeId - b.employeeId || a.date.localeCompare(b.date))
+      .sort((a, b) => String(a.employeeId).localeCompare(String(b.employeeId)) || a.date.localeCompare(b.date))
       .map(s => ({
         employeeId: s.employeeId, date: s.date,
         startHour: s.startHour, endHour: s.endHour,
@@ -343,10 +344,10 @@ export function teamToRows(team) {
 export function rowsToTeam(rows, existingTeam = []) {
   if (!rows || rows.length < 2) return existingTeam
   return rows.slice(1).filter(r => r[0] != null && r[0] !== '').map(r => {
-    const existing = existingTeam.find(e => e.id === Number(r[0])) ?? {}
+    const existing = existingTeam.find(e => e.id === String(r[0])) ?? {}
     return {
       ...existing,
-      id: Number(r[0]), name: String(r[1] ?? ''), role: String(r[2] ?? ''),
+      id: String(r[0]), name: String(r[1] ?? ''), role: String(r[2] ?? ''),
       color: String(r[3] ?? '#A8D5B5'), contract: Number(r[4] ?? 35),
       startBalance: Number(r[5] ?? 0), archived: parseBool(r[6]),
     }

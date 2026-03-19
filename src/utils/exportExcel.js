@@ -195,7 +195,7 @@ function buildSummarySheet(shifts, team) {
   }
 
   const entries = Object.values(grouped).sort((a, b) => {
-    if (a.employeeId !== b.employeeId) return a.employeeId - b.employeeId
+    if (a.employeeId !== b.employeeId) return String(a.employeeId).localeCompare(String(b.employeeId))
     return a.mon.localeCompare(b.mon)
   })
 
