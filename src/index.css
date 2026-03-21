@@ -317,7 +317,7 @@ button { font-family: inherit; cursor: pointer; }
   min-height: 44px;
   border-radius: var(--radius-sm);
   border: none;
-  background: rgba(224, 85, 85, 0.10);
+  background: var(--btn-danger-bg);
   color: var(--color-error);
   font-family: 'Poppins', sans-serif;
   font-size: 13px;
@@ -325,8 +325,8 @@ button { font-family: inherit; cursor: pointer; }
   cursor: pointer;
   transition: background var(--t-base);
 }
-.btn-danger:hover  { background: rgba(224, 85, 85, 0.18); }
-.btn-danger:active { background: rgba(224, 85, 85, 0.26); }
+.btn-danger:hover  { background: var(--btn-danger-bg-hover); }
+.btn-danger:active { background: var(--btn-danger-bg-active); }
 
 /* Séparateur horizontal */
 .sep {
