@@ -23,9 +23,9 @@
   justify-content: center;
   width: 1.5rem;
   height: 1.5rem;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   background: var(--color-success);
-  color: #fff;
+  color: var(--bg);
   font-size: 14px;
   font-weight: 700;
   flex-shrink: 0;
@@ -154,13 +154,13 @@
   cursor: pointer;
 }
 .order-day-cell--clickable:hover {
-  border-color: rgba(124, 111, 205, 0.4);
+  border-color: var(--color-purple-400);
   background: var(--bg-3);
 }
 .order-day-cell--today.order-day-cell--clickable:hover {
   filter: brightness(0.97);
   background: var(--accent-sub);
-  border-color: rgba(124, 111, 205, 0.4);
+  border-color: var(--color-purple-400);
 }
 
 /* Numéro du jour — ancré en haut à droite, au-dessus du bouton add-trigger */
@@ -217,13 +217,13 @@
 }
 
 /* Couleurs canal — identiques aux badges de statut du Planning (DayCard) */
-.order-pill--boutique { background: var(--order-boutique-bg); color: #1e7a4a; }
+.order-pill--boutique { background: var(--order-boutique-bg); color: var(--order-boutique-text); }
 .order-pill--boutique .order-pill-dot { background: var(--order-boutique); }
 
-.order-pill--web      { background: var(--order-web-bg); color: #2d86c7; }
+.order-pill--web      { background: var(--order-web-bg); color: var(--order-web-text); }
 .order-pill--web      .order-pill-dot { background: var(--order-web); }
 
-.order-pill--brunch   { background: var(--order-brunch-bg); color: #8a6500; }
+.order-pill--brunch   { background: var(--order-brunch-bg); color: var(--order-brunch-text); }
 .order-pill--brunch   .order-pill-dot { background: var(--order-brunch); }
 
 .order-pill-dot {
@@ -264,16 +264,16 @@
   cursor: pointer;
   transition: border-color var(--t-base), background var(--t-base);
 }
-.som-btn:hover { border-color: #00000070; background: var(--bg-3); }
+.som-btn:hover { border-color: var(--border-m); background: var(--bg-3); } /* ⚠ #00000070 ≈ --border-m (0.11) : quasi-identique */
 
 .som-btn--brunch {
   background: var(--order-brunch-bg);
-  border-color: rgba(255, 216, 102, 0.6);
-  color: #8a6500;
+  border-color: rgba(255, 216, 102, 0.6); /* ⚠ dérivé de --type-school (#FFD866) — pas de token alpha school */
+  color: var(--order-brunch-text);
 }
 .som-btn--brunch:hover {
   background: var(--order-brunch-bg);
-  border-color: rgba(255, 216, 102, 0.8);
+  border-color: rgba(255, 216, 102, 0.8); /* ⚠ même note */
 }
 
 /* ── NewOrderModal / BrunchModal — form plat ─────────────────────────────── */
@@ -342,7 +342,7 @@
   padding: 0;
   transition: background var(--t-fast), color var(--t-fast);
 }
-.nom-row-remove:hover { background: rgba(224, 85, 85, 0.1); color: var(--color-error); }
+.nom-row-remove:hover { background: var(--btn-danger-bg); color: var(--color-error); }
 
 /* Bouton "+ Ajouter un produit" */
 .nom-add-row { min-height: 40px; font-size: 12px; }
@@ -619,7 +619,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #7c6fcd;
+  color: var(--accent);
 }
 
 .order-detail-note-text {
@@ -685,7 +685,7 @@
   font-weight: 500;
   color: var(--text-3);
   background: var(--bg-2);
-  border-radius: 20px;
+  border-radius: var(--radius-pill);
   padding: 3px 10px;
   white-space: nowrap;
   flex-shrink: 0;
@@ -795,10 +795,10 @@
   padding: 2px 8px;
   border-radius: var(--radius-md);
 }
-.odm-badge--boutique { background: var(--order-boutique-bg); color: #1e7a4a; }
-.odm-badge--web      { background: var(--order-web-bg);      color: #2d86c7; }
-.odm-badge--brunch   { background: var(--order-brunch-bg);   color: #8a6500; }
-.odm-badge--paid     { background: var(--order-boutique-bg); color: #1e7a4a; }
+.odm-badge--boutique { background: var(--order-boutique-bg); color: var(--order-boutique-text); }
+.odm-badge--web      { background: var(--order-web-bg);      color: var(--order-web-text); }
+.odm-badge--brunch   { background: var(--order-brunch-bg);   color: var(--order-brunch-text); }
+.odm-badge--paid     { background: var(--order-boutique-bg); color: var(--order-boutique-text); }
 .odm-badge--unpaid   { background: var(--text-3); color: var(--bg); }
 
 /* Ligne 2 : Produits en liste */
@@ -867,7 +867,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.07em;
-  color: #7c6fcd;
+  color: var(--accent);
   flex-shrink: 0;
   padding-top: 2px;
 }
@@ -889,8 +889,8 @@
 }
 .odm-card-edit   { flex: 1; gap: 6px; }
 .odm-card-delete { flex: 1; gap: 6px; }
-.odm-card-delete:hover  { background: rgba(224, 85, 85, 0.18); }
-.odm-card-delete:active { background: rgba(224, 85, 85, 0.26); }
+.odm-card-delete:hover  { background: var(--btn-danger-bg-hover); }
+.odm-card-delete:active { background: var(--btn-danger-bg-active); }
 
 /* État confirmation suppression */
 .odm-card--confirm {
@@ -921,6 +921,6 @@
   cursor: pointer;
   transition: opacity var(--t-fast);
 }
-.odm-paid-toggle--paid   { background: var(--order-boutique-bg); color: #1e7a4a; }
-.odm-paid-toggle--unpaid { background: var(--type-sick-bg);      color: #c0392b; }
+.odm-paid-toggle--paid   { background: var(--order-boutique-bg); color: var(--order-boutique-text); }
+.odm-paid-toggle--unpaid { background: var(--type-sick-bg);      color: var(--color-red-800); }
 .odm-paid-toggle:hover   { opacity: 0.75; }
