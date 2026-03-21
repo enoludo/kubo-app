@@ -5,49 +5,120 @@
 }
 
 :root {
-  /* ── Couleurs de base ─────────────────────────── */
-  --bg:          #FFFFFF;
-  --bg-2:        #f5f4f9;
-  --bg-3:        #eeedf5;
-  --bg-4:        #000;
-  --text:        #111111;
-  --text-2:      #555566;
-  --text-3:      #9999aa;
-  --hover:       #E9E7F1;
-  --border:      rgba(0, 0, 0, 0.07);
-  --border-m:    rgba(0, 0, 0, 0.11);
-  --shadow-s:    0 1px 4px rgba(0, 0, 0, 0.07), 0 2px 8px rgba(0, 0, 0, 0.05);
-  --shadow-m:    0 4px 16px rgba(0, 0, 0, 0.10), 0 1px 4px rgba(0, 0, 0, 0.06);
-  --accent:      #111;
-  --accent-l:    #a095e0;
-  --accent-sub:  rgba(124, 111, 205, 0.12);
 
-  /* ── Couleurs sémantiques ─────────────────────── */
-  --color-error:        #E05555;
-  --color-error-bg:     #FFF0F0;
-  --color-error-dark:   #A52B2B;
-  --color-success:      #4CAF50;
-  --color-success-bg:   #F0FAF4;
-  --color-success-dark: #2E7D32;
-  --color-warn:         #F5A623;
-  --color-warn-bg:      #FFF8EC;
-  --color-warn-dark:    #B06A00;
-  --color-holiday-bg:   #FFF8E7;
-  --color-holiday-cell: #FFFCF2;
-  --color-holiday-text: #B8860B;
+  /* ══════════════════════════════════════════════════════════════
+     NIVEAU 1 — PRIMITIFS
+     Valeurs brutes. Ne pas utiliser directement dans les composants.
+  ══════════════════════════════════════════════════════════════ */
 
-  /* ── Border-radius ────────────────────────────── */
+  /* Neutres */
+  --color-white:    #FFFFFF;
+  --color-gray-50:  #f5f4f9;
+  --color-gray-100: #eeedf5;
+  --color-gray-200: #E9E7F1;
+  --color-gray-800: #555566;
+  --color-gray-900: #111111;
+  --color-gray-950: #000000;
+  --color-muted:    #9999aa;
+
+  /* Violet (accent principal) */
+  --color-purple-100: rgba(124, 111, 205, 0.12);
+  --color-purple-200: #a095e0;
+  --color-purple-400: rgba(124, 111, 205, 0.4);
+  --color-purple-500: #7c6fcd;
+
+  /* Vert */
+  --color-green-400: #4CAF50;
+  --color-green-500: #2ECC71;
+  --color-green-600: #66DA9B;
+  --color-green-700: #2E7D32;
+  --color-green-800: #1e7a4a;
+
+  /* Rouge */
+  --color-red-400: #E05555;
+  --color-red-500: #E74C3C;
+  --color-red-700: #A52B2B;
+  --color-red-800: #C0392B;
+
+  /* Ambre */
+  --color-amber-300: #FFD866;
+  --color-amber-400: #F5A623;
+  --color-amber-500: #F39C12;
+  --color-amber-700: #B06A00;
+  --color-amber-800: #8a6500;
+
+  /* Bleu */
+  --color-blue-400: #7AC5FF;
+  --color-blue-700: #2d86c7;
+
+  /* Palette shifts (couleurs uniques) */
+  --color-lavender: #C8AFFF;
+  --color-salmon:   #FF9594;
+  --color-mint:     #66DA9B;
+  --color-peach:    #FFBB88;
+
+  /* Alphas error */
+  --color-red-alpha-xs: rgba(224, 85, 85, 0.08);
+  --color-red-alpha-sm: rgba(224, 85, 85, 0.10);
+  --color-red-alpha-md: rgba(224, 85, 85, 0.18);
+  --color-red-alpha-lg: rgba(224, 85, 85, 0.26);
+
+  /* Alphas warn */
+  --color-amber-alpha-sm: rgba(245, 166, 35, 0.10);
+  --color-amber-alpha:    rgba(245, 166, 35, 0.12);
+  --color-amber-alpha-md: rgba(245, 166, 35, 0.14);
+  --color-amber-alpha-lg: rgba(245, 166, 35, 0.20);
+  --color-amber-alpha-xl: rgba(245, 166, 35, 0.26);
+
+  /* Alphas success */
+  --color-green-alpha: rgba(76, 175, 80, 0.12);
+
+  /* Radius */
+  --radius-xs:   2px;
   --radius-sm:   8px;
   --radius-md:   12px;
   --radius-lg:   16px;
+  --radius-pill: 36px;
   --radius-full: 50%;
 
-  /* ── Transitions ──────────────────────────────── */
+  /* Transitions */
   --t-fast: 0.12s ease;
   --t-base: 0.15s ease;
-  --t-slow: 0.3s ease;
+  --t-slow: 0.3s  ease;
 
-  /* ── Z-index ──────────────────────────────────── */
+
+  /* ══════════════════════════════════════════════════════════════
+     NIVEAU 2 — SÉMANTIQUES
+     Rôle fonctionnel. Utiliser dans les composants.
+  ══════════════════════════════════════════════════════════════ */
+
+  /* Surfaces */
+  --bg:    var(--color-white);
+  --bg-2:  var(--color-gray-50);
+  --bg-3:  var(--color-gray-100);
+  --bg-4:  var(--color-gray-950);
+  --hover: var(--color-gray-200);
+
+  /* Texte */
+  --text:   var(--color-gray-900);
+  --text-2: var(--color-gray-800);
+  --text-3: var(--color-muted);
+
+  /* Accent */
+  --accent:      var(--color-purple-500);  /* violet — couleur de marque */
+  --accent-dark: var(--color-gray-950);    /* noir — actions principales lourdes */
+  --accent-l:    var(--color-purple-200);
+  --accent-sub:  var(--color-purple-100);
+
+  /* Bordures */
+  --border:   rgba(0, 0, 0, 0.07);
+  --border-m: rgba(0, 0, 0, 0.11);
+
+  /* Ombres */
+  --shadow-s: 0 1px 4px rgba(0, 0, 0, 0.07), 0 2px 8px rgba(0, 0, 0, 0.05);
+  --shadow-m: 0 4px 16px rgba(0, 0, 0, 0.10), 0 1px 4px rgba(0, 0, 0, 0.06);
+
+  /* Z-index */
   --z-header:   30;
   --z-sticky:   90;
   --z-dropdown: 100;
@@ -58,26 +129,69 @@
   --z-overlay:  9000;
   --z-toast:    9999;
 
-  /* ── Layout tokens ────────────────────────────── */
-  --nav-w:       auto;
-  --header-h:    118px;
-  --sidebar-w:   232px;
-  --footer-h:    88px;
+  /* Layout */
+  --nav-w:      auto;
+  --header-h:   118px;
+  --sidebar-w:  232px;
+  --footer-h:   88px;
+  --tv-emp-col: 200px;
+  --gap:        1rem;
+  --pad-h:      24px;
 
-  /* ── Responsive layout ────────────────────────── */
-  --tv-emp-col:  200px;
-  --gap:         1rem;
-  --pad-h:       24px;
+  /* États — error */
+  --color-error:        var(--color-red-400);
+  --color-error-bg:     #FFF0F0;
+  --color-error-dark:   var(--color-red-700);
+  --color-error-border: #F5AAAA;
+  --color-error-hover:  #FFE5E5;
 
-  /* ── Types de shifts ──────────────────────────── */
-  --type-work:   #7AC5FF;
-  --type-leave:  #C8AFFF;
-  --type-sick:   #FF9594;
-  --type-school: #FFD866;
-  --type-rest:   #66DA9B;
-  --type-absent: #FFBB88;
+  /* États — success */
+  --color-success:        var(--color-green-400);
+  --color-success-bg:     #F0FAF4;
+  --color-success-dark:   var(--color-green-700);
+  --color-success-border: #A3D9B5;
+  --color-success-hover:  #E2F5EA;
 
-  /* ── Types de shifts — fond 25% ──────────────── */
+  /* États — warn */
+  --color-warn:        var(--color-amber-400);
+  --color-warn-bg:     #FFF8EC;
+  --color-warn-dark:   var(--color-amber-700);
+  --color-warn-border: #F5C76B;
+
+  /* Jours fériés */
+  --color-holiday-bg:   #FFF8E7;
+  --color-holiday-cell: #FFFCF2;
+  --color-holiday-text: #B8860B;
+
+  /* Overlays */
+  --overlay-modal:  #53515425;
+  --overlay-dark:   rgba(0, 0, 0, 0.35);
+  --overlay-light:  rgba(255, 255, 255, 0.72);
+
+  /* Sync dots */
+  --sync-dot-green:  var(--color-green-500);
+  --sync-dot-red:    var(--color-red-500);
+  --sync-dot-orange: var(--color-amber-500);
+
+  /* Services externes */
+  --service-sheets-color:  #0F9D58;
+  --service-webflow-color: #4353FF;
+
+
+  /* ══════════════════════════════════════════════════════════════
+     NIVEAU 3 — COMPOSANTS / MODULES
+     Préfixe --type-*, --order-*, --btn-*
+  ══════════════════════════════════════════════════════════════ */
+
+  /* Planning — types de shifts (couleurs) */
+  --type-work:   var(--color-blue-400);
+  --type-leave:  var(--color-lavender);
+  --type-sick:   var(--color-salmon);
+  --type-school: var(--color-amber-300);
+  --type-rest:   var(--color-mint);
+  --type-absent: var(--color-peach);
+
+  /* Planning — types de shifts (fonds 25%) */
   --type-work-bg:   #7AC5FF40;
   --type-leave-bg:  #C8AFFF40;
   --type-sick-bg:   #FF959440;
@@ -85,15 +199,29 @@
   --type-rest-bg:   #66DA9B40;
   --type-absent-bg: #FFBB8840;
 
-  /* ── Canaux commandes ─────────────────────────── */
-  --order-web:      #7AC5FF;
-  --order-boutique: #66DA9B;
-  --order-brunch:   #FFBB88;
+  /* Orders — canaux */
+  --order-web:           var(--color-blue-400);
+  --order-web-bg:        #7AC5FF40;
+  --order-web-text:      var(--color-blue-700);
 
-  /* ── Canaux commandes — fond 25% ─────────────── */
-  --order-web-bg:      #7AC5FF40;
-  --order-boutique-bg: #66DA9B40;
-  --order-brunch-bg:   #FFBB8840;
+  --order-boutique:      var(--color-mint);
+  --order-boutique-bg:   #66DA9B40;
+  --order-boutique-text: var(--color-green-800);
+
+  --order-brunch:        var(--color-peach);
+  --order-brunch-bg:     #FFBB8840;
+  --order-brunch-text:   var(--color-amber-800);
+
+  /* Boutons — couche composant */
+  --btn-danger-bg:        var(--color-red-alpha-sm);
+  --btn-danger-bg-hover:  var(--color-red-alpha-md);
+  --btn-danger-bg-active: var(--color-red-alpha-lg);
+  --btn-danger-bg-xs:     var(--color-red-alpha-xs);
+
+  --btn-archive-bg:       var(--color-amber-alpha-sm);
+  --btn-archive-bg-md:    var(--color-amber-alpha-md);
+  --btn-archive-bg-hover: var(--color-amber-alpha-lg);
+  --btn-archive-bg-xl:    var(--color-amber-alpha-xl);
 }
 
 html, body, #root {
