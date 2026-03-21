@@ -21,7 +21,7 @@ export default function TableView({
       {/* En-tête des colonnes jours */}
       <div className="tv-header-row">
         <div className="tv-emp-col tv-emp-col--add">
-          <button className="tv-add-employee-btn" onClick={onAddEmployee}>
+          <button className="tv-add-employee-btn add-trigger add-trigger--labeled" onClick={onAddEmployee}>
             <span className="tv-add-avatar">+</span>
             <span className="tv-add-label">Employé</span>
           </button>

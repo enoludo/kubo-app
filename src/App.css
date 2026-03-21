@@ -1850,22 +1850,9 @@
 
 .tv-add-employee-btn {
   width: 100%;
-  display: flex;
-  justify-content: center;
-  flex-direction: row;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 10px;
-  border-radius: var(--radius-sm);
-  border: 1px dashed var(--border-m);
-  background: transparent;
-  cursor: pointer;
-  transition: border-color var(--t-base), background var(--t-base);
-  font-family: 'Poppins', sans-serif;
 }
 
 .tv-add-avatar {
-  
   color: var(--bg-4);
   font-size: 18px;
   display: flex;
@@ -1876,15 +1863,9 @@
 }
 
 .tv-add-label {
-  font-family: 'Poppins', sans-serif;
   font-size: 13px;
   font-weight: 500;
   color: #111;
-}
-
-.tv-add-employee-btn:hover {
-  border-color: #00000070;
-  background: var(--bg-3);
 }
 
 /* Ligne d'un employé */
@@ -1926,26 +1907,9 @@
 .day-card:hover { border-color: var(--card-border, #7c6fcd99); }
 
 .day-card--empty {
-  flex: 1;
-  min-height: clamp(80px, 9vh, 140px);
-  border-radius: var(--radius-sm);
-  background: var(--bg);
-  border: 1px dashed var(--border-m);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: border-color var(--t-base), background var(--t-base);
+  /* override .day-card's solid border with dashed */
+  border: 1.5px dashed var(--bg-3);
 }
-.day-card--empty:hover { border-color: #00000070; background-color: var(--bg-3);}
-
-.day-card-plus {
-  font-size: 20px;
-  color: #ccc;
-  line-height: 1;
-  transition: color var(--t-base);
-}
-.day-card--empty:hover .day-card-plus { color: var(--accent); }
 
 /* Badge statut */
 .day-card-badge {

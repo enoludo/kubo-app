@@ -57,8 +57,8 @@ export default function DayCard({ employee, shifts, onAdd, onEdit, onToggleValid
       )
     }
     return (
-      <div className="day-card day-card--empty" style={{ '--card-border': '#7c6fcd99' }} onClick={onAdd}>
-        <span className="day-card-plus">+</span>
+      <div className="day-card day-card--empty add-trigger add-trigger--icon" style={{ '--card-border': '#7c6fcd99' }} onClick={onAdd}>
+        +
       </div>
     )
   }

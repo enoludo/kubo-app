@@ -84,7 +84,7 @@ function OrderDayCell({ date, orders, isCurrentMonth, isToday, isPast, onAddOrde
         {/* Bouton + — cellules vides, non samedi, non passées */}
         {!hasOrders && !isSaturday && isCurrentMonth && !isPast && (
           <button
-            className="order-day-add"
+            className="order-day-add add-trigger add-trigger--icon"
             onClick={e => { e.stopPropagation(); onAddOrder(date) }}
             aria-label="Ajouter une commande"
           >

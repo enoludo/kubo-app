@@ -179,7 +179,7 @@ export default function NewOrderModal({ onSave, onCancel, initialDate, initialCh
             ))}
           </div>
 
-          <button className="tv-add-employee-btn nom-add-row" onClick={addRow} type="button">
+          <button className="tv-add-employee-btn nom-add-row add-trigger add-trigger--labeled" onClick={addRow} type="button">
             + Ajouter un produit
           </button>
         </div>

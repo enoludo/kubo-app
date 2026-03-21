@@ -86,7 +86,7 @@ export default function OrdersHeader({
               onRetry: webflowStatus === 'error' ? onRetryWebflow : undefined,
             },
           ]} />
-          <button className="orders-new-btn" onClick={onNewOrder}>
+          <button className="orders-new-btn add-trigger add-trigger--labeled" onClick={onNewOrder}>
             + Nouvelle commande
           </button>
         </div>

@@ -215,6 +215,48 @@ button { font-family: inherit; cursor: pointer; }
 
 /* ─────────────────────────────────────────────────────────────────────────── */
 
+/* ── Élément d'ajout générique ────────────────────────────────────────────── */
+.add-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px dashed var(--bg-3);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-3);
+  cursor: pointer;
+  transition: border-color var(--t-fast),
+              color var(--t-fast),
+              background var(--t-fast);
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.add-trigger:hover,
+.add-trigger:active {
+  border-color: var(--bg-4);
+  color: var(--bg-4);
+  background: var(--bg-2);
+}
+
+/* Variante avec texte + icône */
+.add-trigger--labeled {
+  gap: 6px;
+  padding: 8px 14px;
+  min-height: 44px;
+}
+
+/* Variante icône seule (cases calendrier) */
+.add-trigger--icon {
+  width: 100%;
+  height: 100%;
+  font-size: 20px;
+  font-weight: 300;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--bg-3); border-radius: 3px; }

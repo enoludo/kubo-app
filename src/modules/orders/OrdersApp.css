@@ -44,24 +44,7 @@
   user-select: none;
 }
 
-/* Bouton Nouvelle commande — CTA primaire, même style que modal-confirm */
-.orders-new-btn {
-    width: auto;
-    height:3rem;
-  display: flex;
-  justify-content: center;
-  flex-direction: row;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 10px 2rem;
-  border-radius: var(--radius-sm);
-  border: 1px dashed var(--border-m);
-  background: transparent;
-  cursor: pointer;
-  transition: border-color var(--t-base), background var(--t-base);
-  font-family: 'Poppins', sans-serif;
-}
-.orders-new-btn:hover    { opacity: 0.85; }
+/* Bouton Nouvelle commande */
 .orders-new-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
 /* ── Body ────────────────────────────────────────────────────────────────── */
@@ -145,14 +128,10 @@
   pointer-events: none;
 }
 
-/* Cases vides (non samedi, mois courant) — même style que .day-card--empty */
-.order-day-cell--empty {
-  background: var(--bg);
-  border: 1px dashed var(--border-m);
-}
-.order-day-cell--empty:hover {
-  border-color: #00000070;
-  background: var(--bg-3);
+/* Cases vides — pas de bordure sur la cellule, le bouton .add-trigger la fournit */
+.order-day-cell--empty.order-day-cell--clickable:hover {
+  border-color: transparent; /* le hover vient du bouton .add-trigger */
+  background: transparent;
 }
 
 /* Dates passées — atténuées, non interactives si sans commande */
@@ -184,11 +163,12 @@
   border-color: rgba(124, 111, 205, 0.4);
 }
 
-/* Numéro du jour — ancré en haut à droite */
+/* Numéro du jour — ancré en haut à droite, au-dessus du bouton add-trigger */
 .order-day-num {
   position: absolute;
   top: 1rem;
   right: 1rem;
+  z-index: 1;
   font-family: 'Poppins', sans-serif;
   font-size: 12px;
   font-weight: 500;
@@ -212,26 +192,13 @@
   overflow: hidden;
 }
 
-/* Bouton "+" — centré sur toute la surface de la cellule */
+/* Bouton "+" — couvre toute la surface de la cellule */
 .order-day-add {
   position: absolute;
   top: 0;
   left: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-  background: none;
-  border: none;
   padding: 0;
-  font-size: 20px;
-  color: #ccc;
-  line-height: 1;
-  cursor: pointer;
-  transition: color var(--t-base);
 }
-.order-day-cell--empty:hover .order-day-add { color: #00000070; }
 
 /* ── Pills canal ─────────────────────────────────────────────────────────── */
 
