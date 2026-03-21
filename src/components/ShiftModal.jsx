@@ -198,7 +198,11 @@ export default function ShiftModal({ info, onSave, onDelete, onCancel, onToggleV
             className={`modal-shift-validate${isShiftValidated ? ' is-validated' : ''}`}
             onClick={() => { onToggleValidated(info.shift.id); onCancel() }}
             title={isShiftValidated ? 'Dévalider' : 'Valider'}
-          >✓</button>
+          ><svg xmlns="http://www.w3.org/2000/svg" width="10.96" height="10.96"  viewBox="0 0 10.96 10.96">
+  <path id="Tracé_95" data-name="Tracé 95" d="M641.295,1667.494h-9.75v-5.75h1.5v4.25h8.25Z" transform="translate(-1621.6 -721.566) rotate(-45)" fill="currentcolor"/>
+</svg>
+
+</button>
         )}
 
         {/* Header */}
@@ -208,7 +212,7 @@ export default function ShiftModal({ info, onSave, onDelete, onCancel, onToggleV
           </div>
           <div>
             <div className="modal-emp-name">{info.employee.name}</div>
-            <div className="modal-emp-role">{info.employee.role}</div>
+            <div className="text-meta modal-emp-role">{info.employee.role}</div>
           </div>
         </div>
 
@@ -395,10 +399,10 @@ export default function ShiftModal({ info, onSave, onDelete, onCancel, onToggleV
         <div className="modal-actions">
           {isEdit ? (
             <>
-              <button className="modal-cancel" onClick={onCancel}>Annuler</button>
-              <button className="modal-delete" onClick={onDelete}>Supprimer</button>
+              <button className="btn-secondary modal-cancel" onClick={onCancel}>Annuler</button>
+              <button className="btn-danger modal-delete" onClick={onDelete}>Supprimer</button>
               <button
-                className="modal-confirm"
+                className="btn-primary modal-confirm"
                 style={{ background: (dayExceeded || leaveConflict) ? '#E05555' : info.employee.color }}
                 onClick={() => onSave(start, end, pause, type, buildExtra())}
                 disabled={(!isFullDay && end <= start) || !!leaveConflict}
@@ -408,9 +412,9 @@ export default function ShiftModal({ info, onSave, onDelete, onCancel, onToggleV
             </>
           ) : (
             <>
-              <button className="modal-cancel" onClick={onCancel}>Annuler</button>
+              <button className="btn-secondary modal-cancel" onClick={onCancel}>Annuler</button>
               <button
-                className="modal-confirm"
+                className="btn-primary modal-confirm"
                 style={{ background: (dayExceeded || leaveConflict) ? '#E05555' : info.employee.color }}
                 onClick={() => onSave(start, end, pause, type, buildExtra())}
                 disabled={(!isFullDay && end <= start) || !!leaveConflict}

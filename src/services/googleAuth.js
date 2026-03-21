@@ -4,10 +4,11 @@
 
 const GIS_URL = 'https://accounts.google.com/gsi/client'
 
-let _tokenClient = null
-let _token       = null
-let _tokenExpiry = 0   // timestamp ms
-let _clientId    = null
+let _tokenClient  = null
+let _token        = null
+let _tokenExpiry  = 0      // timestamp ms
+let _clientId     = null
+let _pendingQueue = []     // { onSuccess, onError }[] — callbacks en attente du token
 
 // Charge le script GIS une seule fois
 export async function loadGIS() {
@@ -31,19 +32,31 @@ export async function loadGIS() {
   })
 }
 
-// Initialise le client OAuth (à appeler après loadGIS)
+// Initialise le client OAuth (à appeler après loadGIS).
+// Supporte les appels simultanés : tous les appelants en attente reçoivent le token
+// via la queue — évite la race condition entre useGoogleSync et useOrdersGoogleSync.
 export function initTokenClient(clientId, onSuccess, onError) {
-  _clientId    = clientId
+  _clientId = clientId
+  _pendingQueue.push({ onSuccess, onError })
+
+  // Si un client existe déjà pour ce clientId, on réutilise — pas de recréation.
+  // Le prochain requestToken/requestTokenSilent délivrera le token à toute la queue.
+  if (_tokenClient) return
+
   _tokenClient = window.google.accounts.oauth2.initTokenClient({
     client_id:      clientId,
     scope:          'https://www.googleapis.com/auth/spreadsheets',
     callback:       (r) => {
-      if (r.error) { onError(r.error); return }
+      const queue = _pendingQueue.splice(0)
+      if (r.error) { queue.forEach(({ onError: e }) => e(r.error)); return }
       _token       = r.access_token
       _tokenExpiry = Date.now() + (Number(r.expires_in) - 60) * 1000 // 60s buffer
-      onSuccess(_token)
+      queue.forEach(({ onSuccess: s }) => s(_token))
     },
-    error_callback: (e) => onError(e?.message ?? 'Erreur OAuth'),
+    error_callback: (e) => {
+      const queue = _pendingQueue.splice(0)
+      queue.forEach(({ onError: err }) => err(new Error(e?.message ?? 'Erreur OAuth')))
+    },
   })
 }
 
@@ -86,6 +99,8 @@ export function getToken() {
 // Révoque et efface le token
 export function revokeToken() {
   if (_token) window.google?.accounts?.oauth2?.revoke?.(_token, () => {})
-  _token       = null
-  _tokenExpiry = 0
+  _token        = null
+  _tokenExpiry  = 0
+  _tokenClient  = null   // force la recréation du client au prochain connect
+  _pendingQueue = []     // vide les callbacks orphelins
 }

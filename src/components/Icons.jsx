@@ -30,13 +30,12 @@ export function PdfIcon({ size = 16 }) {
   )
 }
 
-export function PrintIcon({ size = 16 }) {
+export function CopyIcon({ size = 14 }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M6 9V3h12v6"/>
-      <rect x="3" y="9" width="18" height="10" rx="2"/>
-      <path d="M6 14h12M6 19h12V14H6v5z"/>
-      <circle cx="18" cy="13" r="0.8" fill="currentColor"/>
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="9" y="9" width="13" height="13" rx="2"/>
+      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
     </svg>
   )
 }

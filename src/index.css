@@ -66,8 +66,34 @@
 
   /* ── Responsive layout ────────────────────────── */
   --tv-emp-col:  200px;
-  --gap:         12px;
+  --gap:         1rem;
   --pad-h:       24px;
+
+  /* ── Types de shifts ──────────────────────────── */
+  --type-work:   #7AC5FF;
+  --type-leave:  #C8AFFF;
+  --type-sick:   #FF9594;
+  --type-school: #FFD866;
+  --type-rest:   #66DA9B;
+  --type-absent: #FFBB88;
+
+  /* ── Types de shifts — fond 25% ──────────────── */
+  --type-work-bg:   #7AC5FF40;
+  --type-leave-bg:  #C8AFFF40;
+  --type-sick-bg:   #FF959440;
+  --type-school-bg: #FFD86640;
+  --type-rest-bg:   #66DA9B40;
+  --type-absent-bg: #FFBB8840;
+
+  /* ── Canaux commandes ─────────────────────────── */
+  --order-web:      #7AC5FF;
+  --order-boutique: #66DA9B;
+  --order-brunch:   #FFBB88;
+
+  /* ── Canaux commandes — fond 25% ─────────────── */
+  --order-web-bg:      #7AC5FF40;
+  --order-boutique-bg: #66DA9B40;
+  --order-brunch-bg:   #FFBB8840;
 }
 
 html, body, #root {
@@ -85,6 +111,109 @@ body {
 }
 
 button { font-family: inherit; cursor: pointer; }
+
+/* ─── Classes génériques partagées entre tous les modules ────────────────────
+   Usage : ajouter la classe générique + la classe module si override nécessaire
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* Label de champ — uppercase, 10px, text-3 */
+.field-label {
+  font-family: 'Poppins', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+
+/* Input/select de formulaire — 13px, bg-2, sans bordure */
+.field-input {
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  background: var(--bg-2);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Bouton principal — fond sombre, texte clair */
+.btn-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 1.5rem;
+  min-height: 44px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--bg-4);
+  color: var(--bg-2);
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity var(--t-base);
+}
+.btn-primary:hover    { opacity: 0.85; }
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Bouton secondaire — fond clair, texte atténué */
+.btn-secondary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  min-height: 44px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--bg-2);
+  color: var(--text-2);
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--t-base);
+}
+.btn-secondary:hover { background: var(--bg-3); }
+
+/* Bouton destructif — rouge pastel */
+.btn-danger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  min-height: 44px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: rgba(224, 85, 85, 0.10);
+  color: var(--color-error);
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--t-base);
+}
+.btn-danger:hover  { background: rgba(224, 85, 85, 0.18); }
+.btn-danger:active { background: rgba(224, 85, 85, 0.26); }
+
+/* Séparateur horizontal */
+.sep {
+  height: 1px;
+  background: var(--bg-3);
+}
+
+/* Texte méta — sous-titre, rôle, info secondaire */
+.text-meta {
+  font-family: 'Poppins', sans-serif;
+  font-size: 11px;
+  color: var(--text-3);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────── */
 
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }

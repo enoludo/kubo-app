@@ -46,7 +46,7 @@ export default function EmployeeModal({ employee, onSave, onCancel, onArchive, o
           <div className="modal-emp-form-title">Archiver {firstName} ?</div>
           <div className="archive-modal-body">Il n'apparaîtra plus dans le planning actif.</div>
           <div className="modal-actions">
-            <button className="modal-cancel" onClick={() => setConfirmMode(null)}>Retour</button>
+            <button className="btn-secondary modal-cancel" onClick={() => setConfirmMode(null)}>Retour</button>
             <button className="modal-archive-confirm" onClick={onArchive}>Archiver</button>
           </div>
         </div>
@@ -65,8 +65,8 @@ export default function EmployeeModal({ employee, onSave, onCancel, onArchive, o
             Tous ses shifts seront également supprimés. Cette action est irréversible.
           </div>
           <div className="modal-actions">
-            <button className="modal-cancel" onClick={() => setConfirmMode(null)}>Retour</button>
-            <button className="modal-delete" onClick={onDelete}>Supprimer définitivement</button>
+            <button className="btn-secondary modal-cancel" onClick={() => setConfirmMode(null)}>Retour</button>
+            <button className="btn-danger modal-delete" onClick={onDelete}>Supprimer définitivement</button>
           </div>
         </div>
       </div>
@@ -162,15 +162,15 @@ export default function EmployeeModal({ employee, onSave, onCancel, onArchive, o
           </div>
           <div>
             <div className="modal-emp-name">{name || 'Prénom Nom'}</div>
-            <div className="modal-emp-role">{role || 'Poste / rôle'}</div>
+            <div className="text-meta modal-emp-role">{role || 'Poste / rôle'}</div>
           </div>
         </div>
 
         {/* Primary actions */}
         <div className="modal-actions">
-          <button className="modal-cancel" onClick={onCancel}>Annuler</button>
+          <button className="btn-secondary modal-cancel" onClick={onCancel}>Annuler</button>
           <button
-            className="modal-confirm"
+            className="btn-primary modal-confirm"
             style={{ background: color }}
             onClick={handleSave}
             disabled={!name.trim()}

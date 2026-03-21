@@ -1,14 +1,16 @@
-export default function ArchiveModal({ employee, mode, onConfirm, onCancel }) {
-  const firstName = employee.name.split(' ')[0]
+export default function ArchiveModal({ employee, mode, onConfirm, onCancel, title: titleProp, body: bodyProp, confirmLabel: confirmLabelProp }) {
+  const firstName = employee?.name?.split(' ')[0] ?? ''
   const isDelete  = mode === 'delete'
 
-  const title = isDelete
+  const title = titleProp ?? (isDelete
     ? `Supprimer définitivement ${firstName} ?`
-    : `Archiver ${firstName} ?`
+    : `Archiver ${firstName} ?`)
 
-  const body = isDelete
+  const body = bodyProp ?? (isDelete
     ? `Tous ses shifts seront également supprimés. Cette action est irréversible.`
-    : `Il n'apparaîtra plus dans le planning actif.`
+    : `Il n'apparaîtra plus dans le planning actif.`)
+
+  const confirmLabel = confirmLabelProp ?? (isDelete ? 'Supprimer définitivement' : 'Archiver')
 
   return (
     <div className="modal-overlay" onClick={onCancel}>
@@ -18,10 +20,10 @@ export default function ArchiveModal({ employee, mode, onConfirm, onCancel }) {
         <div className="archive-modal-body">{body}</div>
 
         <div className="modal-actions">
-          <button className="modal-cancel" onClick={onCancel}>Annuler</button>
-          {isDelete
-            ? <button className="modal-delete" onClick={onConfirm}>Supprimer définitivement</button>
-            : <button className="modal-archive-confirm" onClick={onConfirm}>Archiver</button>
+          <button className="btn-secondary modal-cancel" onClick={onCancel}>Annuler</button>
+          {isDelete || titleProp
+            ? <button className="btn-danger modal-delete" onClick={onConfirm}>{confirmLabel}</button>
+            : <button className="modal-archive-confirm" onClick={onConfirm}>{confirmLabel}</button>
           }
         </div>
 

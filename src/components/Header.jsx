@@ -1,16 +1,17 @@
 import { useState, useRef, useEffect } from 'react'
 import { createPortal } from 'react-dom'
-import { PrintIcon, PdfIcon, MailIcon } from './Icons'
+import { PdfIcon, MailIcon } from './Icons'
+import ConnectionDot from './ConnectionDot'
 
 function SaveIcon() {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 19.078 19.078" fill="currentColor">
-      <g transform="translate(0.164 0.164)">
-        <path d="M16.992,18.914H1.758A1.924,1.924,0,0,1-.164,16.992V5.659A3.073,3.073,0,0,1,.742,3.472L3.47.742A3.073,3.073,0,0,1,5.658-.164H16.992a1.924,1.924,0,0,1,1.922,1.922V16.992A1.924,1.924,0,0,1,16.992,18.914ZM5.659,1.336A1.583,1.583,0,0,0,4.531,1.8L1.8,4.532a1.6,1.6,0,0,0-.467,1.126V16.992a.422.422,0,0,0,.422.422H16.992a.422.422,0,0,0,.422-.422V1.758a.422.422,0,0,0-.422-.422Z"/>
-        <path d="M9.961,13.055a3.094,3.094,0,1,1,3.094-3.094A3.1,3.1,0,0,1,9.961,13.055Zm0-4.687a1.594,1.594,0,1,0,1.594,1.594A1.6,1.6,0,0,0,9.961,8.367Z"/>
-        <path d="M13.477,4.852H7.617A1.924,1.924,0,0,1,5.7,2.93V.586a.75.75,0,0,1,1.5,0V2.93a.422.422,0,0,0,.422.422h5.859A.422.422,0,0,0,13.9,2.93V.586a.75.75,0,0,1,1.5,0V2.93A1.924,1.924,0,0,1,13.477,4.852Z"/>
-      </g>
-    </svg>
+    <svg xmlns="http://www.w3.org/2000/svg" width="19.078" height="16.734" fill="currentcolor" viewBox="0 0 19.078 16.734">
+  <g id="Groupe_141" data-name="Groupe 141" transform="translate(0.164 -1.008)">
+    <path id="Tracé_92" data-name="Tracé 92" d="M16.992,17.742H6.445A1.868,1.868,0,0,1,4.523,15.82V8.789A1.868,1.868,0,0,1,6.445,6.867H16.992a1.868,1.868,0,0,1,1.922,1.922V15.82A1.868,1.868,0,0,1,16.992,17.742ZM6.023,8.8V15.82c0,.269.1.318.171.355a.765.765,0,0,0,.251.067H16.992c.269,0,.318-.1.355-.171a.765.765,0,0,0,.067-.251V8.789c0-.269-.1-.318-.171-.355a.765.765,0,0,0-.251-.067H6.445c-.258,0-.311.094-.343.15A.708.708,0,0,0,6.023,8.8Z"/>
+    <path id="Tracé_93" data-name="Tracé 93" d="M2.93,11.883H1.758A1.924,1.924,0,0,1-.164,9.961V2.93A1.924,1.924,0,0,1,1.758,1.008H12.3A1.924,1.924,0,0,1,14.227,2.93V5.273a.75.75,0,0,1-1.5,0V2.93a.422.422,0,0,0-.422-.422H1.758a.422.422,0,0,0-.422.422V9.961a.422.422,0,0,0,.422.422H2.93a.75.75,0,0,1,0,1.5Z"/>
+  </g>
+</svg>
+
   )
 }
 
@@ -146,60 +147,6 @@ function PlanDropdown({
   )
 }
 
-// ── Indicateur de sync Google Sheets ─────────────────────────────────────────
-function SyncButton({ status, error, onConnect, onDisconnect, onRetry }) {
-  if (status === 'disconnected') {
-    return (
-      <button className="header-sync-btn header-sync-btn--connect" onClick={onConnect}>
-        <SheetsIcon />
-        <span>Connecter Sheets</span>
-      </button>
-    )
-  }
-  if (status === 'connecting' || status === 'syncing' || status === 'reconnecting') {
-    const label = status === 'connecting' ? 'Connexion…'
-                : status === 'reconnecting' ? 'Reconnexion…'
-                : 'Sync…'
-    return (
-      <button className="header-sync-btn header-sync-btn--syncing" disabled>
-        <span className="sync-dot sync-dot--spin" />
-        <span>{label}</span>
-      </button>
-    )
-  }
-  if (status === 'expired') {
-    return (
-      <button className="header-sync-btn header-sync-btn--error" onClick={onRetry} title={error ?? 'Session expirée'}>
-        <span className="sync-dot sync-dot--red" />
-        <span>Session expirée</span>
-      </button>
-    )
-  }
-  if (status === 'error') {
-    return (
-      <button className="header-sync-btn header-sync-btn--error" onClick={onRetry} title={error ?? 'Erreur de synchronisation'}>
-        <span className="sync-dot sync-dot--red" />
-        <span>Reconnecter</span>
-      </button>
-    )
-  }
-  // synced
-  return (
-    <button className="header-sync-btn header-sync-btn--synced" onClick={onDisconnect} title="Synchronisé · Cliquer pour déconnecter">
-      <span className="sync-dot sync-dot--green" />
-    </button>
-  )
-}
-
-function TodayIcon() {
-  return (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
-      stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="10"/>
-      <polyline points="12 6 12 12 16 14"/>
-    </svg>
-  )
-}
 
 function SheetsIcon() {
   return (
@@ -224,8 +171,8 @@ const DATA_SOURCE_LABEL = {
 export default function Header({
   week, onOpenPicker, onPdfExport, pdfGenerating, onSendToAll,
   copiedPlan, templates, onCopyPlan, onPastePlan, onSaveTemplate, onLoadTemplate,
-  syncStatus, syncError, onSyncConnect, onSyncDisconnect, onSyncRetry,
-  dataSource, onReset, onTodayOpen,
+  syncStatus, syncError, onSyncConnect, onSyncRetry,
+  dataSource, onReset,
 }) {
   const { dates, prev, next } = week
   const [menuOpen, setMenuOpen] = useState(false)
@@ -269,9 +216,6 @@ export default function Header({
       <button onClick={() => action(onPdfExport)} disabled={pdfGenerating}>
         <PdfIcon size={15} /><span>{pdfGenerating ? 'Génération…' : 'Exporter PDF'}</span>
       </button>
-      <button onClick={() => action(() => window.print())}>
-        <PrintIcon size={15} /><span>Imprimer</span>
-      </button>
       <div className="emp-menu-divider" />
       <button onClick={() => action(onSendToAll)}>
         <MailIcon size={15} /><span>Envoyer à tous</span>
@@ -299,9 +243,15 @@ export default function Header({
 
         {/* Centre : navigation semaine */}
         <div className="header-nav-center">
-          <button className="nav-btn" onClick={prev} aria-label="Semaine précédente">‹</button>
+          <button className="nav-btn" onClick={prev} aria-label="Semaine précédente"><svg xmlns="http://www.w3.org/2000/svg" width="12.728" height="12.728" fill="currentcolor" viewBox="0 0 12.728 12.728">
+  <path id="Tracé_12" data-name="Tracé 12" d="M613.332,602.91h-2v-9h9v2h-7Z" transform="translate(-852.235 18.683) rotate(-45)" fill="#7e7e7e"/>
+</svg>
+</button>
           <button className="week-label week-label--btn" onClick={onOpenPicker}>{range}</button>
-          <button className="nav-btn" onClick={next} aria-label="Semaine suivante">›</button>
+          <button className="nav-btn" onClick={next} aria-label="Semaine suivante"><svg xmlns="http://www.w3.org/2000/svg" width="12.728" height="12.728" fill="currentcolor" viewBox="0 0 12.728 12.728">
+  <path id="Tracé_13" data-name="Tracé 13" d="M8,9H-1V0H1V7H8Z" transform="translate(5.657 12.021) rotate(-135)" fill="#7e7e7e"/>
+</svg>
+</button>
         </div>
 
         {/* Droite : source données + sync + exports */}
@@ -311,21 +261,17 @@ export default function Header({
               {DATA_SOURCE_LABEL[dataSource]}
             </span>
           )}
-          <SyncButton
-            status={syncStatus}
-            error={syncError}
-            onConnect={onSyncConnect}
-            onDisconnect={onSyncDisconnect}
-            onRetry={onSyncRetry}
-          />
-          <button
-            className="header-menu-btn"
-            onClick={onTodayOpen}
-            aria-label="Qui est là aujourd'hui"
-            title="Aujourd'hui"
-          >
-            <TodayIcon />
-          </button>
+          <ConnectionDot connections={[{
+            label:     'Google Sheets',
+            status:    syncStatus === 'synced' ? 'connected' : syncStatus,
+            detail:    syncStatus === 'synced'       ? 'Synchronisé'
+                     : syncStatus === 'disconnected' ? 'Non connecté'
+                     : syncStatus === 'expired'      ? 'Session expirée'
+                     : syncStatus === 'error'        ? (syncError ?? 'Erreur de synchronisation')
+                     : 'Connexion en cours…',
+            onConnect: syncStatus === 'disconnected' ? onSyncConnect  : undefined,
+            onRetry:   (syncStatus === 'error' || syncStatus === 'expired') ? onSyncRetry : undefined,
+          }]} />
           <button
             ref={btnRef}
             className={`header-menu-btn${menuOpen ? ' active' : ''}`}

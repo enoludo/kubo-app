@@ -3,6 +3,21 @@ import { exportToExcel }  from '../utils/exportExcel'
 import { generatePdf }    from '../utils/exportPdf'
 import { buildTeamMailto } from '../utils/emailPlanning'
 
+function getMondayOf(date) {
+  const d = new Date(date), day = d.getDay()
+  d.setDate(d.getDate() + (day === 0 ? -6 : 1 - day))
+  d.setHours(0, 0, 0, 0)
+  return d
+}
+
+function offsetToWeekDates(offset, todayMonday) {
+  const mon = new Date(todayMonday)
+  mon.setDate(mon.getDate() + offset * 7)
+  return Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(mon); d.setDate(mon.getDate() + i); return d
+  })
+}
+
 export function useExports({ week, team, schedule }) {
   const [pdfGenerating, setPdfGenerating] = useState(false)
   const [pickerOpen,    setPickerOpen]    = useState(false)
@@ -10,6 +25,19 @@ export function useExports({ week, team, schedule }) {
   function handleSendToAll() {
     const href = buildTeamMailto(team, week.dates, schedule.shifts)
     if (href) window.location.href = href
+  }
+
+  function handleSendToAllSelection(offsets) {
+    const todayMonday = getMondayOf(new Date())
+    for (const offset of [...offsets].sort((a, b) => a - b)) {
+      const weekDates = offsetToWeekDates(offset, todayMonday)
+      const href = buildTeamMailto(team, weekDates, schedule.shifts)
+      if (href) {
+        const a = document.createElement('a')
+        a.href = href
+        a.click()
+      }
+    }
   }
 
   function handleExportSelection(offsets) {
@@ -27,15 +55,6 @@ export function useExports({ week, team, schedule }) {
       })
     }))
     exportToExcel(schedule.shifts.filter(s => dateStrs.has(s.date)), team)
-  }
-
-  function handlePrintSelection() {
-    setPickerOpen(false)
-    document.body.classList.add('printing-selection')
-    setTimeout(() => {
-      window.print()
-      document.body.classList.remove('printing-selection')
-    }, 100)
   }
 
   async function handlePdfExport(offsets) {
@@ -71,6 +90,6 @@ export function useExports({ week, team, schedule }) {
 
   return {
     pdfGenerating, pickerOpen, setPickerOpen,
-    handlePdfExport, handleSendToAll, handleExportSelection, handlePrintSelection,
+    handlePdfExport, handleSendToAll, handleSendToAllSelection, handleExportSelection,
   }
 }

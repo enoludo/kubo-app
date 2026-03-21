@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { dateToStr, WEEKLY_CONTRACT } from '../hooks/useSchedule'
-import { ExcelIcon, PrintIcon, PdfIcon } from './Icons'
+import { PdfIcon, MailIcon } from './Icons'
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -42,7 +42,7 @@ function effectiveH(s) {
 
 export default function WeekPickerPanel({
   shifts, team, currentOffset, onSelect, onClose,
-  onPrintSelection, onExportSelection, onPdfSelection, pdfGenerating,
+  onPdfSelection, onSendToAll, pdfGenerating,
 }) {
   const [selected, setSelected] = useState(new Set())
   const panelRef = useRef(null)
@@ -142,7 +142,6 @@ export default function WeekPickerPanel({
                   const sunday    = addDays(mon, 6)
                   const wn        = isoWeekNum(mon)
                   const isCurrent = offset === currentOffset
-                  const isPrint   = selected.has(offset)
                   const stats     = weekStats(mon)
 
                   let dotColor = null
@@ -157,14 +156,13 @@ export default function WeekPickerPanel({
                         'week-card',
                         isCurrent  ? 'week-card--current'  : '',
                         !stats.count ? 'week-card--empty' : '',
-                        isPrint    ? 'week-card--print'   : '',
                       ].filter(Boolean).join(' ')}
                       onClick={() => { onSelect(offset); onClose() }}
                     >
                       <input
                         type="checkbox"
                         className="week-card-check"
-                        checked={isPrint}
+                        checked={selected.has(offset)}
                         onChange={e => toggleSelect(offset, e)}
                         onClick={e => e.stopPropagation()}
                       />
@@ -190,13 +188,6 @@ export default function WeekPickerPanel({
         {/* Footer actions */}
         <div className="week-picker-footer">
           <button
-            className="export-btn"
-            disabled={selCount === 0}
-            onClick={() => selCount > 0 && onExportSelection([...selected])}
-          >
-            <ExcelIcon /><span>Exporter</span>
-          </button>
-          <button
             className="pdf-btn"
             disabled={selCount === 0 || pdfGenerating}
             onClick={() => selCount > 0 && !pdfGenerating && onPdfSelection([...selected])}
@@ -204,11 +195,11 @@ export default function WeekPickerPanel({
             <PdfIcon /><span>{pdfGenerating ? 'Génération…' : 'PDF'}</span>
           </button>
           <button
-            className="print-btn"
+            className="mail-btn"
             disabled={selCount === 0}
-            onClick={() => selCount > 0 && onPrintSelection([...selected])}
+            onClick={() => selCount > 0 && onSendToAll([...selected])}
           >
-            <PrintIcon /><span>Imprimer</span>
+            <MailIcon size={15} /><span>Envoyer à tous</span>
           </button>
         </div>
 

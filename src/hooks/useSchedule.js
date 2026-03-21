@@ -98,6 +98,38 @@ export function useSchedule() {
     ])
   }
 
+  // Colle les shifts d'une semaine source vers un autre employé
+  // mode 'merge'   : ajoute uniquement sur les jours vides de la semaine cible
+  // mode 'replace' : écrase tous les shifts non-validés de la semaine cible
+  function pasteShifts(targetEmployeeId, sourceShifts, sourceWeekKey, targetWeekKey, mode) {
+    console.log('[pasteShifts] in', { targetEmployeeId, sourceWeekKey, targetWeekKey, mode, sourceShifts })
+    const sourceMonday = new Date(sourceWeekKey + 'T00:00:00')
+    const targetMonday = new Date(targetWeekKey + 'T00:00:00')
+
+    setShifts(prev => {
+      let next = mode === 'replace'
+        ? prev.filter(s => !(s.employeeId === targetEmployeeId && mondayOf(s.date) === targetWeekKey && !s.validated))
+        : prev
+
+      const existingDays = new Set(
+        next.filter(s => s.employeeId === targetEmployeeId && mondayOf(s.date) === targetWeekKey).map(s => s.date)
+      )
+
+      const newShifts = sourceShifts.flatMap(s => {
+        const dayOffset  = Math.round((new Date(s.date + 'T00:00:00') - sourceMonday) / 86400000)
+        const td         = new Date(targetMonday)
+        td.setDate(targetMonday.getDate() + dayOffset)
+        const targetDate = dateToStr(td)
+        if (mode === 'merge' && existingDays.has(targetDate)) return []
+        const { id: _id, employeeId: _emp, date: _date, validated: _val, ...rest } = s
+        return [{ ...rest, id: crypto.randomUUID(), employeeId: targetEmployeeId, date: targetDate, validated: false }]
+      })
+
+      console.log('[pasteShifts] out', { newShifts, existingDays: [...existingDays] })
+      return [...next, ...newShifts]
+    })
+  }
+
   // Réinitialise aux données de démonstration (après confirmation utilisateur)
   function resetShifts() {
     setShifts(demoShifts)
@@ -152,7 +184,7 @@ export function useSchedule() {
 
   return {
     shifts, addShift, moveShift, updateShift, removeShift, removeEmployeeShifts,
-    toggleValidated, replaceWeekShifts, resetShifts,
+    toggleValidated, replaceWeekShifts, pasteShifts, resetShifts,
     getTotalHours, getWeekHours, getActiveWeeks, getBalance, getWeekBalance,
   }
 }

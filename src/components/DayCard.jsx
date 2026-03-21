@@ -1,4 +1,5 @@
 import { fmtTime } from '../utils/date'
+import { getTypeColor } from '../utils/theme'
 
 function fmtDur(h) {
   const m  = Math.round(h * 60)
@@ -27,26 +28,16 @@ function effectiveH(s) {
 }
 
 const STATUS = {
-  work:   { label: 'Travaillé', color: '#7AC5FF' },
-  leave:  { label: 'Congés',    color: '#C8AFFF' },
-  sick:   { label: 'Maladie',   color: '#FF9594' },
-  school: { label: 'École',     color: '#FFD866' },
-  rest:   { label: 'Repos',     color: '#66DA9B' },
-  absent: { label: 'Absent',    color: '#FFBB88' },
-}
-
-// Couleur de fond des cards par type (50% non validé, 25% validé)
-const TYPE_BG = {
-  work:   '#7AC5FF',
-  leave:  '#C8AFFF',
-  sick:   '#FF9594',
-  school: '#FFD866',
-  rest:   '#66DA9B',
-  absent: '#FFBB88',
+  work:   { label: 'Travaillé' },
+  leave:  { label: 'Congés'    },
+  sick:   { label: 'Maladie'   },
+  school: { label: 'École'     },
+  rest:   { label: 'Repos'     },
+  absent: { label: 'Absent'    },
 }
 
 function typeBg(type, validated) {
-  const base = TYPE_BG[type] ?? '#ffffff'
+  const base = getTypeColor(type)
   return base + (validated ? '1A' : '40')
 }
 
@@ -57,8 +48,8 @@ export default function DayCard({ employee, shifts, onAdd, onEdit, onToggleValid
     if (defaultType) {
       const st = STATUS[defaultType] || STATUS.work
       return (
-        <div className="day-card" style={{ background: typeBg(defaultType, false), '--card-border': (TYPE_BG[defaultType] ?? '#7c6fcd') + '99' }} onClick={onAdd}>
-          <span className="day-card-badge" style={{ background: st.color + '44', color: '#333' }}>
+        <div className="day-card" style={{ background: typeBg(defaultType, false), '--card-border': getTypeColor(defaultType) + '99' }} onClick={onAdd}>
+          <span className="day-card-badge" style={{ background: getTypeColor(defaultType) + '44', color: '#333' }}>
             {st.label}
           </span>
           <div className="day-card-label">Journée entière</div>
@@ -83,13 +74,13 @@ export default function DayCard({ employee, shifts, onAdd, onEdit, onToggleValid
   return (
     <div
       className={`day-card${isValidated ? ' day-card--validated' : ''}`}
-      style={{ background: typeBg(type, isValidated), '--card-border': (TYPE_BG[type] ?? '#7c6fcd') + '99' }}
+      style={{ background: typeBg(type, isValidated), '--card-border': getTypeColor(type) + '99' }}
       onClick={() => onEdit(mainShift.id)}
     >
       {/* Badge statut */}
       <span
         className="day-card-badge"
-        style={{ background: st.color + '44', color: '#333' }}
+        style={{ background: getTypeColor(type) + '44', color: '#333' }}
       >
         {st.label}
       </span>
@@ -100,7 +91,10 @@ export default function DayCard({ employee, shifts, onAdd, onEdit, onToggleValid
           className={`day-card-validate${isValidated ? ' is-validated' : ''}`}
           onClick={e => { e.stopPropagation(); onToggleValidated(mainShift.id) }}
           title={isValidated ? 'Dévalider' : 'Valider'}
-        >✓</button>
+        ><svg xmlns="http://www.w3.org/2000/svg" width="10.96" height="10.96" viewBox="0 0 10.96 10.96">
+  <path id="Tracé_95" data-name="Tracé 95" d="M641.295,1667.494h-9.75v-5.75h1.5v4.25h8.25Z" transform="translate(-1621.6 -721.566) rotate(-45)" fill="currentcolor"/>
+</svg>
+</button>
       )}
 
       {isWork ? (

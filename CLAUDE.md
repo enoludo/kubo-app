@@ -44,6 +44,13 @@ All architecture and rules are defined in:
 - /docs/database.md
 - /docs/features.md
 
+### Documentation obligatoire à lire
+
+Avant toute tâche sur un module spécifique, lire le fichier de contexte correspondant :
+
+- **Module Commandes** → `/docs/orders-context.md`
+  (canaux, règles métier, schéma de données, intégration Webflow, formulaires)
+
 You must always follow these documents.
 
 If any instruction conflicts with them:
@@ -111,6 +118,14 @@ Données de démonstration — modifier uniquement ici :
 - Équipe : `src/data/team.json`
 
 Ne pas mettre de données dans les hooks ou composants.
+
+---
+
+## Usage tactile
+
+L'app est utilisée principalement sur tablette.
+Aucune fonctionnalité ne doit dépendre du hover.
+Toutes les interactions doivent fonctionner au tap.
 
 ---
 

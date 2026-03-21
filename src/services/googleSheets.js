@@ -13,6 +13,7 @@
 
 import { START_HOUR, END_HOUR } from '../hooks/useSchedule'
 import { dateToStr, fmtTime, mondayOf, weekDatesFromMonday, weekSheetName } from '../utils/date'
+import { getTypeColor } from '../utils/theme'
 
 export { mondayOf, weekDatesFromMonday, weekSheetName } from '../utils/date'
 
@@ -22,9 +23,10 @@ const DAYS_FR     = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'
 const HIDDEN_START = 10   // colonne K
 const COLS_PER_DAY = 5   // Type, Début, Fin, Pause, Validé
 const HIDDEN_END   = HIDDEN_START + 7 * COLS_PER_DAY  // 45 (exclusive)
+const DEFAULT_REST = new Set([0, 6])  // Lundi, Dimanche — repos par défaut dans le Sheet
 
 // Dropdown options
-const TYPE_OPTIONS  = ['Travaillé', 'Congés', 'Repos', 'Arrêt maladie', 'École']
+const TYPE_OPTIONS  = ['Travaillé', 'Congés', 'Absent', 'Repos', 'Arrêt maladie', 'École']
 const PAUSE_OPTIONS = ['Aucune', '15min', '30min', '45min', '1h', '1h30', '2h']
 const TIME_OPTIONS  = (() => {
   const opts = []
@@ -36,8 +38,8 @@ const TIME_OPTIONS  = (() => {
 })()
 
 const TYPE_TO_LABEL = {
-  work: 'Travaillé', vacation: 'Congés', rest: 'Repos',
-  sick: 'Arrêt maladie', school: 'École',
+  work: 'Travaillé', leave: 'Congés', absent: 'Absent',
+  rest: 'Repos', sick: 'Arrêt maladie', school: 'École',
 }
 const LABEL_TO_TYPE = Object.fromEntries(
   Object.entries(TYPE_TO_LABEL).map(([k, v]) => [v, k])
@@ -120,13 +122,8 @@ function blendOnWhite(hex, opacity) {
   }
 }
 
-const TYPE_HEX = {
-  work: '#7AC5FF', vacation: '#C8AFFF', rest: '#66DA9B',
-  sick: '#FF9594', school: '#FFD866',
-}
-
 function shiftBgColor(type, validated) {
-  return blendOnWhite(TYPE_HEX[type] ?? TYPE_HEX.work, validated ? 0.2 : 0.4)
+  return blendOnWhite(getTypeColor(type), validated ? 0.2 : 0.4)
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -171,8 +168,9 @@ function colLetter(index) {
 // shift → 5 values [Type, Début, Fin, Pause, Validé]
 function shiftToHiddenCols(shift) {
   if (!shift) return ['', '', '', 'Aucune', false]
-  const label = TYPE_TO_LABEL[shift.type ?? 'work'] ?? 'Travaillé'
-  if ((shift.type ?? 'work') === 'work') {
+  const type  = shift.type ?? 'work'
+  const label = TYPE_TO_LABEL[type] ?? 'Travaillé'
+  if (type === 'work' || type === 'absent') {
     return [label, fmtTime(shift.startHour), fmtTime(shift.endHour), fmtPause(shift.pause), shift.validated ?? false]
   }
   return [label, '', '', 'Aucune', shift.validated ?? false]
@@ -184,34 +182,56 @@ function hiddenColsToShift(cols, employeeId, date, id) {
   if (!typeLabel || typeLabel === '') return null
   const type        = LABEL_TO_TYPE[String(typeLabel)] ?? 'work'
   const isValidated = parseBool(cols[4])
-  if (type !== 'work') {
-    return { id, employeeId, date, startHour: 0, endHour: 0, pause: 0, type, validated: isValidated }
+  if (type === 'work' || type === 'absent') {
+    return {
+      id, employeeId, date,
+      startHour: parseH(String(cols[1] ?? '')),
+      endHour:   parseH(String(cols[2] ?? '')),
+      pause:     parsePause(String(cols[3] ?? '')),
+      type, validated: isValidated,
+    }
   }
-  return {
-    id, employeeId, date,
-    startHour: parseH(String(cols[1] ?? '')),
-    endHour:   parseH(String(cols[2] ?? '')),
-    pause:     parsePause(String(cols[3] ?? '')),
-    type: 'work', validated: isValidated,
-  }
+  return { id, employeeId, date, startHour: 0, endHour: 0, pause: 0, type, validated: isValidated }
+}
+
+// Durée effective formatée (ex. 7h30)
+function fmtDur(start, end, pause) {
+  const dur = (end - start) - (pause ?? 0)
+  if (dur <= 0) return null
+  const h = Math.floor(dur)
+  const m = Math.round((dur - h) * 60)
+  return m > 0 ? `${h}h${String(m).padStart(2, '0')}` : `${h}h`
 }
 
 // Texte affiché dans une cellule jour — valeur directe (pas de formule)
 function shiftCellText(shift) {
-  const type  = shift.type ?? 'work'
-  const label = TYPE_TO_LABEL[type] ?? 'Travaillé'
-  const lines = []
+  const type      = shift.type ?? 'work'
+  const validated = shift.validated ?? false
+  let text
+
   if (type === 'work') {
-    lines.push(label)
-    lines.push(`${fmtTime(shift.startHour)} − ${fmtTime(shift.endHour)}`)
-    if (shift.pause) lines.push(`Pause ${fmtPause(shift.pause)}`)
-  } else if (type === 'vacation') {
-    lines.push('Congés — Journée entière')
+    const parts = [`${fmtTime(shift.startHour)} → ${fmtTime(shift.endHour)}`]
+    if (shift.pause) parts.push(`Pause ${fmtPause(shift.pause)}`)
+    const dur = fmtDur(shift.startHour, shift.endHour, shift.pause)
+    if (dur) parts.push(`${dur} eff.`)
+    text = parts.join(' | ')
+  } else if (type === 'leave') {
+    text = '🌴 Congés — Journée entière'
+  } else if (type === 'absent') {
+    text = `⚠ Absent — ${fmtTime(shift.startHour)} → ${fmtTime(shift.endHour)}`
+  } else if (type === 'school') {
+    text = shift.schoolAbsenceDuration
+      ? `📚 École — Absent ${shift.schoolAbsenceDuration}`
+      : '📚 École'
+  } else if (type === 'rest') {
+    text = 'Repos'
+  } else if (type === 'sick') {
+    text = 'Arrêt maladie'
   } else {
-    lines.push(label)
+    text = TYPE_TO_LABEL[type] ?? 'Travaillé'
   }
-  if (shift.validated) lines.push('✓ Validé')
-  return lines.join('\n')
+
+  return validated ? `✓ ${text}` : text
 }
 
 // 2D array for writing to K2:AS(n+1)
@@ -220,28 +240,34 @@ function buildHiddenColValues(activeTeam, weekDates, allShifts) {
   const wkShifts = allShifts.filter(s => strs.has(s.date))
   return activeTeam.map(emp => {
     const row = []
-    weekDates.forEach(date => {
+    weekDates.forEach((date, di) => {
       const shift = wkShifts.find(s => s.employeeId === emp.id && s.date === dateToStr(date))
-      row.push(...shiftToHiddenCols(shift))
+      if (!shift && DEFAULT_REST.has(di)) {
+        row.push('Repos', '', '', 'Aucune', false)
+      } else {
+        row.push(...shiftToHiddenCols(shift))
+      }
     })
     return row
   })
 }
 
 // Parse hidden col rows back into shift objects
+// Matching par position (index) : même ordre que buildHiddenColValues → activeTeam[ri-1]
+// Robuste aux renommages d'employés (P2 : plus de find-by-name)
 function parseHiddenRows(empRows, hiddenRows, team, weekDates) {
   if (!empRows || empRows.length < 2) return []
-  const colDates = weekDates.map(dateToStr)
-  const shifts   = []
+  const colDates   = weekDates.map(dateToStr)
+  const activeTeam = team.filter(e => !e.archived)
+  const shifts     = []
 
   for (let ri = 1; ri < empRows.length; ri++) {
-    const empCell = empRows[ri]?.[0]
-    if (!empCell) continue
-    const empName = String(empCell).split(' / ')[0].trim()
-    const emp     = team.find(e => e.name === empName)
+    // Index-based : la ligne ri correspond à activeTeam[ri-1]
+    // même ordre que buildHiddenColValues qui itère activeTeam.map(...)
+    const emp = activeTeam[ri - 1]
     if (!emp) continue
 
-    const hiddenRow = hiddenRows[ri] ?? []   // row 0 = hidden header, ri aligns
+    const hiddenRow = hiddenRows[ri] ?? []
     for (let di = 0; di < 7; di++) {
       const cols  = hiddenRow.slice(di * COLS_PER_DAY, di * COLS_PER_DAY + COLS_PER_DAY)
       if (!cols[0]) continue
@@ -278,9 +304,9 @@ function formatBalance(hours, zeroLabel = 'À jour') {
 }
 
 function balanceColors(balance) {
-  if (balance > 0) return { bg: blendOnWhite('#66DA9B', 0.3), fg: hexToRgb('#1A6B3A') }
+  if (balance > 0) return { bg: blendOnWhite(getTypeColor('rest'), 0.3), fg: hexToRgb('#1A6B3A') }
   if (balance < 0) return { bg: blendOnWhite('#F39C12', 0.25), fg: hexToRgb('#B06A00') }
-  return { bg: blendOnWhite('#66DA9B', 0.2), fg: hexToRgb('#1A6B3A') }
+  return { bg: blendOnWhite(getTypeColor('rest'), 0.2), fg: hexToRgb('#1A6B3A') }
 }
 
 // ─── Signature ID-indépendante ────────────────────────────────────────────────
@@ -401,13 +427,16 @@ async function formatWeekSheet(token, sheetId, team, weekDates, allShifts) {
       wrapStrategy: 'WRAP', textFormat: { fontSize: 9 },
     }))
 
-    // Couleur de fond par shift
+    // Couleur de fond par shift (+ Repos par défaut Lundi/Dimanche)
     activeTeam.forEach((emp, ri) => {
       weekDates.forEach((date, ci) => {
         const shift = wkShifts.find(s => s.employeeId === emp.id && s.date === dateToStr(date))
-        if (!shift) return
+        const bg = shift
+          ? shiftBgColor(shift.type, shift.validated)
+          : DEFAULT_REST.has(ci) ? blendOnWhite(getTypeColor('rest'), 0.4) : null
+        if (!bg) return
         requests.push(cellFmt(sheetId, ri + 1, ci + 1, {
-          backgroundColor: shiftBgColor(shift.type, shift.validated),
+          backgroundColor: bg,
           horizontalAlignment: 'CENTER', verticalAlignment: 'MIDDLE',
           wrapStrategy: 'WRAP', textFormat: { fontSize: 9 },
         }))
@@ -520,9 +549,10 @@ async function _writeWeekValues(token, weekDates, allShifts, team, sheetTitle) {
 
     const wkShiftsVisible = allShifts.filter(s => strs.has(s.date))
     await writeValues(token, `${sheetTitle}!B2`,
-      activeTeam.map(emp => weekDates.map(date => {
+      activeTeam.map(emp => weekDates.map((date, di) => {
         const shift = wkShiftsVisible.find(s => s.employeeId === emp.id && s.date === dateToStr(date))
-        return shift ? shiftCellText(shift) : ''
+        if (shift) return shiftCellText(shift)
+        return DEFAULT_REST.has(di) ? 'Repos' : ''
       })))
 
     await writeValues(token, `${sheetTitle}!I2`,
@@ -547,6 +577,7 @@ async function _writeWeekValues(token, weekDates, allShifts, team, sheetTitle) {
 
 export async function writeWeekToSheet(token, weekDates, allShifts, team) {
   const name    = weekSheetName(weekDates)
+  console.log('[googleSheets] writeWeekToSheet', name, allShifts.filter(s => new Set(weekDates.map(dateToStr)).has(s.date)).length, 'shifts')
   const sheetId = await _writeWeekValues(token, weekDates, allShifts, team, name)
   await formatWeekSheet(token, sheetId, team, weekDates, allShifts)
 }
@@ -558,6 +589,7 @@ export async function writeWeekToSheet(token, weekDates, allShifts, team) {
 // 3 tentatives, puis throw avec isSyncFailure = true
 export async function writeWeekAtomically(token, weekDates, allShifts, team) {
   const targetName = weekSheetName(weekDates)
+  console.log('[googleSheets] writeWeekAtomically', targetName, allShifts.filter(s => new Set(weekDates.map(dateToStr)).has(s.date)).length, 'shifts')
   const LAST_COL   = colLetter(HIDDEN_END - 1)
   const MAX_RETRIES = 3
 
@@ -626,6 +658,94 @@ export async function readTeamFromSheet(token, existingTeam = []) {
     return rowsToTeam(rows, existingTeam)
   } catch (e) {
     if (e.status === 400 || String(e.message).includes('Unable to parse range')) return existingTeam
+    throw e
+  }
+}
+
+// ─── Commandes boutique ───────────────────────────────────────────────────────
+// Feuille "Commandes" — une ligne par commande boutique ou brunch boutique.
+// Les commandes Webflow (webflowOrderId non null) ne sont pas dans cette feuille.
+
+const ORDERS_SHEET = 'Commandes'
+const ORDERS_HDR   = [
+  'id', 'channel', 'brunchSource', 'customer_name', 'customer_phone',
+  'customer_email', 'items', 'totalPrice', 'pickupDate', 'pickupTime',
+  'paid', 'status', 'createdAt', 'updatedAt',
+]
+
+export function ordersToRows(orders) {
+  return [
+    ORDERS_HDR,
+    ...orders.map(o => [
+      o.id,
+      o.channel,
+      o.brunchSource  ?? '',
+      o.customer?.name  ?? '',
+      o.customer?.phone ?? '',
+      o.customer?.email ?? '',
+      JSON.stringify(o.items ?? []),
+      o.totalPrice   ?? 0,
+      o.pickupDate   ?? '',
+      o.pickupTime   ?? '',
+      o.paid ? 'true' : 'false',
+      o.status       ?? 'new',
+      o.createdAt    ?? '',
+      o.updatedAt    ?? '',
+    ]),
+  ]
+}
+
+export function rowsToOrders(rows) {
+  if (!rows || rows.length < 2) return []
+  return rows.slice(1)
+    .filter(r => r[0] != null && r[0] !== '')
+    .map(r => {
+      let items = []
+      try { items = JSON.parse(r[6] ?? '[]') } catch {}
+      return {
+        id:             String(r[0]),
+        channel:        String(r[1] ?? 'boutique'),
+        brunchSource:   r[2] ? String(r[2]) : null,
+        customer: {
+          name:  String(r[3] ?? ''),
+          phone: r[4] ? String(r[4]) : null,
+          email: r[5] ? String(r[5]) : null,
+        },
+        items,
+        totalPrice:     Number(r[7]  ?? 0),
+        pickupDate:     String(r[8]  ?? ''),
+        pickupTime:     r[9]  ? String(r[9])  : null,
+        paid:           parseBool(r[10]),
+        status:         String(r[11] ?? 'new'),
+        createdAt:      String(r[12] ?? ''),
+        updatedAt:      String(r[13] ?? ''),
+        webflowOrderId: null,
+      }
+    })
+}
+
+export async function writeOrdersToSheet(token, orders) {
+  await ensureSheet(token, ORDERS_SHEET)
+  await clearRange(token, `${ORDERS_SHEET}!A:N`)
+  if (orders.length > 0) {
+    await writeValues(token, `${ORDERS_SHEET}!A1`, ordersToRows(orders))
+  } else {
+    // Garder l'en-tête même si aucune commande
+    await writeValues(token, `${ORDERS_SHEET}!A1`, [ORDERS_HDR])
+  }
+  console.log('[googleSheets] writeOrdersToSheet', orders.length, 'commandes')
+}
+
+export async function readOrdersFromSheet(token) {
+  console.log('[googleSheets] readOrdersFromSheet — lecture feuille "Commandes"')
+  try {
+    const rows = await readValues(token, `${ORDERS_SHEET}!A:N`)
+    const orders = rowsToOrders(rows)
+    console.log('[googleSheets] readOrdersFromSheet —', orders.length, 'commandes parsées')
+    return orders
+  } catch (e) {
+    console.warn('[googleSheets] readOrdersFromSheet — erreur:', e.message)
+    if (e.status === 400 || String(e.message).includes('Unable to parse range')) return []
     throw e
   }
 }

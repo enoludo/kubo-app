@@ -73,21 +73,27 @@ function IconSuppliers() {
 
 function IconSettings() {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-      stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="3"/>
-      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-    </svg>
+    <svg xmlns="http://www.w3.org/2000/svg" width="19.069" height="19.068" fill="currentcolor" viewBox="0 0 19.069 19.068">
+  <g id="Groupe_33" data-name="Groupe 33" transform="translate(0.159 0.161)" opacity="0.5">
+    <path id="Tracé_48" data-name="Tracé 48" d="M12.386-.161a2.281,2.281,0,0,1,2.277,2.4l-.055,1.094a.78.78,0,0,0,.817.818l1.092-.055.114,0a2.28,2.28,0,0,1,1.529,3.972l-.815.735a.781.781,0,0,0,0,1.159l.814.734a2.28,2.28,0,0,1-1.644,3.97L15.421,14.6H15.38a.78.78,0,0,0-.779.82l.056,1.094a2.28,2.28,0,0,1-3.96,1.646l-.738-.817a.78.78,0,0,0-1.159,0l-.74.815a2.28,2.28,0,0,1-3.965-1.638l.056-1.1a.78.78,0,0,0-.819-.819l-1.094.056c-.039,0-.079,0-.118,0A2.28,2.28,0,0,1,.59,10.694L1.4,9.959A.781.781,0,0,0,1.4,8.8L.59,8.06A2.28,2.28,0,0,1,2.23,4.095l1.1.056h.042a.78.78,0,0,0,.778-.821l-.053-1.1A2.28,2.28,0,0,1,8.059.589l.735.812a.779.779,0,0,0,1.159,0L10.7.589A2.283,2.283,0,0,1,12.386-.161Zm3,5.809A2.28,2.28,0,0,1,13.11,3.254l.055-1.094A.78.78,0,0,0,11.806,1.6l-.741.813a2.279,2.279,0,0,1-3.383,0L6.949,1.6a.78.78,0,0,0-1.356.563l.052,1.094a2.28,2.28,0,0,1-2.4,2.394L2.157,5.593H2.121A.78.78,0,0,0,1.6,6.949l.813.738a2.281,2.281,0,0,1,0,3.385l-.813.734a.78.78,0,0,0,.565,1.356l1.095-.056.117,0a2.28,2.28,0,0,1,2.277,2.4l-.056,1.094a.78.78,0,0,0,1.357.557l.738-.813a2.28,2.28,0,0,1,3.384,0l.735.813a.78.78,0,0,0,1.352-.565L13.1,15.5A2.28,2.28,0,0,1,15.5,13.106l1.093.055h.04a.78.78,0,0,0,.523-1.36l-.814-.734a2.281,2.281,0,0,1,0-3.386l.814-.735a.78.78,0,0,0-.562-1.358L15.5,5.645Z"/>
+    <path id="Tracé_49" data-name="Tracé 49" d="M9.375,13.641a4.266,4.266,0,0,1,0-8.531h0a4.266,4.266,0,1,1,0,8.531ZM6.609,9.373s0,0,0,0a2.766,2.766,0,1,0,.81-1.956A2.769,2.769,0,0,0,6.609,9.376Z"/>
+  </g>
+</svg>
+
   )
 }
 
 function IconProfile() {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-      stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-      <circle cx="12" cy="7" r="4"/>
-    </svg>
+    <svg xmlns="http://www.w3.org/2000/svg" width="16.734" height="19.078" fill="currentcolor" viewBox="0 0 16.734 19.078">
+  <g id="Groupe_34" data-name="Groupe 34" transform="translate(-1.008 0.164)" opacity="0.5">
+    <path id="Tracé_22" data-name="Tracé 22" d="M9.375,9.539a4.852,4.852,0,1,1,4.852-4.852A4.857,4.857,0,0,1,9.375,9.539ZM6.023,4.687a3.352,3.352,0,1,0,.982-2.37A3.355,3.355,0,0,0,6.023,4.687Z"/>
+    <path id="Tracé_23" data-name="Tracé 23" d="M10.745,5.438h0A7.593,7.593,0,0,1,5.3,3.125a.75.75,0,0,1,1.08-1.041,6.082,6.082,0,0,0,4.361,1.853,6.015,6.015,0,0,0,2.4-.494.75.75,0,1,1,.594,1.378A7.512,7.512,0,0,1,10.745,5.438Z"/>
+    <path id="Tracé_24" data-name="Tracé 24" d="M16.992,18.914a.75.75,0,0,1-.75-.75,6.867,6.867,0,1,0-13.734,0,.75.75,0,0,1-1.5,0,8.367,8.367,0,0,1,16.734,0A.75.75,0,0,1,16.992,18.914Z"/>
+    <path id="Tracé_25" data-name="Tracé 25" d="M9.375,15.4a3.68,3.68,0,0,1-3.68-3.68v-.587a.75.75,0,0,1,1.5,0v.587a2.18,2.18,0,0,0,4.359,0v-.587a.75.75,0,0,1,1.5,0v.587A3.684,3.684,0,0,1,9.375,15.4Z"/>
+  </g>
+</svg>
+
   )
 }
 
@@ -95,19 +101,19 @@ function IconProfile() {
 const MODULES = [
   { id: 'planning',   label: 'Planning',      icon: IconPlanning,  available: true  },
   { id: 'hygiene',    label: 'Hygiène',       icon: IconHygiene,   available: false },
-  { id: 'orders',     label: 'Commandes',     icon: IconOrders,    available: false },
+  { id: 'orders',     label: 'Commandes',     icon: IconOrders,    available: true  },
   { id: 'products',   label: 'Produits',      icon: IconProducts,  available: false },
   { id: 'recipes',    label: 'Recettes',      icon: IconRecipes,   available: false },
   { id: 'suppliers',  label: 'Fournisseurs',  icon: IconSuppliers, available: false },
 ]
 
-export default function NavSidebar({ activeModule = 'planning' }) {
+export default function NavSidebar({ activeModule = 'planning', onModuleChange, badges = {} }) {
   return (
     <nav className="nav-sidebar">
 
       {/* Logo */}
       <div className="nav-logo">
-        <svg xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" width="36" height="36" viewBox="0 0 48 47.999" fill="currentColor">
+        <svg xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" width="48px" height="48px" viewBox="0 0 48 47.999" fill="currentColor">
           <defs><clipPath id="clip-path"><rect width="48px" height="48px"/></clipPath></defs>
           <g transform="translate(0 0.004)">
             <path d="M320.276,279.849l1.649-1.648,4.237,5.562h2.589l-5.349-7.038,5.273-5.273h-1.155l-7.248,7.248v-7.248h-2.065v12.31h2.067Z" transform="translate(-306.901 -261.809)"/>
@@ -125,16 +131,19 @@ export default function NavSidebar({ activeModule = 'planning' }) {
       {/* Modules */}
       <div className="nav-modules">
         {MODULES.filter(mod => ENABLED_MODULES.includes(mod.id)).map(mod => {
-          const Icon = mod.icon
+          const Icon    = mod.icon
           const isActive = mod.id === activeModule
+          const badge   = badges[mod.id]
           return (
             <button
               key={mod.id}
               className={`nav-item${isActive ? ' nav-item--active' : ''}${!mod.available ? ' nav-item--disabled' : ''}`}
               title={mod.available ? mod.label : `${mod.label} (bientôt)`}
               disabled={!mod.available}
+              onClick={() => mod.available && onModuleChange?.(mod.id)}
             >
               <Icon />
+              {badge > 0 && <span className="nav-badge">{badge}</span>}
             </button>
           )
         })}

@@ -1,15 +1,14 @@
-// ─── Synchronisation bidirectionnelle avec Google Sheets ─────────────────────
+// ─── Synchronisation Google Sheets — App comme source de vérité ──────────────
 //
 // Flux :
-//  1. autoConnect() au montage → auth silencieuse → pull Sheets → polling
-//  2. connect() manuel → popup OAuth → push local → polling
-//  3. Chaque modification locale → debounce 1s → push semaines affectées
-//  4. Polling 30s → compare Sheets vs dernier push → applique ou conflit
-//  5. Token check 45min → refresh silencieux proactif si <5min restantes
-//  6. Erreur 401/403 → refresh silencieux → retry → ou 'expired'
+//  1. autoConnect() au montage → auth silencieuse → pull initial → statut 'synced'
+//  2. connect() manuel → popup OAuth → push local → statut 'synced'
+//  3. Chaque modification locale → debounce 1s → push semaines modifiées uniquement
+//  4. Token check 45min → refresh silencieux proactif si <5min restantes
+//  5. Erreur 401/403 → refresh silencieux → retry unique → ou 'expired'
 //
-// Anti-boucle   : suppressRef bloque le push après un pull entrant
-// Anti-doublon  : reconnectingRef empêche des refreshs concurrents
+// L'app est la seule source de vérité.
+// Le Sheet est une vue en lecture. Pas de polling, pas de résolution de conflits.
 
 import { useState, useEffect, useRef } from 'react'
 import {
@@ -24,7 +23,6 @@ import { getDataService, setDataService, clearDataService } from '../services/Da
 import { GoogleSheetsAdapter } from '../services/adapters/GoogleSheetsAdapter'
 
 const DEBOUNCE_MS          = 1_000
-const POLL_MS              = 30_000
 const TOKEN_CHECK_MS       = 45 * 60 * 1_000  // vérification proactive toutes les 45min
 const TOKEN_EXPIRY_WARN_MS =  5 * 60 * 1_000  // refresh si moins de 5min restantes
 
@@ -40,36 +38,42 @@ export function useGoogleSync({
   replaceWeekShifts,
   onToast,
 }) {
-  const [status,   setStatus]   = useState('connecting')
-  const [errMsg,   setErrMsg]   = useState(null)
-  const [conflict, setConflict] = useState(null)
-  const [loading,  setLoading]  = useState(true)
+  // C6 : status initial conditionnel — pas de spinner si Sheets non configuré
+  const hasConfig = !!(import.meta.env.VITE_GOOGLE_CLIENT_ID && import.meta.env.VITE_GOOGLE_SHEET_ID)
+  const [status,  setStatus]  = useState(hasConfig ? 'connecting' : 'disconnected')
+  const [errMsg,  setErrMsg]  = useState(null)
+  const [loading, setLoading] = useState(hasConfig)
 
   // Refs — stables dans les closures asynchrones
-  const tokenRef        = useRef(null)
-  const shiftsRef       = useRef(shifts)
-  const teamRef         = useRef(team)
-  const weekDatesRef    = useRef(weekDates)
-  const suppressRef     = useRef(false)
-  const dirtyRef        = useRef(false)
-  const debounceRef     = useRef(null)
-  const pollRef         = useRef(null)
-  const tokenCheckRef   = useRef(null)
-  const reconnectingRef = useRef(false)  // empêche les refreshs concurrents
-  const lastPushedRef   = useRef({})
+  const tokenRef          = useRef(null)
+  const shiftsRef         = useRef(shifts)
+  const teamRef           = useRef(team)
+  const weekDatesRef      = useRef(weekDates)
+  // C1 : suppressRef consommé une seule fois après le pull initial (pattern consume-once)
+  const suppressRef       = useRef(false)
+  const debounceRef       = useRef(null)
+  const tokenCheckRef     = useRef(null)
+  const reconnectingRef   = useRef(false)
+  // C2 : sigs par semaine — push uniquement si le contenu a changé
+  const lastPushedRef     = useRef({})
+  // C3 : sig équipe — évite de repousser l'équipe inchangée
+  const lastTeamSigRef    = useRef(null)
 
-  // Synchroniser les refs avec les props
+  // Sync refs
   useEffect(() => { shiftsRef.current    = shifts    }, [shifts])
   useEffect(() => { teamRef.current      = team      }, [team])
   useEffect(() => { weekDatesRef.current = weekDates }, [weekDates])
 
-  // Déclencheur debounce — push outbound après chaque modification locale
+  // Debounce push — déclenché à chaque modification locale
   useEffect(() => {
     if (!tokenRef.current) return
-    if (suppressRef.current) return
-    dirtyRef.current = true
+    // C1 : consume-once — premier fire après un pull : on absorbe sans pousser
+    if (suppressRef.current) {
+      suppressRef.current = false
+      return
+    }
     clearTimeout(debounceRef.current)
-    debounceRef.current = setTimeout(pushAll, DEBOUNCE_MS)
+    debounceRef.current = setTimeout(push, DEBOUNCE_MS)
   }, [shifts, team]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Auto-connect silencieux au montage
@@ -78,11 +82,10 @@ export function useGoogleSync({
   // Cleanup au démontage
   useEffect(() => () => {
     clearTimeout(debounceRef.current)
-    clearInterval(pollRef.current)
     clearInterval(tokenCheckRef.current)
   }, [])
 
-  // ── Refresh silencieux du token ───────────────────────────────────────────
+  // ── Token management ──────────────────────────────────────────────────────
 
   async function attemptSilentRefresh() {
     try {
@@ -96,66 +99,47 @@ export function useGoogleSync({
     }
   }
 
-  // Token expiré définitivement — stoppe tout, passe en 'expired'
   function handleTokenExpired() {
     tokenRef.current        = null
     reconnectingRef.current = false
-    clearInterval(pollRef.current)
     clearInterval(tokenCheckRef.current)
     clearDataService()
     setStatus('expired')
     setErrMsg('Session Google expirée — reconnectez pour reprendre la sync')
   }
 
-  // Appelé quand une API retourne 401 / 403 — tente le refresh puis retry
-  async function handleAuthError(retryFn) {
-    if (reconnectingRef.current) return
+  // C5 : refresh silencieux sans retry récursif — retourne true si réussi
+  async function handleAuthError() {
+    if (reconnectingRef.current) return false
     reconnectingRef.current = true
     setStatus('reconnecting')
-
     const ok = await attemptSilentRefresh()
     reconnectingRef.current = false
-
-    if (!ok) {
-      handleTokenExpired()
-      return
-    }
-
+    if (!ok) { handleTokenExpired(); return false }
     setStatus('synced')
-    // Rejouer l'opération qui a échoué avec le nouveau token
-    if (retryFn) {
-      try { await retryFn() } catch { handleTokenExpired() }
-    }
+    return true
   }
 
-  // Vérification proactive : refresh si le token expire dans moins de WARN ms
   async function ensureFreshToken() {
     if (!tokenRef.current)              return
     if (!isTokenExpiringSoon(TOKEN_EXPIRY_WARN_MS)) return
     if (reconnectingRef.current)        return
-
     reconnectingRef.current = true
     setStatus('reconnecting')
     const ok = await attemptSilentRefresh()
     reconnectingRef.current = false
-
     if (!ok) { handleTokenExpired() } else { setStatus('synced') }
   }
 
-  // Timer toutes les 45 min — refresh proactif avant expiration
   function startTokenCheck() {
     clearInterval(tokenCheckRef.current)
     tokenCheckRef.current = setInterval(ensureFreshToken, TOKEN_CHECK_MS)
   }
 
-  // ── Auth silencieux au montage ────────────────────────────────────────────
+  // ── Auto-connect silencieux au montage ────────────────────────────────────
 
   async function autoConnect() {
-    if (!import.meta.env.VITE_GOOGLE_CLIENT_ID || !import.meta.env.VITE_GOOGLE_SHEET_ID) {
-      setStatus('disconnected')
-      setLoading(false)
-      return
-    }
+    if (!hasConfig) return  // status déjà 'disconnected'
     try {
       await loadGIS()
       const token = await new Promise((resolve, reject) => {
@@ -165,7 +149,6 @@ export function useGoogleSync({
       tokenRef.current = token
       setDataService(new GoogleSheetsAdapter(tokenRef))
       await pullFromSheet()
-      startPolling()
       startTokenCheck()
     } catch {
       setStatus('disconnected')
@@ -173,30 +156,35 @@ export function useGoogleSync({
     }
   }
 
-  // ── Pull initial : Sheets → App ───────────────────────────────────────────
+  // ── Pull initial : Sheets → App (une seule fois au connect) ──────────────
 
   async function pullFromSheet() {
-    const token = tokenRef.current
-    if (!token) { setLoading(false); return }
+    if (!tokenRef.current) { setLoading(false); return }
     try {
-      suppressRef.current = true
       const curWD = weekDatesRef.current
-      const name  = weekSheetName(curWD)
       const ds    = getDataService()
       const [remShifts, remTeam] = await Promise.all([
         ds.getShifts(curWD, teamRef.current),
         ds.getEmployees(teamRef.current),
       ])
-      if (remShifts.length > 0) {
-        replaceWeekShifts(curWD, remShifts)
-        lastPushedRef.current[name] = shiftsSig(remShifts)
-      } else {
-        const localStrs = new Set(curWD.map(d => dateToStr(d)))
-        const localWk   = shiftsRef.current.filter(s => localStrs.has(s.date))
-        lastPushedRef.current[name] = shiftsSig(localWk)
+
+      // Appliquer les données distantes et armer la suppression
+      if (remShifts.length > 0 || remTeam.length > 0) {
+        // C1 : suppress = true AVANT les mises à jour d'état pour bloquer le premier push
+        suppressRef.current = true
+        if (remShifts.length > 0) replaceWeekShifts(curWD, remShifts)
+        if (remTeam.length > 0)   setTeam(() => remTeam)
       }
-      if (remTeam.length > 0) setTeam(prev => remTeam.length > 0 ? remTeam : prev)
-      setTimeout(() => { suppressRef.current = false }, 100)
+
+      // Initialiser les sigs pour éviter de repousser du contenu non modifié
+      const name      = weekSheetName(curWD)
+      const localStrs = new Set(curWD.map(d => dateToStr(d)))
+      const wkShifts  = remShifts.length > 0
+        ? remShifts
+        : shiftsRef.current.filter(s => localStrs.has(s.date))
+      lastPushedRef.current[name] = shiftsSig(wkShifts)
+      lastTeamSigRef.current      = JSON.stringify(remTeam.length > 0 ? remTeam : teamRef.current)
+
       setStatus('synced')
     } catch (err) {
       if (isAuthError(err)) {
@@ -210,7 +198,7 @@ export function useGoogleSync({
     }
   }
 
-  // ── Auth manuel (popup) ───────────────────────────────────────────────────
+  // ── Connect manuel (popup OAuth) ──────────────────────────────────────────
 
   async function connect() {
     setStatus('syncing')
@@ -223,8 +211,7 @@ export function useGoogleSync({
       })
       tokenRef.current = token
       setDataService(new GoogleSheetsAdapter(tokenRef))
-      await pushAll()
-      startPolling()
+      await push()
       startTokenCheck()
     } catch (err) {
       setStatus('error')
@@ -236,24 +223,20 @@ export function useGoogleSync({
     revokeToken()
     tokenRef.current        = null
     reconnectingRef.current = false
-    clearInterval(pollRef.current)
     clearInterval(tokenCheckRef.current)
     clearTimeout(debounceRef.current)
-    dirtyRef.current = false
     clearDataService()
     setStatus('disconnected')
     setErrMsg(null)
-    setConflict(null)
   }
 
   // ── Push : App → Sheets ───────────────────────────────────────────────────
 
-  async function pushAll() {
+  async function push(isRetry = false) {
     if (!tokenRef.current) return
 
-    // Refresh proactif si token proche de l'expiration
     await ensureFreshToken()
-    if (!tokenRef.current) return  // expire pendant le refresh
+    if (!tokenRef.current) return
 
     setStatus('syncing')
     try {
@@ -261,31 +244,37 @@ export function useGoogleSync({
       const curTeam   = teamRef.current
       const ds        = getDataService()
 
-      await ds.saveEmployees(curTeam)
-
-      const mondays = [...new Set(curShifts.map(s => mondayOf(s.date)))]
-      for (const mon of mondays) {
-        const wd   = weekDatesFromMonday(mon)
-        const name = weekSheetName(wd)
-        const strs = new Set(wd.map(d => {
-          const y  = d.getFullYear()
-          const m  = String(d.getMonth() + 1).padStart(2, '0')
-          const dd = String(d.getDate()).padStart(2, '0')
-          return `${y}-${m}-${dd}`
-        }))
-        const wkShifts = curShifts.filter(s => strs.has(s.date))
-        await ds.saveWeekShifts(wd, curShifts, curTeam)
-        lastPushedRef.current[name] = shiftsSig(wkShifts)
+      // C3 : push équipe uniquement si elle a changé
+      const teamSig = JSON.stringify(curTeam)
+      if (teamSig !== lastTeamSigRef.current) {
+        await ds.saveEmployees(curTeam)
+        lastTeamSigRef.current = teamSig
       }
 
-      dirtyRef.current = false
+      // C2 : push uniquement les semaines dont le contenu a changé
+      const mondays = [...new Set(curShifts.map(s => mondayOf(s.date)))]
+      for (const mon of mondays) {
+        const wd       = weekDatesFromMonday(mon)
+        const name     = weekSheetName(wd)
+        const strs     = new Set(wd.map(d => dateToStr(d)))  // C7 : dateToStr de utils
+        const wkShifts = curShifts.filter(s => strs.has(s.date))
+        const sig      = shiftsSig(wkShifts)
+        if (sig === lastPushedRef.current[name]) continue  // inchangé, on saute
+        await ds.saveWeekShifts(wd, curShifts, curTeam)
+        lastPushedRef.current[name] = sig
+      }
+
       setStatus('synced')
     } catch (err) {
-      if (isAuthError(err)) {
-        await handleAuthError(pushAll)  // retry après refresh
+      if (isAuthError(err) && !isRetry) {
+        // C5 : refresh + retry unique, pas de récursion indéfinie
+        const refreshed = await handleAuthError()
+        if (refreshed) {
+          try { await push(true) } catch (e2) { setErrMsg(e2.message); setStatus('error') }
+        }
       } else if (err.isSyncFailure) {
-        onToast('Sync échouée — données locales préservées', '#E05555')
-        setStatus('session')
+        onToast?.('Sync échouée — données locales préservées', '#E05555')
+        setStatus('synced')  // C8 : 'synced' pas 'session' (statut inexistant)
       } else {
         setErrMsg(err.message)
         setStatus('error')
@@ -293,76 +282,13 @@ export function useGoogleSync({
     }
   }
 
-  // ── Poll : Sheets → App ───────────────────────────────────────────────────
-
-  async function pollCurrentWeek() {
-    if (!tokenRef.current) return
-
-    await ensureFreshToken()
-    if (!tokenRef.current) return
-
-    const curWD = weekDatesRef.current
-    const name  = weekSheetName(curWD)
-    const ds    = getDataService()
-    try {
-      const remShifts = await ds.getShifts(curWD, teamRef.current)
-      const remSig    = shiftsSig(remShifts)
-      const lastSig   = lastPushedRef.current[name]
-
-      if (lastSig !== undefined && remSig === lastSig) return
-
-      if (dirtyRef.current) {
-        const remTeam = await ds.getEmployees(teamRef.current)
-        setConflict({ remoteShifts: remShifts, remoteTeam: remTeam })
-      } else {
-        suppressRef.current = true
-        const remTeam = await ds.getEmployees(teamRef.current)
-        setTeam(prev => remTeam.length > 0 ? remTeam : prev)
-        replaceWeekShifts(curWD, remShifts)
-        lastPushedRef.current[name] = shiftsSig(remShifts)
-        setTimeout(() => { suppressRef.current = false }, 100)
-        onToast?.('Planning mis à jour depuis Google Sheets', '#4CAF50')
-      }
-    } catch (err) {
-      if (isAuthError(err)) {
-        await handleAuthError(pollCurrentWeek)
-      }
-      // Autres erreurs : silencieux, retry au prochain poll
-    }
-  }
-
-  function startPolling() {
-    clearInterval(pollRef.current)
-    pollRef.current = setInterval(pollCurrentWeek, POLL_MS)
-  }
-
-  // ── Résolution de conflit ─────────────────────────────────────────────────
-
-  function resolveConflict(choice) {
-    if (!conflict) return
-    if (choice === 'remote') {
-      suppressRef.current = true
-      const curWD = weekDatesRef.current
-      const name  = weekSheetName(curWD)
-      if (conflict.remoteTeam?.length > 0) setTeam(conflict.remoteTeam)
-      replaceWeekShifts(curWD, conflict.remoteShifts)
-      lastPushedRef.current[name] = shiftsSig(conflict.remoteShifts)
-      setTimeout(() => { suppressRef.current = false }, 100)
-    } else {
-      pushAll()
-    }
-    setConflict(null)
-  }
-
-  // ── Retry / Reconnexion ───────────────────────────────────────────────────
+  // ── Retry ─────────────────────────────────────────────────────────────────
 
   async function retry() {
     setErrMsg(null)
-    // Pas de token (expired ou jamais connecté) → popup OAuth
     if (!tokenRef.current) { connect(); return }
-    await pushAll()
-    if (tokenRef.current) startPolling()
+    await push()
   }
 
-  return { status, errMsg, conflict, loading, connect, disconnect, resolveConflict, retry }
+  return { status, errMsg, loading, connect, disconnect, retry }
 }

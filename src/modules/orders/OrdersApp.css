@@ -1,0 +1,959 @@
+/* ─── Module Commandes — styles ──────────────────────────────────────────────
+   Règle absolue : uniquement des variables CSS existantes.
+   Aucun override du module Planning.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* ── Header ──────────────────────────────────────────────────────────────── */
+
+/* Badge "X commandes à venir" — cercle vert + label noir */
+.orders-upcoming-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.orders-upcoming-badge-count {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background: var(--color-success);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+/* Label mois centré — même style que .week-label--btn du Planning */
+.orders-month-label {
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(18px, 1.2vw, 22px);
+  font-weight: 400;
+  color: var(--text);
+  min-width: 160px;
+  text-align: center;
+  padding: 0 var(--radius-lg);
+  user-select: none;
+}
+
+/* Bouton Nouvelle commande — CTA primaire, même style que modal-confirm */
+.orders-new-btn {
+    width: auto;
+    height:3rem;
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 10px 2rem;
+  border-radius: var(--radius-sm);
+  border: 1px dashed var(--border-m);
+  background: transparent;
+  cursor: pointer;
+  transition: border-color var(--t-base), background var(--t-base);
+  font-family: 'Poppins', sans-serif;
+}
+.orders-new-btn:hover    { opacity: 0.85; }
+.orders-new-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ── Body ────────────────────────────────────────────────────────────────── */
+
+.orders-body {
+  overflow: hidden;
+}
+
+/* ── Calendrier ──────────────────────────────────────────────────────────── */
+
+/* Même structure que .tv-body : padding var(--pad-h), gap var(--gap) */
+.orders-calendar {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 0 var(--pad-h) var(--pad-h);
+  gap: var(--gap);
+}
+
+/* En-tête des jours — même gap que .tv-header-row */
+.orders-cal-header {
+  display: grid;
+  align-items: center;
+  height:5rem;
+  grid-template-columns: repeat(7, 1fr);
+  gap: var(--gap);
+  flex-shrink: 0;
+}
+
+/* Noms de jours — même style que .tv-hdr-name */
+.orders-cal-day-name {
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(10px, 0.75vw, 12px);
+  font-weight: 600;
+  color: var(--text-2);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  text-align: center;
+  padding: 10px 4px;
+}
+
+/* Corps du calendrier : 6 rangées — même gap que .tv-body */
+.orders-cal-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  min-height: 0;
+}
+
+/* Grille semaine — même gap que entre les day-cards */
+.orders-cal-week {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  flex: 1;
+  gap: var(--gap);
+  min-height: clamp(80px, 9vh, 140px);
+}
+
+/* ── Cellule jour — même style que .day-card ─────────────────────────────── */
+
+.order-day-cell {
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  min-height: clamp(80px, 9vh, 140px);
+  overflow: hidden;
+  border: 1px solid transparent;
+  transition: border-color var(--t-base), background var(--t-base);
+}
+
+/* Jours hors du mois courant */
+.order-day-cell--outside {
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+/* Cases vides (non samedi, mois courant) — même style que .day-card--empty */
+.order-day-cell--empty {
+  background: var(--bg);
+  border: 1px dashed var(--border-m);
+}
+.order-day-cell--empty:hover {
+  border-color: #00000070;
+  background: var(--bg-3);
+}
+
+/* Dates passées — atténuées, non interactives si sans commande */
+.order-day-cell--past {
+  opacity: 1;
+  background-color: var(--accent-sub);
+}
+.order-day-cell--past:not(.order-day-cell--has-orders) {
+  cursor: default;
+  pointer-events: none;
+}
+
+/* Aujourd'hui */
+.order-day-cell--today {
+  background: var(--type-sick-bg);
+}
+
+/* Cellule cliquable (mois courant) — même effet que .day-card:hover */
+.order-day-cell--clickable {
+  cursor: pointer;
+}
+.order-day-cell--clickable:hover {
+  border-color: rgba(124, 111, 205, 0.4);
+  background: var(--bg-3);
+}
+.order-day-cell--today.order-day-cell--clickable:hover {
+  filter: brightness(0.97);
+  background: var(--accent-sub);
+  border-color: rgba(124, 111, 205, 0.4);
+}
+
+/* Numéro du jour — ancré en haut à droite */
+.order-day-num {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-2);
+  line-height: 1;
+}
+.order-day-cell--today .order-day-num {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+
+/* Zone contenu (pills) — centrée horizontalement */
+.order-day-content {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* Bouton "+" — centré sur toute la surface de la cellule */
+.order-day-add {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 20px;
+  color: #ccc;
+  line-height: 1;
+  cursor: pointer;
+  transition: color var(--t-base);
+}
+.order-day-cell--empty:hover .order-day-add { color: #00000070; }
+
+/* ── Pills canal ─────────────────────────────────────────────────────────── */
+
+.order-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 7px 2px 5px;
+  border-radius: var(--radius-sm);
+  font-family: 'Poppins', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Couleurs canal — identiques aux badges de statut du Planning (DayCard) */
+.order-pill--boutique { background: var(--order-boutique-bg); color: #1e7a4a; }
+.order-pill--boutique .order-pill-dot { background: var(--order-boutique); }
+
+.order-pill--web      { background: var(--order-web-bg); color: #2d86c7; }
+.order-pill--web      .order-pill-dot { background: var(--order-web); }
+
+.order-pill--brunch   { background: var(--order-brunch-bg); color: #8a6500; }
+.order-pill--brunch   .order-pill-dot { background: var(--order-brunch); }
+
+.order-pill-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+
+.order-pill-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── SaturdayChoiceModal ──────────────────────────────────────────────────── */
+
+.som-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.som-btn {
+  width: 100%;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  border: 1px dashed var(--border-m);
+  background: transparent;
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color var(--t-base), background var(--t-base);
+}
+.som-btn:hover { border-color: #00000070; background: var(--bg-3); }
+
+.som-btn--brunch {
+  background: var(--order-brunch-bg);
+  border-color: rgba(255, 216, 102, 0.6);
+  color: #8a6500;
+}
+.som-btn--brunch:hover {
+  background: var(--order-brunch-bg);
+  border-color: rgba(255, 216, 102, 0.8);
+}
+
+/* ── NewOrderModal / BrunchModal — form plat ─────────────────────────────── */
+
+/* Scroll interne si la liste de produits est longue */
+.modal--nom {
+  max-height: calc(100vh - 64px);
+  overflow-y: auto;
+}
+
+/* Section produits */
+.nom-products {
+  margin-bottom: 4px;
+}
+
+.nom-section-label {
+  /* extends .field-label */
+  display: block;
+  margin-bottom: 8px;
+}
+.nom-section-label--invalid { color: var(--color-error); }
+
+/* Lignes produits dynamiques */
+.nom-product-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.nom-product-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nom-product-row input {
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  background: var(--bg-2);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  outline: none;
+  min-width: 0;
+  min-height: 38px;
+}
+
+/* Bouton × de suppression de ligne */
+.nom-row-remove {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--text-3);
+  font-size: 18px;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  padding: 0;
+  transition: background var(--t-fast), color var(--t-fast);
+}
+.nom-row-remove:hover { background: rgba(224, 85, 85, 0.1); color: var(--color-error); }
+
+/* Bouton "+ Ajouter un produit" */
+.nom-add-row { min-height: 40px; font-size: 12px; }
+
+/* ── Stepper quantité ────────────────────────────────────────────────────── */
+.qty-stepper {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.qty-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  background: var(--bg-2);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  transition: background var(--t-fast);
+  padding: 0;
+}
+.qty-btn:hover:not(:disabled) { background: var(--bg-3); }
+.qty-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+.qty-value {
+  min-width: 40px;
+  height: 44px;
+  text-align: center;
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--bg-2);
+  border: none;
+  border-radius: var(--radius-sm);
+  outline: none;
+  padding: 0 4px;
+  /* masque les flèches native number input */
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+.qty-value::-webkit-inner-spin-button,
+.qty-value::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+
+/* Deux champs côte à côte (date + heure, nb personnes + heure) */
+.nom-row-2col {
+  display: flex;
+  gap: 12px;
+}
+.nom-row-2col .modal-field-full { flex: 1; }
+
+/* Champ aligné à droite (prix total) */
+.nom-input-right { text-align: right; }
+
+/* Checkbox payée */
+.nom-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+  user-select: none;
+}
+.nom-checkbox-label input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+  accent-color: var(--accent);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* Champ invalide (nom vide après soumission) */
+.nom-field-invalid input {
+  border: 1px solid var(--color-error);
+}
+
+/* Select dans modal-field-full (heure brunch) */
+.modal-field-full select {
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  background: var(--bg-2);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+/* .modal-save supprimé — remplacé par .btn-primary */
+
+/* ── Modale détail commande ───────────────────────────────────────────────── */
+
+/* Même largeur que les autres modales du Planning */
+.modal--order-detail {
+  width: 460px;
+}
+
+/* En-tête : canal + statut + fermer */
+.order-detail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.order-detail-badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+
+/* Bouton fermer — même style que .emp-menu-btn */
+.order-detail-close {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--bg-2);
+  color: var(--text-3);
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--t-fast);
+}
+.order-detail-close:hover { background: var(--bg-3); color: var(--text); }
+
+/* Client */
+.order-detail-customer { margin-bottom: 16px; }
+
+.order-detail-name {
+  font-family: 'Poppins', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.order-detail-contact {
+  display: block;
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  color: var(--text);
+  margin-top: 3px;
+  text-decoration: none;
+}
+.order-detail-contact--link { color: var(--text); text-decoration: none; }
+.order-detail-contact--link:hover { text-decoration: underline; }
+
+/* Date & heure de retrait */
+.order-detail-pickup { margin-bottom: 16px; }
+
+.order-detail-pickup-date {
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  text-transform: capitalize;
+}
+
+.order-detail-pickup-time {
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  color: var(--text-3);
+  margin-top: 2px;
+}
+
+/* .order-detail-sep supprimé — remplacé par .sep */
+/* Le margin est géré via style={{ margin: 'var(--gap) 0' }} si besoin */
+
+/* Tableau des articles */
+.order-detail-items {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.order-detail-items-header {
+  display: grid;
+  grid-template-columns: 1fr 36px 60px 60px;
+  gap: 8px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-3);
+  padding-bottom: 6px;
+}
+
+.order-detail-item {
+  display: grid;
+  grid-template-columns: 1fr 36px 60px 60px;
+  gap: 8px;
+  align-items: center;
+  padding: 6px 0;
+}
+
+.order-detail-item-label {
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.order-detail-item-meta {
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  color: var(--text-3);
+  text-align: right;
+}
+
+.order-detail-item-sub {
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-2);
+  text-align: right;
+}
+
+/* Total */
+.order-detail-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: 'Poppins', sans-serif;
+  padding: 4px 0 2px;
+}
+.order-detail-total span:first-child {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-3);
+}
+.order-detail-total span:last-child {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* Note client — fond var(--bg-2), même border-radius que les cards */
+.order-detail-note {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  background: var(--bg-2);
+  border-radius: var(--radius-sm);
+  padding: var(--gap) 14px;
+  margin-top: var(--gap);
+}
+
+.order-detail-note-label {
+  font-family: 'Poppins', sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #7c6fcd;
+}
+
+.order-detail-note-text {
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  color: var(--text-2);
+  font-style: italic;
+  line-height: 1.45;
+}
+
+/* Bouton avancement statut — même style que .modal-confirm */
+.order-detail-advance-btn {
+  width: 100%;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--bg-4);
+  color: var(--bg-2);
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 16px;
+  transition: opacity var(--t-base);
+}
+.order-detail-advance-btn:hover { opacity: 0.85; }
+
+/* ── Modal "Commandes du jour" (.odm) ────────────────────────────────────── */
+
+/* Surcharge de .modal : padding 0, flex column, scroll interne */
+.modal.odm {
+  width: 560px;
+  max-height: 85vh;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* En-tête : titre + boutons — séparé du corps par un trait */
+.odm-header {
+  display: flex;
+  align-items: center;
+  gap: var(--gap);
+  padding: 1.5rem;
+  flex-shrink: 0;
+}
+
+/* Conteneur gauche : titre + badge empilés */
+.odm-header-left {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+/* .odm-title supprimé — remplacé par .modal-emp-name */
+
+/* Badge compteur "X commande(s)" */
+.odm-count-badge {
+  font-family: 'Poppins', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-3);
+  background: var(--bg-2);
+  border-radius: 20px;
+  padding: 3px 10px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.odm-header-btns {
+  margin-left: auto;
+  margin-bottom: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* Boutons du header ODM — .som-btn en mode inline (pas full-width) */
+.odm-header-btns .som-btn { width: auto; min-height: 36px; padding: 0 14px; }
+
+/* Corps scrollable — grille 2 colonnes */
+.odm-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 1.5rem 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  align-items: stretch;
+  align-content: start;
+}
+
+@media (max-width: 600px) {
+  .odm-body { grid-template-columns: 1fr; }
+}
+
+/* État vide — span 2 colonnes */
+.odm-empty {
+  grid-column: 1 / -1;
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  color: var(--text-3);
+  text-align: center;
+  padding: 32px 0;
+  margin: 0;
+}
+
+/* ── Carte commande ───────────────────────────────────────────────────────── */
+
+/* Carte commande */
+.odm-card {
+  border-radius: var(--radius-sm);
+  background: var(--bg-2);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Ligne 1 : Nom | Montant */
+.odm-card-row1 {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+/* Bloc contact indépendant (téléphone + email) */
+.odm-card-contact-block {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.odm-card-name {
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.2;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.odm-card-total-amount {
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  flex-shrink: 0;
+}
+
+/* Ligne 0 : badges canal + paiement */
+.odm-card-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-bottom: 2px;
+}
+
+/* Badges canal / paiement */
+.odm-badge {
+  font-family: 'Poppins', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--radius-md);
+}
+.odm-badge--boutique { background: var(--order-boutique-bg); color: #1e7a4a; }
+.odm-badge--web      { background: var(--order-web-bg);      color: #2d86c7; }
+.odm-badge--brunch   { background: var(--order-brunch-bg);   color: #8a6500; }
+.odm-badge--paid     { background: var(--order-boutique-bg); color: #1e7a4a; }
+.odm-badge--unpaid   { background: var(--text-3); color: var(--bg); }
+
+/* Ligne 2 : Produits en liste */
+.odm-card-products {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  border-top: solid 1px var(--bg-3);
+  border-bottom: solid 1px var(--bg-3);
+  padding: 1rem 0;
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  color: var(--text);
+  line-height: 1.4;
+}
+
+.odm-item { display: flex; flex-direction: column; }
+
+.odm-item-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.odm-item-name { flex: 1; }
+
+.odm-item-qty {
+  font-weight: 600;
+  color: var(--text-2);
+  margin-left: 8px;
+}
+
+.odm-item-size {
+  font-size: 12px;
+  color: var(--text-3);
+  margin-top: 2px;
+}
+
+/* Ligne 3 : Heure de retrait */
+.odm-card-time {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+  color: var(--text);
+  margin-top: auto;
+}
+
+/* Contact (téléphone + email) — directement sous le nom */
+.odm-card-contact {
+  display: block;
+  font-size: 11px;
+}
+
+/* Note — fond var(--bg) pour contraste sur fond var(--bg-2) de la carte */
+.odm-card-note {
+  display: flex;
+  gap: 8px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+}
+
+.odm-card-note-label {
+  font-family: 'Poppins', sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: #7c6fcd;
+  flex-shrink: 0;
+  padding-top: 2px;
+}
+
+.odm-card-note-text {
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  color: var(--text-2);
+  font-style: italic;
+  line-height: 1.4;
+}
+
+
+/* Footer actions (modifier + supprimer) */
+.odm-card-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+.odm-card-edit   { flex: 1; gap: 6px; }
+.odm-card-delete { flex: 1; gap: 6px; }
+.odm-card-delete:hover  { background: rgba(224, 85, 85, 0.18); }
+.odm-card-delete:active { background: rgba(224, 85, 85, 0.26); }
+
+/* État confirmation suppression */
+.odm-card--confirm {
+  border: 1px solid var(--type-sick-bg);
+}
+
+.odm-confirm-text {
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  color: var(--text);
+  margin: 0 0 12px;
+  line-height: 1.4;
+}
+
+.odm-confirm-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* Toggle Payé/Non payé dans NewOrderModal récap */
+.odm-paid-toggle {
+  font-family: 'Poppins', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  border: none;
+  cursor: pointer;
+  transition: opacity var(--t-fast);
+}
+.odm-paid-toggle--paid   { background: var(--order-boutique-bg); color: #1e7a4a; }
+.odm-paid-toggle--unpaid { background: var(--type-sick-bg);      color: #c0392b; }
+.odm-paid-toggle:hover   { opacity: 0.75; }
