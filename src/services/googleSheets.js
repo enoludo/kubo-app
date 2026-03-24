@@ -749,3 +749,217 @@ export async function readOrdersFromSheet(token) {
     throw e
   }
 }
+
+// ─── Produits — 4 feuilles séparées ──────────────────────────────────────────
+// Products | ProductSizes | ProductIngredients | RecipeSteps
+// Relation : chaque sous-table référence product_id (colonne A).
+
+const PRODUCTS_SHEET     = 'Products'
+const SIZES_SHEET        = 'ProductSizes'
+const INGREDIENTS_SHEET  = 'ProductIngredients'
+const STEPS_SHEET        = 'RecipeSteps'
+
+// ── En-têtes ──────────────────────────────────────────────────────────────────
+
+const PRODUCTS_HDR = [
+  'id', 'name', 'category', 'photoUrl', 'description',
+  'active', 'seasonal', 'season',
+  'totalProductionTimeMin', 'restTimeMin', 'advancePrepDays',
+  'storageConditions', 'shelfLifeHours',
+  'allergens', 'sanitaryNotes',
+  'availableToOrder', 'minOrderDays', 'minQty', 'customizable',
+  'difficulty', 'variants', 'internalNotes',
+  'createdAt', 'updatedAt',
+]
+
+const SIZES_HDR = [
+  'id', 'product_id', 'label', 'price', 'costPerUnit',
+  'weightG', 'productionTimeMin', 'minOrderQty',
+]
+
+const INGREDIENTS_HDR = [
+  'id', 'product_id', 'name', 'quantity', 'unit',
+]
+
+const STEPS_HDR = [
+  'id', 'product_id', 'order', 'description',
+  'temperatureC', 'durationMin', 'equipment',
+]
+
+// ── Sérialisation ─────────────────────────────────────────────────────────────
+
+export function productsToRows(products) {
+  const pRows  = [PRODUCTS_HDR]
+  const sRows  = [SIZES_HDR]
+  const iRows  = [INGREDIENTS_HDR]
+  const rRows  = [STEPS_HDR]
+
+  for (const p of products) {
+    pRows.push([
+      p.id, p.name, p.category ?? '', p.photoUrl ?? '', p.description ?? '',
+      p.active ? 'true' : 'false',
+      p.seasonal ? 'true' : 'false',
+      p.season ?? '',
+      p.totalProductionTimeMin ?? '', p.restTimeMin ?? '', p.advancePrepDays ?? 0,
+      p.storageConditions ?? '', p.shelfLifeHours ?? '',
+      JSON.stringify(p.allergens ?? []),
+      p.sanitaryNotes ?? '',
+      p.availableToOrder ? 'true' : 'false',
+      p.minOrderDays ?? '', p.minQty ?? '',
+      p.customizable ? 'true' : 'false',
+      p.difficulty ?? 3,
+      JSON.stringify(p.variants ?? []),
+      p.internalNotes ?? '',
+      p.createdAt ?? '', p.updatedAt ?? '',
+    ])
+
+    for (const s of (p.sizes ?? [])) {
+      sRows.push([
+        s.id, p.id, s.label, s.price ?? '', s.costPerUnit ?? '',
+        s.weightG ?? '', s.productionTimeMin ?? '', s.minOrderQty ?? 1,
+      ])
+    }
+
+    for (const ing of (p.ingredients ?? [])) {
+      iRows.push([ing.id, p.id, ing.name, ing.quantity ?? '', ing.unit ?? 'g'])
+    }
+
+    for (const step of (p.recipeSteps ?? [])) {
+      rRows.push([
+        step.id, p.id, step.order, step.description ?? '',
+        step.temperatureC ?? '', step.durationMin ?? '', step.equipment ?? '',
+      ])
+    }
+  }
+
+  return { pRows, sRows, iRows, rRows }
+}
+
+// ── Désérialisation ───────────────────────────────────────────────────────────
+
+function parseJsonArr(val) {
+  try { return JSON.parse(val ?? '[]') } catch { return [] }
+}
+
+export function rowsToProducts(pRows, sRows, iRows, rRows) {
+  if (!pRows || pRows.length < 2) return []
+
+  // Index sous-tables par product_id pour O(1) lookup
+  const sizesById = {}
+  for (const r of (sRows ?? []).slice(1)) {
+    if (!r[1]) continue
+    ;(sizesById[r[1]] ??= []).push({
+      id: String(r[0]), label: String(r[2] ?? ''),
+      price:             r[3] !== '' ? Number(r[3]) : null,
+      costPerUnit:       r[4] !== '' ? Number(r[4]) : null,
+      weightG:           r[5] !== '' ? Number(r[5]) : null,
+      productionTimeMin: r[6] !== '' ? Number(r[6]) : null,
+      minOrderQty:       r[7] !== '' ? Number(r[7]) : 1,
+    })
+  }
+
+  const ingredientsById = {}
+  for (const r of (iRows ?? []).slice(1)) {
+    if (!r[1]) continue
+    ;(ingredientsById[r[1]] ??= []).push({
+      id: String(r[0]), name: String(r[2] ?? ''),
+      quantity: r[3] !== '' ? Number(r[3]) : null,
+      unit: String(r[4] ?? 'g'),
+    })
+  }
+
+  const stepsById = {}
+  for (const r of (rRows ?? []).slice(1)) {
+    if (!r[1]) continue
+    ;(stepsById[r[1]] ??= []).push({
+      id: String(r[0]), order: Number(r[2] ?? 1),
+      description:   String(r[3] ?? ''),
+      temperatureC:  r[4] !== '' ? Number(r[4]) : null,
+      durationMin:   r[5] !== '' ? Number(r[5]) : null,
+      equipment:     r[6] ? String(r[6]) : null,
+    })
+  }
+
+  return pRows.slice(1)
+    .filter(r => r[0] != null && r[0] !== '')
+    .map(r => {
+      const id = String(r[0])
+      return {
+        id,
+        name:                  String(r[1]  ?? ''),
+        category:              String(r[2]  ?? ''),
+        photoUrl:              r[3]  ? String(r[3])  : null,
+        description:           r[4]  ? String(r[4])  : null,
+        active:                parseBool(r[5]),
+        seasonal:              parseBool(r[6]),
+        season:                r[7]  ? String(r[7])  : null,
+        totalProductionTimeMin:r[8]  !== '' ? Number(r[8])  : null,
+        restTimeMin:           r[9]  !== '' ? Number(r[9])  : null,
+        advancePrepDays:       r[10] !== '' ? Number(r[10]) : 0,
+        storageConditions:     r[11] ? String(r[11]) : null,
+        shelfLifeHours:        r[12] !== '' ? Number(r[12]) : null,
+        allergens:             parseJsonArr(r[13]),
+        sanitaryNotes:         r[14] ? String(r[14]) : null,
+        availableToOrder:      parseBool(r[15]),
+        minOrderDays:          r[16] !== '' ? Number(r[16]) : null,
+        minQty:                r[17] !== '' ? Number(r[17]) : null,
+        customizable:          parseBool(r[18]),
+        difficulty:            r[19] !== '' ? Number(r[19]) : 3,
+        variants:              parseJsonArr(r[20]),
+        internalNotes:         r[21] ? String(r[21]) : null,
+        createdAt:             String(r[22] ?? ''),
+        updatedAt:             String(r[23] ?? ''),
+        sizes:                 sizesById[id]       ?? [],
+        ingredients:           ingredientsById[id] ?? [],
+        recipeSteps:           (stepsById[id] ?? []).sort((a, b) => a.order - b.order),
+      }
+    })
+}
+
+// ── Lecture / écriture ────────────────────────────────────────────────────────
+
+export async function writeProductsToSheet(token, products) {
+  const { pRows, sRows, iRows, rRows } = productsToRows(products)
+
+  await Promise.all([
+    ensureSheet(token, PRODUCTS_SHEET),
+    ensureSheet(token, SIZES_SHEET),
+    ensureSheet(token, INGREDIENTS_SHEET),
+    ensureSheet(token, STEPS_SHEET),
+  ])
+
+  await Promise.all([
+    clearRange(token, `${PRODUCTS_SHEET}!A:Z`),
+    clearRange(token, `${SIZES_SHEET}!A:H`),
+    clearRange(token, `${INGREDIENTS_SHEET}!A:E`),
+    clearRange(token, `${STEPS_SHEET}!A:G`),
+  ])
+
+  await Promise.all([
+    writeValues(token, `${PRODUCTS_SHEET}!A1`,    pRows),
+    writeValues(token, `${SIZES_SHEET}!A1`,        sRows),
+    writeValues(token, `${INGREDIENTS_SHEET}!A1`,  iRows),
+    writeValues(token, `${STEPS_SHEET}!A1`,        rRows),
+  ])
+
+  console.log('[googleSheets] writeProductsToSheet', products.length, 'produits')
+}
+
+export async function readProductsFromSheet(token) {
+  console.log('[googleSheets] readProductsFromSheet — lecture 4 feuilles')
+  try {
+    const [pRows, sRows, iRows, rRows] = await Promise.all([
+      readValues(token, `${PRODUCTS_SHEET}!A:X`),
+      readValues(token, `${SIZES_SHEET}!A:H`),
+      readValues(token, `${INGREDIENTS_SHEET}!A:E`),
+      readValues(token, `${STEPS_SHEET}!A:G`),
+    ])
+    const products = rowsToProducts(pRows, sRows, iRows, rRows)
+    console.log('[googleSheets] readProductsFromSheet —', products.length, 'produits parsés')
+    return products
+  } catch (e) {
+    console.warn('[googleSheets] readProductsFromSheet — erreur:', e.message)
+    if (e.status === 400 || String(e.message).includes('Unable to parse range')) return null
+    throw e
+  }
+}

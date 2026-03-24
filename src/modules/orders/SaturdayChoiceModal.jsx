@@ -21,9 +21,6 @@ export default function SaturdayChoiceModal({ date, onNewOrder, onNewBrunch, onC
           </button>
         </div>
 
-        <div className="modal-actions" style={{ marginTop: 16 }}>
-          <button className="btn-secondary modal-cancel" onClick={onClose}>Annuler</button>
-        </div>
 
       </div>
     </div>

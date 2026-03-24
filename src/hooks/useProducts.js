@@ -1,0 +1,172 @@
+// ─── Hook useProducts — State & CRUD ──────────────────────────────────────────
+//
+// Persistance localStorage 'kubo_products'.
+// Si vide → charge les données de démonstration.
+// Sprint 5 ajoutera la sync Google Sheets.
+
+import { useState, useCallback, useMemo, useEffect } from 'react'
+import { fetchProducts } from '../services/webflowAdapter'
+
+const LOCAL_KEY = 'kubo_products'
+
+function localLoad() {
+  try {
+    const raw = localStorage.getItem(LOCAL_KEY)
+    return raw ? JSON.parse(raw) : null
+  } catch { return null }
+}
+
+function localSave(products) {
+  try {
+    localStorage.setItem(LOCAL_KEY, JSON.stringify(products))
+  } catch {}
+}
+
+export function useProducts({ onToast } = {}) {
+  const [products, setProducts] = useState(() => {
+    const saved = localLoad()
+    return saved ?? []
+  })
+
+  // ── Sync Webflow au montage ────────────────────────────────────────────────
+
+  useEffect(() => {
+    console.log('[useProducts] sync Webflow démarrée')
+    fetchProducts().then(webflowProducts => {
+      if (!webflowProducts.length) return
+      setProducts(prev => {
+        const existingWfIds = new Set(prev.filter(p => p.webflowProductId).map(p => p.webflowProductId))
+        const toAdd = webflowProducts.filter(p => !existingWfIds.has(p.webflowProductId))
+        const toUpdate = webflowProducts.filter(p => existingWfIds.has(p.webflowProductId))
+
+        let next = prev.map(p => {
+          if (!p.webflowProductId) return p
+          const wf = toUpdate.find(w => w.webflowProductId === p.webflowProductId)
+          if (!wf) return p
+          return {
+            ...p,
+            name:     wf.name,
+            active:   wf.active,
+            sizes:    wf.sizes,
+            photoUrl: wf.photoUrl,
+            updatedAt: new Date().toISOString(),
+          }
+        })
+
+        if (toAdd.length) {
+          next = [...next, ...toAdd]
+          onToast?.(`${toAdd.length} nouveau(x) produit(s) importé(s) depuis Webflow`, null)
+        }
+
+        if (next !== prev) localSave(next)
+        return next
+      })
+    }).catch(err => {
+      console.warn('[useProducts] Webflow sync échouée:', err.message)
+    })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // ── Helpers internes ───────────────────────────────────────────────────────
+
+  function update(next) {
+    setProducts(next)
+    localSave(next)
+  }
+
+  // ── CRUD ───────────────────────────────────────────────────────────────────
+
+  const addProduct = useCallback((data) => {
+    const now = new Date().toISOString()
+    const product = {
+      ...data,
+      id:        `prod-${Date.now()}`,
+      createdAt: now,
+      updatedAt: now,
+    }
+    update(prev => {
+      const next = [...prev, product]
+      localSave(next)
+      return next
+    })
+    onToast?.(`${data.name} ajouté ✓`, null)
+    return product
+  }, [onToast])
+
+  const updateProduct = useCallback((id, changes) => {
+    update(prev => {
+      const next = prev.map(p =>
+        p.id === id ? { ...p, ...changes, updatedAt: new Date().toISOString() } : p
+      )
+      localSave(next)
+      return next
+    })
+    onToast?.('Produit mis à jour ✓', null)
+  }, [onToast])
+
+  const deleteProduct = useCallback((id) => {
+    update(prev => {
+      const next = prev.filter(p => p.id !== id)
+      localSave(next)
+      return next
+    })
+    onToast?.('Produit supprimé', null)
+  }, [onToast])
+
+  const toggleActive = useCallback((id) => {
+    update(prev => {
+      const next = prev.map(p =>
+        p.id === id
+          ? { ...p, active: !p.active, updatedAt: new Date().toISOString() }
+          : p
+      )
+      localSave(next)
+      return next
+    })
+  }, [])
+
+  // ── Dérivés ────────────────────────────────────────────────────────────────
+
+  const categories = useMemo(() => {
+    const set = new Set(products.map(p => p.category).filter(Boolean))
+    return Array.from(set).sort()
+  }, [products])
+
+  const activeProducts   = useMemo(() => products.filter(p => p.active),  [products])
+  const inactiveProducts = useMemo(() => products.filter(p => !p.active), [products])
+
+  function getById(id) {
+    return products.find(p => p.id === id) ?? null
+  }
+
+  // ── Vider tous les produits ────────────────────────────────────────────────
+
+  const resetToDemo = useCallback(() => {
+    localStorage.removeItem(LOCAL_KEY)
+    setProducts([])
+    onToast?.('Données produits réinitialisées', null)
+  }, [onToast])
+
+  // Exposé pour la sync Sheets : remplace l'état entier + persiste
+  const setProductsFromSync = useCallback((nextOrFn) => {
+    setProducts(prev => {
+      const next = typeof nextOrFn === 'function' ? nextOrFn(prev) : nextOrFn
+      localSave(next)
+      return next
+    })
+  }, [])
+
+  return {
+    products,
+    activeProducts,
+    inactiveProducts,
+    categories,
+    getById,
+    addProduct,
+    updateProduct,
+    deleteProduct,
+    toggleActive,
+    resetToDemo,
+    setProductsFromSync,
+  }
+}

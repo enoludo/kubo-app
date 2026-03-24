@@ -25,7 +25,7 @@
   --color-purple-100: rgba(124, 111, 205, 0.12);
   --color-purple-200: #a095e0;
   --color-purple-400: rgba(124, 111, 205, 0.4);
-  --color-purple-500: #7c6fcd;
+  --color-purple-500: #000000;
 
   /* Vert */
   --color-green-400: #4CAF50;
@@ -74,11 +74,11 @@
   --color-green-alpha: rgba(76, 175, 80, 0.12);
 
   /* Radius */
-  --radius-xs:   2px;
-  --radius-sm:   8px;
-  --radius-md:   12px;
-  --radius-lg:   16px;
-  --radius-pill: 36px;
+  --radius-xs:   0.25rem;
+  --radius-sm:   0.5rem;
+  --radius-md:   0.75rem;
+  --radius-lg:   1rem;
+  --radius-pill: 2rem;
   --radius-full: 50%;
 
   /* Transitions */
@@ -136,7 +136,8 @@
   --footer-h:   88px;
   --tv-emp-col: 200px;
   --gap:        1rem;
-  --pad-h:      24px;
+  --gap-small:  0.5rem;   
+  --pad-h:      1.5rem;
 
   /* États — error */
   --color-error:        var(--color-red-400);
@@ -266,6 +267,7 @@ button { font-family: inherit; cursor: pointer; }
   padding: 8px 12px;
   outline: none;
   width: 100%;
+  min-height: 3rem;
   box-sizing: border-box;
 }
 
@@ -275,7 +277,7 @@ button { font-family: inherit; cursor: pointer; }
   align-items: center;
   justify-content: center;
   padding: 10px 1.5rem;
-  min-height: 44px;
+  min-height: 3rem;
   border-radius: var(--radius-sm);
   border: none;
   background: var(--bg-4);
@@ -295,7 +297,7 @@ button { font-family: inherit; cursor: pointer; }
   align-items: center;
   justify-content: center;
   padding: 10px;
-  min-height: 44px;
+  min-height: 3rem;
   border-radius: var(--radius-sm);
   border: none;
   background: var(--bg-2);
@@ -305,6 +307,7 @@ button { font-family: inherit; cursor: pointer; }
   font-weight: 500;
   cursor: pointer;
   transition: background var(--t-base);
+  mix-blend-mode: multiply;
 }
 .btn-secondary:hover { background: var(--bg-3); }
 
@@ -314,7 +317,7 @@ button { font-family: inherit; cursor: pointer; }
   align-items: center;
   justify-content: center;
   padding: 10px;
-  min-height: 44px;
+  min-height: 3rem;
   border-radius: var(--radius-sm);
   border: none;
   background: var(--btn-danger-bg);
@@ -348,10 +351,10 @@ button { font-family: inherit; cursor: pointer; }
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1.5px dashed var(--bg-3);
+  border: 1.5px dashed var(--color-purple-400);
   border-radius: var(--radius-sm);
-  background: transparent;
-  color: var(--text-3);
+  background: var(--bg);
+  color: var(--text-2);
   cursor: pointer;
   transition: border-color var(--t-fast),
               color var(--t-fast),
@@ -361,7 +364,9 @@ button { font-family: inherit; cursor: pointer; }
   font-weight: 500;
 }
 
-.add-trigger:hover,
+.add-trigger:hover{
+  background: transparent;
+}
 .add-trigger:active {
   border-color: var(--bg-4);
   color: var(--bg-4);
@@ -372,7 +377,7 @@ button { font-family: inherit; cursor: pointer; }
 .add-trigger--labeled {
   gap: 6px;
   padding: 8px 14px;
-  min-height: 44px;
+  min-height: 3rem;
 }
 
 /* Variante icône seule (cases calendrier) */

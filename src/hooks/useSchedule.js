@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
 import { sessionSave, sessionLoad } from '../utils/session'
-import demoShifts from '../data/demoShifts'
 import { dateToStr, mondayOf } from '../utils/date'
 
 export { dateToStr, fmtH } from '../utils/date'
@@ -39,8 +38,8 @@ for (let h = START_HOUR; h <= END_HOUR; h++) {
 // ─── Hook ──────────────────────────────────────────────────────────────────
 
 export function useSchedule() {
-  // Priorité : sessionStorage → données démo
-  const [shifts, setShifts] = useState(() => sessionLoad('shifts') ?? demoShifts)
+  // Priorité : sessionStorage → liste vide
+  const [shifts, setShifts] = useState(() => sessionLoad('shifts') ?? [])
 
   const saveTimer = useRef(null)
 
@@ -130,9 +129,9 @@ export function useSchedule() {
     })
   }
 
-  // Réinitialise aux données de démonstration (après confirmation utilisateur)
+  // Vide tous les shifts (après confirmation utilisateur)
   function resetShifts() {
-    setShifts(demoShifts)
+    setShifts([])
   }
 
   // Cumul total toutes semaines confondues

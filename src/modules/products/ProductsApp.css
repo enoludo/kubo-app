@@ -1,0 +1,1453 @@
+/* ─── Module Produits ─────────────────────────────────────────────────────── */
+
+/* Tokens spécifiques au module */
+:root {
+  --product-card-radius:    var(--radius-sm);
+  --product-photo-h:        140px;
+  --product-inactive-alpha: 0.5;
+}
+
+/* ── Shell ───────────────────────────────────────────────────────────────── */
+
+.products-app {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--bg-2);
+  overflow: hidden;
+}
+
+/* ── Catalogue ───────────────────────────────────────────────────────────── */
+
+.products-catalog {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ── Barre de filtres ────────────────────────────────────────────────────── */
+
+.products-filter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: var(--pad-h);
+  flex-shrink: 0;
+}
+
+/* Groupe central : recherche + catégorie */
+.products-filter-center {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  max-width: 50%;
+  min-width: 0;
+}
+
+.products-filter-search {
+  flex: 2;
+  min-width: 0;
+  background: var(--bg);
+  border: none;
+  border-radius: 1.5rem;
+  height: 3rem;
+  padding: 0 1.25rem;
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  color: var(--text);
+  outline: none;
+}
+
+.products-filter-select {
+  flex: 1;
+  min-width: 0;
+  background: var(--bg);
+  border: none;
+  border-radius: 1.5rem;
+  height: 3rem;
+  padding: 0 1.25rem;
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  color: var(--text);
+  outline: none;
+  cursor: pointer;
+  appearance: auto;
+}
+
+.products-filter-toggle {
+  height: 3rem;
+  padding: 0 1.25rem;
+  border: 1px solid var(--border-m);
+  border-radius: 1.5rem;
+  background: var(--bg-2);
+  color: var(--text-2);
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background var(--t-fast), border-color var(--t-fast), color var(--t-fast);
+}
+.products-filter-toggle:active { background: var(--bg-3); }
+.products-filter-toggle--active {
+  background: var(--accent-sub);
+  border-color: var(--accent-l);
+  color: var(--text);
+}
+
+/* ── Zone scrollable ─────────────────────────────────────────────────────── */
+
+.products-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--pad-h);
+}
+
+/* ── Grille ──────────────────────────────────────────────────────────────── */
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--gap-small);
+  align-items: start;
+  width: 100%;
+}
+
+@media (max-width: 1024px) {
+  .products-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.products-catalog-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 0;
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  color: var(--text-3);
+}
+
+/* ── Card produit ────────────────────────────────────────────────────────── */
+
+.product-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-height: 120px;
+  background: var(--bg);
+  border-radius: var(--radius-lg);
+  border: 0px solid var(--border);
+  overflow: hidden;
+  cursor: pointer;
+  text-align: left;
+  transition: box-shadow var(--t-base), transform var(--t-fast);
+  padding: 0;
+}
+.product-card:active {
+  transform: scale(0.98);
+  box-shadow: none;
+}
+.product-card--inactive {
+  opacity: var(--product-inactive-alpha);
+}
+
+/* Photo */
+.product-card-photo {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  background: var(--bg-3);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.product-card-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.product-card-photo-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  color: var(--text-3);
+}
+
+/* Badges photo */
+.product-card-inactive-badge,
+.product-card-seasonal-badge {
+  position: absolute;
+  top: 8px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+}
+.product-card-inactive-badge {
+  left: 8px;
+  background: var(--color-red-alpha-md);
+  color: var(--color-error-dark);
+}
+.product-card-seasonal-badge {
+  right: 8px;
+  background: var(--color-amber-alpha-md);
+  color: var(--color-warn-dark);
+}
+.product-card-webflow-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  padding: 2px 6px;
+  border-radius: var(--radius-pill);
+  background: var(--color-blue-alpha-md, rgba(59, 130, 246, 0.15));
+  color: var(--color-blue-dark, #1d4ed8);
+  letter-spacing: 0.02em;
+}
+
+/* Corps */
+.product-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: var(--pad-h);
+  flex: 1;
+}
+
+.product-card-category {
+  font-family: 'Poppins', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+
+.product-card-name {
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.product-card-desc {
+  font-family: 'Poppins', sans-serif;
+  font-size: 11px;
+  color: var(--text-3);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-top: 2px;
+}
+
+/* Allergènes */
+.product-card-allergens {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+.product-card-allergen {
+  font-family: 'Poppins', sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  padding: 2px 7px;
+  border-radius: var(--radius-pill);
+  background: var(--color-red-alpha-sm);
+  color: var(--text-2);
+  border: 1px solid var(--color-red-alpha-lg);
+}
+
+/* Badge grossesse sur la card */
+.product-card-pregnancy {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  width: fit-content;
+}
+.product-card-pregnancy--no {
+  background: var(--color-error-bg);
+  color: var(--color-error-dark);
+  border: 1px solid var(--color-error-border);
+}
+.product-card-pregnancy--check {
+  background: var(--color-warn-bg);
+  color: var(--color-warn-dark);
+  border: 1px solid var(--color-warn-border);
+}
+
+/* Pied de card */
+.product-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 10px;
+}
+
+.product-card-price {
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.product-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.product-card-tag {
+  font-family: 'Poppins', sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  padding: 2px 7px;
+  border-radius: var(--radius-pill);
+}
+.product-card-tag--order {
+  background: var(--accent-sub);
+  color: var(--text-2);
+}
+
+.product-card-diff {
+  font-size: 10px;
+  color: var(--color-amber-400);
+  letter-spacing: 1px;
+}
+
+/* ═══════════════════════════════════════════
+   PRODUCT DETAIL MODAL
+═══════════════════════════════════════════ */
+
+.product-detail-overlay {
+  z-index: var(--z-overlay);
+  align-items: flex-end;
+}
+
+.product-detail-modal {
+  background: var(--bg);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  width: 100%;
+  max-width: 860px;
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  /* Centré sur desktop, slide depuis le bas sur tablette */
+  margin: 0 auto;
+  border-radius: var(--radius-lg);
+  margin-bottom: 0;
+}
+
+/* ── En-tête modal ────────────────────────────────────────────────────────── */
+
+.product-detail-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 24px 24px 0;
+  flex-shrink: 0;
+}
+
+.product-detail-header-photo {
+  width: auto;
+  height: 6rem;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--radius-sm);
+  background: var(--bg-3);
+  overflow: hidden;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.product-detail-header-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.product-detail-header-placeholder {
+  font-size: 32px;
+}
+
+.product-detail-header-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.product-detail-header-category {
+  font-family: 'Poppins', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+
+.product-detail-header-name {
+  font-family: 'Poppins', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.product-detail-header-price {
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.product-detail-header-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.product-detail-header-tag {
+  font-family: 'Poppins', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: var(--radius-pill);
+}
+.product-detail-header-tag--inactive {
+  background: var(--color-red-alpha-sm);
+  color: var(--color-error-dark);
+}
+.product-detail-header-tag--seasonal {
+  background: var(--color-amber-alpha-sm);
+  color: var(--color-warn-dark);
+}
+.product-detail-header-tag--order {
+  background: var(--accent-sub);
+  color: var(--text-2);
+}
+
+.product-detail-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.product-detail-edit-btn {
+  min-height: 3rem;
+  padding: 0 1.25rem;
+  font-size: 12px;
+}
+
+.product-detail-close {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-full);
+  border: none;
+  background: var(--bg-2);
+  color: var(--text-3);
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--t-fast), color var(--t-fast);
+  flex-shrink: 0;
+}
+.product-detail-close:active {
+  background: var(--bg-3);
+  color: var(--text);
+}
+
+/* ── Barre d'onglets ──────────────────────────────────────────────────────── */
+
+.product-detail-tabs {
+  display: flex;
+  gap: 0;
+  padding: 16px 24px 0;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.product-detail-tabs::-webkit-scrollbar { display: none; }
+
+.product-detail-tab {
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-3);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 10px 16px;
+  cursor: pointer;
+  white-space: nowrap;
+  min-height: 44px;
+  transition: color var(--t-fast), border-color var(--t-fast);
+}
+.product-detail-tab--active {
+  color: var(--text);
+  border-bottom-color: var(--text);
+}
+.product-detail-tab:active:not(.product-detail-tab--active) {
+  color: var(--text-2);
+}
+
+/* ── Corps scrollable ─────────────────────────────────────────────────────── */
+
+.product-detail-body {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+/* ── Footer suppression ──────────────────────────────────────────────────── */
+
+.product-detail-footer {
+  flex-shrink: 0;
+  padding: 12px 24px;
+  border-top: 1px solid var(--border);
+}
+
+.product-detail-delete-btn {
+  height: 44px;
+  padding: 0 20px;
+}
+
+.product-detail-confirm-del {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.product-detail-confirm-msg {
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  color: var(--text);
+}
+
+.product-detail-confirm-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.product-detail-tab-content {
+  padding: 24px;
+}
+
+/* ── Sections génériques ──────────────────────────────────────────────────── */
+
+.product-detail-section {
+  margin-bottom: 20px;
+}
+
+.product-detail-section-label {
+  margin-bottom: 10px;
+}
+
+.product-detail-text {
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  color: var(--text-2);
+  line-height: 1.6;
+}
+
+.product-detail-text--note {
+  background: var(--bg-2);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  border-left: 3px solid var(--color-amber-300);
+}
+
+.product-detail-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 10px;
+}
+
+.product-detail-info-item {
+  background: var(--bg-2);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.product-detail-info-key {
+  font-family: 'Poppins', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+
+.product-detail-info-val {
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+.product-detail-info-val--highlight {
+  color: var(--text);
+  font-size: 15px;
+}
+.product-detail-info-val--yes { color: var(--color-success); }
+.product-detail-info-val--no  { color: var(--text-3); }
+
+.product-detail-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.product-detail-tag {
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 12px;
+  border-radius: var(--radius-pill);
+  background: var(--bg-3);
+  color: var(--text-2);
+}
+
+/* ═══════════════════════════════════════════
+   INGRÉDIENTS
+═══════════════════════════════════════════ */
+
+.product-ingredient-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.product-ingredient-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--bg-2);
+  border-radius: var(--radius-sm);
+  font-family: 'Poppins', sans-serif;
+}
+
+.product-ingredient-name {
+  font-size: 13px;
+  color: var(--text);
+  font-weight: 500;
+}
+
+.product-ingredient-qty {
+  font-size: 12px;
+  color: var(--text-3);
+  font-weight: 500;
+}
+
+/* ═══════════════════════════════════════════
+   RECIPE STEPS
+═══════════════════════════════════════════ */
+
+.recipe-empty {
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  color: var(--text-3);
+}
+
+.recipe-steps {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.recipe-step {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.recipe-step-num {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-full);
+  background: var(--bg-4);
+  color: var(--bg);
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.recipe-step-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.recipe-step-desc {
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.6;
+}
+
+.recipe-step-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.recipe-step-tag {
+  font-family: 'Poppins', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+}
+
+.recipe-step-tag--temp  { background: var(--color-red-alpha-xs);    color: var(--color-error-dark); }
+.recipe-step-tag--time  { background: var(--accent-sub);             color: var(--text-2); }
+.recipe-step-tag--equip { background: var(--bg-3);                   color: var(--text-3); }
+
+/* ═══════════════════════════════════════════
+   SIZE TABLE
+═══════════════════════════════════════════ */
+
+.size-table-empty {
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  color: var(--text-3);
+}
+
+.size-table-wrap {
+  overflow-x: auto;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+
+.size-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+}
+
+.size-table th {
+  padding: 10px 14px;
+  text-align: left;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  background: var(--bg-2);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.size-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-2);
+}
+
+.size-table tr:last-child td {
+  border-bottom: none;
+}
+
+.size-table tr:nth-child(even) td {
+  background: var(--bg-2);
+}
+
+.size-table-label {
+  font-weight: 600;
+  color: var(--text) !important;
+}
+
+.size-table-price {
+  font-weight: 700;
+  color: var(--text) !important;
+}
+
+.size-table-margin {
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+}
+.size-table-margin--good { background: var(--color-green-alpha);     color: var(--color-success-dark); }
+.size-table-margin--ok   { background: var(--color-amber-alpha-sm);  color: var(--color-warn-dark); }
+.size-table-margin--low  { background: var(--color-red-alpha-sm);    color: var(--color-error-dark); }
+
+/* ═══════════════════════════════════════════
+   ALLERGEN BADGES — FULL
+═══════════════════════════════════════════ */
+
+.allergen-full-none {
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  color: var(--text-3);
+}
+
+.allergen-full-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-bottom: 10px;
+}
+.allergen-full-title--absent {
+  margin-top: 20px;
+}
+
+.allergen-full-present,
+.allergen-full-absent {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.allergen-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font-family: 'Poppins', sans-serif;
+}
+
+.allergen-badge--present {
+  background: var(--color-amber-alpha-md);
+  border: 1px solid var(--color-amber-alpha-xl);
+}
+
+.allergen-badge--absent {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  opacity: 0.6;
+}
+
+.allergen-badge-emoji {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.allergen-badge-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-2);
+  white-space: nowrap;
+}
+
+.allergen-badge--present .allergen-badge-label {
+  color: var(--color-warn-dark);
+}
+
+/* ── Note coût ────────────────────────────────────────────────────────────── */
+
+.product-detail-cost-note {
+  margin-top: 16px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 11px;
+  color: var(--text-3);
+}
+
+/* ═══════════════════════════════════════════
+   PRODUCT FORM MODAL
+═══════════════════════════════════════════ */
+
+.product-form-overlay {
+  z-index: var(--z-overlay);
+  align-items: flex-end;
+}
+
+.product-form-modal {
+  background: var(--bg);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  width: 100%;
+  max-width: 720px;
+  max-height: 96vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  margin: 0 auto;
+}
+
+/* ── En-tête ──────────────────────────────────────────────────────────────── */
+
+.product-form-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.product-form-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* ── Corps scrollable ─────────────────────────────────────────────────────── */
+
+.product-form-body {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+/* ── Sections ─────────────────────────────────────────────────────────────── */
+
+.pf-section {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.pf-section-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+
+.pf-sep {
+  height: 1px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+/* ── Champs ───────────────────────────────────────────────────────────────── */
+
+.pf-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pf-label { /* extends .field-label */ }
+
+.pf-hint {
+  font-family: 'Poppins', sans-serif;
+  font-size: 11px;
+  color: var(--text-3);
+}
+
+.pf-input {
+  min-height: 44px;
+}
+
+.pf-textarea {
+  resize: vertical;
+  min-height: 64px;
+}
+
+.pf-row {
+  display: grid;
+  gap: 12px;
+}
+.pf-row--2 { grid-template-columns: 1fr 1fr; }
+
+/* ── Toggles ──────────────────────────────────────────────────────────────── */
+
+.pf-toggles-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.pf-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px 0;
+  min-height: 44px;
+}
+
+.pf-toggle-track {
+  width: 40px;
+  height: 24px;
+  border-radius: var(--radius-pill);
+  background: var(--bg-3);
+  display: flex;
+  align-items: center;
+  padding: 3px;
+  flex-shrink: 0;
+  transition: background var(--t-base);
+}
+.pf-toggle--on .pf-toggle-track {
+  background: var(--text);
+}
+
+.pf-toggle-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: var(--radius-full);
+  background: var(--bg);
+  box-shadow: var(--shadow-s);
+  transition: transform var(--t-base);
+}
+.pf-toggle--on .pf-toggle-thumb {
+  transform: translateX(16px);
+}
+
+.pf-toggle-label {
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-2);
+}
+
+/* ── Tailles ──────────────────────────────────────────────────────────────── */
+
+.pf-size-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pf-size-preset {
+  height: 44px;
+  padding: 0 14px;
+  border-radius: var(--radius-sm);
+  border: 1.5px dashed var(--color-purple-400);
+  background: var(--bg);
+  color: var(--text-2);
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--t-fast), border-color var(--t-fast), color var(--t-fast);
+}
+.pf-size-preset--added {
+  border-style: solid;
+  border-color: var(--border);
+  background: var(--bg-2);
+  color: var(--text-3);
+  cursor: default;
+  opacity: 0.5;
+}
+.pf-size-preset--custom {
+  border-style: solid;
+  background: var(--bg-2);
+}
+.pf-size-preset:not(:disabled):active {
+  background: var(--accent-sub);
+}
+
+.pf-sizes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow-x: auto;
+}
+
+.pf-size-row {
+  display: grid;
+  grid-template-columns: 160px 80px 90px 70px 80px 60px 36px;
+  gap: 6px;
+  align-items: center;
+}
+
+.pf-size-row--header {
+  font-family: 'Poppins', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  padding: 0 2px;
+}
+.pf-size-row--header span { padding: 0 4px; }
+
+.pf-size-input { min-height: 40px; font-size: 12px; }
+
+/* ── Ingrédients ──────────────────────────────────────────────────────────── */
+
+.pf-ingredient-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pf-ingredient-row {
+  display: grid;
+  grid-template-columns: 1fr 80px 80px 36px;
+  gap: 6px;
+  align-items: center;
+}
+
+.pf-ing-name { }
+.pf-ing-qty  { }
+.pf-ing-unit { min-height: 44px; cursor: pointer; }
+
+/* ── Bouton d'ajout générique ─────────────────────────────────────────────── */
+
+.pf-add-row-btn {
+  align-self: flex-start;
+}
+
+/* ── Étapes recette ───────────────────────────────────────────────────────── */
+
+.pf-step-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pf-step {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  background: var(--bg-2);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+}
+
+.pf-step-num {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-full);
+  background: var(--bg-4);
+  color: var(--bg);
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 8px;
+}
+
+.pf-step-fields {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.pf-step-meta-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pf-step-meta-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 90px;
+}
+
+.pf-step-meta-field--wide {
+  flex: 1;
+  min-width: 160px;
+}
+
+.pf-label-mini { /* extends .field-label */ }
+
+.pf-step-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.pf-step-move {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-m);
+  background: var(--bg);
+  color: var(--text-3);
+  font-size: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--t-fast);
+}
+.pf-step-move:disabled { opacity: 0.3; cursor: default; }
+.pf-step-move:not(:disabled):active { background: var(--bg-3); }
+
+/* ── Bouton supprimer générique ───────────────────────────────────────────── */
+
+.pf-remove-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--btn-danger-bg-xs);
+  color: var(--color-error);
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background var(--t-fast);
+}
+.pf-remove-btn:active { background: var(--btn-danger-bg-hover); }
+
+/* ── Allergènes ───────────────────────────────────────────────────────────── */
+
+.pf-allergen-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 8px;
+}
+
+.pf-allergen-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 8px;
+  min-height: 64px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border);
+  background: var(--bg-2);
+  cursor: pointer;
+  transition: border-color var(--t-fast), background var(--t-fast);
+}
+.pf-allergen-btn--active {
+  border-color: var(--color-amber-400);
+  background: var(--color-amber-alpha-sm);
+}
+.pf-allergen-btn:active {
+  background: var(--color-amber-alpha-md);
+}
+
+.pf-allergen-emoji {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.pf-allergen-label {
+  font-family: 'Poppins', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-2);
+  text-align: center;
+  line-height: 1.3;
+}
+.pf-allergen-btn--active .pf-allergen-label {
+  color: var(--color-warn-dark);
+}
+
+/* ── Sélecteur grossesse (formulaire) ─────────────────────────────────────── */
+
+.pf-pregnancy-selector {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pf-pregnancy-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 8px 14px;
+  min-height: 44px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--bg-3);
+  background: var(--bg-2);
+  color: var(--text-2);
+  cursor: pointer;
+  transition: border-color var(--t-fast), background var(--t-fast), color var(--t-fast);
+  flex: 1;
+  justify-content: center;
+}
+.pf-pregnancy-btn:hover:not(.pf-pregnancy-btn--active) {
+  background: var(--bg-3);
+}
+.pf-pregnancy-btn--yes.pf-pregnancy-btn--active {
+  border-color: var(--color-success-border);
+  background: var(--color-success-bg);
+  color: var(--color-success-dark);
+}
+.pf-pregnancy-btn--check.pf-pregnancy-btn--active {
+  border-color: var(--color-warn-border);
+  background: var(--color-warn-bg);
+  color: var(--color-warn-dark);
+}
+.pf-pregnancy-btn--no.pf-pregnancy-btn--active {
+  border-color: var(--color-error-border);
+  background: var(--color-error-bg);
+  color: var(--color-error-dark);
+}
+
+/* ── Indicateur grossesse (modal détail) ──────────────────────────────────── */
+
+.product-detail-pregnancy {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+}
+.product-detail-pregnancy--yes   { background: var(--color-success-bg); }
+.product-detail-pregnancy--check { background: var(--color-warn-bg);    }
+.product-detail-pregnancy--no    { background: var(--color-error-bg);   }
+
+.product-detail-pregnancy-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+  line-height: 1.4;
+}
+
+.product-detail-pregnancy-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.product-detail-pregnancy-label {
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.product-detail-pregnancy--yes   .product-detail-pregnancy-label { color: var(--color-success-dark); }
+.product-detail-pregnancy--check .product-detail-pregnancy-label { color: var(--color-warn-dark);    }
+.product-detail-pregnancy--no    .product-detail-pregnancy-label { color: var(--color-error-dark);   }
+
+.product-detail-pregnancy-note {
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-2);
+  line-height: 1.45;
+  font-style: italic;
+}
+
+/* ── Difficulté ───────────────────────────────────────────────────────────── */
+
+.pf-difficulty {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pf-difficulty-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 14px;
+  min-height: 56px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border);
+  background: var(--bg-2);
+  cursor: pointer;
+  transition: border-color var(--t-fast), background var(--t-fast);
+  flex: 1;
+  min-width: 80px;
+}
+.pf-difficulty-btn--active {
+  border-color: var(--text);
+  background: var(--bg-3);
+}
+
+.pf-difficulty-stars {
+  font-size: 13px;
+  color: var(--color-amber-400);
+  letter-spacing: 1px;
+}
+
+.pf-difficulty-label {
+  font-family: 'Poppins', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-3);
+  white-space: nowrap;
+}
+.pf-difficulty-btn--active .pf-difficulty-label {
+  color: var(--text-2);
+}
+
+/* ── Pied de formulaire ───────────────────────────────────────────────────── */
+
+.product-form-footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 24px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.product-form-delete { flex-shrink: 0; }
+
+.product-form-cancel {
+  flex: 1;
+}
+
+.product-form-save {
+  flex: 2;
+}
+
+.product-form-confirm-del {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-error-dark);
+}
+.product-form-confirm-del span { flex: 1; }
+.product-form-confirm-del .btn-secondary,
+.product-form-confirm-del .btn-danger { flex-shrink: 0; min-height: 44px; }

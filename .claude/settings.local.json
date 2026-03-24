@@ -4,7 +4,10 @@
       "Bash(npm run:*)",
       "Bash(npm install:*)",
       "Bash(npm uninstall:*)",
-      "Bash(npx vite:*)"
+      "Bash(npx vite:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(npx tsc:*)"
     ]
   }
 }

@@ -66,7 +66,7 @@ function OrderDayCell({ date, orders, isCurrentMonth, isToday, isPast, onAddOrde
         !isCurrentMonth                              ? 'order-day-cell--outside'    : '',
         isToday                                      ? 'order-day-cell--today'      : '',
         hasOrders                                    ? 'order-day-cell--has-orders' : '',
-        isCurrentMonth && !hasOrders && !isSaturday  ? 'order-day-cell--empty'      : '',
+        isCurrentMonth && !hasOrders                 ? 'order-day-cell--empty'      : '',
         isCurrentMonth                               ? 'order-day-cell--clickable'  : '',
         isPast && isCurrentMonth                     ? 'order-day-cell--past'       : '',
       ].filter(Boolean).join(' ')}
@@ -81,12 +81,12 @@ function OrderDayCell({ date, orders, isCurrentMonth, isToday, isPast, onAddOrde
           <OrderPill key={c} channel={c} count={byChannel[c]} />
         ))}
 
-        {/* Bouton + — cellules vides, non samedi, non passées */}
-        {!hasOrders && !isSaturday && isCurrentMonth && !isPast && (
+        {/* Bouton + — cellules vides, non passées (samedi → SaturdayChoiceModal) */}
+        {!hasOrders && isCurrentMonth && !isPast && (
           <button
             className="order-day-add add-trigger add-trigger--icon"
-            onClick={e => { e.stopPropagation(); onAddOrder(date) }}
-            aria-label="Ajouter une commande"
+            onClick={e => { e.stopPropagation(); isSaturday ? onSaturdayClick(date) : onAddOrder(date) }}
+            aria-label={isSaturday ? 'Ajouter un brunch ou une commande' : 'Ajouter une commande'}
           >
             +
           </button>

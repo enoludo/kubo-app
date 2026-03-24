@@ -290,5 +290,5 @@ export function useGoogleSync({
     await push()
   }
 
-  return { status, errMsg, loading, connect, disconnect, retry }
+  return { status, errMsg, loading, connect, disconnect, retry, getToken: () => tokenRef.current }
 }

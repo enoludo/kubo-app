@@ -2,7 +2,23 @@
 // Ce composant fait partie du shell global de l'application.
 // Il sera partagé par tous les modules (Planning, Hygiène, Commandes, etc.)
 // Active module : 'planning' (hardcodé jusqu'à l'ajout du routing)
+import { useState, useRef, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { ENABLED_MODULES } from '../config/modules'
+
+function dotColor(statuses) {
+  if (statuses.some(s => s === 'error' || s === 'expired')) return 'red'
+  if (statuses.some(s => s === 'loading' || s === 'connecting' || s === 'syncing' || s === 'reconnecting')) return 'orange'
+  if (statuses.every(s => s === 'synced' || s === 'connected' || s === 'idle')) return 'green'
+  if (statuses.some(s => s === 'disconnected')) return 'red'
+  return 'orange'
+}
+
+const DOT_COLORS = {
+  green:  'var(--color-success)',
+  orange: 'var(--color-warn)',
+  red:    'var(--color-error)',
+}
 
 function IconPlanning() {
   return (
@@ -39,11 +55,17 @@ function IconOrders() {
 
 function IconProducts() {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-      stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 9h18M3 9a9 9 0 0 1 18 0M3 9c0 5 4 9 9 9s9-4 9-9"/>
-      <path d="M12 9v9M8 13h8"/>
-    </svg>
+    <svg xmlns="http://www.w3.org/2000/svg" width="16.484" height="18.849" viewBox="0 0 16.484 18.849" fill="currentcolor">
+  <g id="Groupe_144" data-name="Groupe 144" transform="translate(-1.112 0.059)">
+    <path id="Tracé_94" data-name="Tracé 94" d="M5.762,18.789a1.854,1.854,0,0,1-1.8-1.445l-.9-4.04a.625.625,0,0,1,1.22-.272l.9,4.041a.6.6,0,0,0,.58.466h7.188a.591.591,0,0,0,.58-.465l.894-4.038a.625.625,0,1,1,1.22.27l-.894,4.039a1.834,1.834,0,0,1-1.8,1.445H5.762Z"/>
+    <path id="Tracé_95" data-name="Tracé 95" d="M14.228,13.916a3.34,3.34,0,0,1-2.435-1.053,3.354,3.354,0,0,1-4.877,0,3.361,3.361,0,0,1-5.8-2.318A4.831,4.831,0,0,1,2.94,6.767,8.941,8.941,0,0,1,6.907,4.988a.625.625,0,0,1,.249,1.225A7.7,7.7,0,0,0,3.743,7.725a3.572,3.572,0,0,0-1.382,2.822,2.109,2.109,0,0,0,4,.952.625.625,0,0,1,1.119,0,2.1,2.1,0,0,0,3.756,0,.625.625,0,0,1,1.119,0,2.109,2.109,0,0,0,4-.95,3.572,3.572,0,0,0-1.382-2.823A7.709,7.709,0,0,0,11.55,6.213.625.625,0,1,1,11.8,4.988a8.948,8.948,0,0,1,3.968,1.78A4.831,4.831,0,0,1,17.6,10.547a3.346,3.346,0,0,1-2.582,3.277A3.4,3.4,0,0,1,14.228,13.916Z"/>
+    <path id="Tracé_96" data-name="Tracé 96" d="M9.354,8.242a2.969,2.969,0,1,1,2.969-2.969A2.972,2.972,0,0,1,9.354,8.242ZM7.635,5.273A1.719,1.719,0,1,0,9.354,3.555,1.721,1.721,0,0,0,7.635,5.273Z"/>
+    <path id="Tracé_97" data-name="Tracé 97" d="M9.353,3.555a.625.625,0,0,1-.618-.537A2.7,2.7,0,0,1,11.786-.033.625.625,0,1,1,11.609,1.2,1.447,1.447,0,0,0,9.973,2.841a.626.626,0,0,1-.62.713Z"/>
+    <path id="Tracé_98" data-name="Tracé 98" d="M7.6,18.789a.625.625,0,0,1-.617-.53l-.922-5.992a.625.625,0,1,1,1.235-.19l.922,5.992a.626.626,0,0,1-.618.72Z"/>
+    <path id="Tracé_99" data-name="Tracé 99" d="M11.112,18.789a.626.626,0,0,1-.618-.72l.922-5.992a.625.625,0,1,1,1.235.19l-.922,5.992A.625.625,0,0,1,11.112,18.789Z"/>
+  </g>
+</svg>
+
   )
 }
 
@@ -102,13 +124,72 @@ const MODULES = [
   { id: 'planning',   label: 'Planning',      icon: IconPlanning,  available: true  },
   { id: 'hygiene',    label: 'Hygiène',       icon: IconHygiene,   available: false },
   { id: 'orders',     label: 'Commandes',     icon: IconOrders,    available: true  },
-  { id: 'products',   label: 'Produits',      icon: IconProducts,  available: false },
+  { id: 'products',   label: 'Produits',      icon: IconProducts,  available: true  },
   { id: 'recipes',    label: 'Recettes',      icon: IconRecipes,   available: false },
   { id: 'suppliers',  label: 'Fournisseurs',  icon: IconSuppliers, available: false },
 ]
 
-export default function NavSidebar({ activeModule = 'planning', onModuleChange, badges = {} }) {
+export default function NavSidebar({ activeModule = 'planning', onModuleChange, badges = {}, connections = [] }) {
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  const [popPos,       setPopPos]       = useState({ top: 0, left: 0 })
+  const settingsBtnRef = useRef(null)
+  const settingsPopRef = useRef(null)
+
+  const connColor = connections.length > 0
+    ? dotColor(connections.map(c => c.status))
+    : 'green'
+
+  function toggleSettings() {
+    if (settingsOpen) { setSettingsOpen(false); return }
+    const rect = settingsBtnRef.current.getBoundingClientRect()
+    setPopPos({ top: rect.top, left: rect.right + 8 })
+    setSettingsOpen(true)
+  }
+
+  useEffect(() => {
+    if (!settingsOpen) return
+    function onDown(e) {
+      if (settingsPopRef.current?.contains(e.target) || settingsBtnRef.current?.contains(e.target)) return
+      setSettingsOpen(false)
+    }
+    document.addEventListener('mousedown', onDown)
+    return () => document.removeEventListener('mousedown', onDown)
+  }, [settingsOpen])
+
+  const settingsPopover = settingsOpen && connections.length > 0 && createPortal(
+    <div
+      ref={settingsPopRef}
+      className="conn-popover"
+      style={{ top: popPos.top, left: popPos.left }}
+    >
+      {connections.map((c, i) => (
+        <div key={i} className="conn-popover-row">
+          <span
+            className="conn-popover-dot"
+            style={{ background: DOT_COLORS[dotColor([c.status])] }}
+          />
+          <div className="conn-popover-info">
+            <span className="conn-popover-label">{c.label}</span>
+            {c.detail && <span className="conn-popover-detail">{c.detail}</span>}
+          </div>
+          {(c.status === 'error' || c.status === 'expired') && c.onRetry && (
+            <button className="conn-popover-action" onClick={() => { c.onRetry(); setSettingsOpen(false) }}>
+              Réessayer
+            </button>
+          )}
+          {c.status === 'disconnected' && c.onConnect && (
+            <button className="conn-popover-action" onClick={() => { c.onConnect(); setSettingsOpen(false) }}>
+              Connecter
+            </button>
+          )}
+        </div>
+      ))}
+    </div>,
+    document.body
+  )
+
   return (
+    <>
     <nav className="nav-sidebar">
 
       {/* Logo */}
@@ -151,8 +232,19 @@ export default function NavSidebar({ activeModule = 'planning', onModuleChange, 
 
       {/* Actions globales */}
       <div className="nav-bottom">
-        <button className="nav-item nav-item--sm" title="Paramètres" disabled>
+        <button
+          ref={settingsBtnRef}
+          className="nav-item nav-item--sm"
+          title="Paramètres"
+          onClick={toggleSettings}
+        >
           <IconSettings />
+          {connections.length > 0 && (
+            <span
+              className="nav-badge nav-badge--dot"
+              style={{ background: DOT_COLORS[connColor] }}
+            />
+          )}
         </button>
         <button className="nav-item nav-item--sm" title="Profil" disabled>
           <IconProfile />
@@ -160,5 +252,7 @@ export default function NavSidebar({ activeModule = 'planning', onModuleChange, 
       </div>
 
     </nav>
+    {settingsPopover}
+    </>
   )
 }

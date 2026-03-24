@@ -35,7 +35,7 @@ function isWebflowOrder(order) {
   return order.channel === 'web' || (order.channel === 'brunch' && order.brunchSource === 'web')
 }
 
-function OrderCard({ order, onEdit, onDelete }) {
+function OrderCard({ order, onEdit, onDelete, getProduct }) {
   const [confirmDelete, setConfirmDelete] = useState(false)
   const canEdit   = !order.paid && !isWebflowOrder(order)
   const canDelete = !isWebflowOrder(order)
@@ -100,15 +100,27 @@ function OrderCard({ order, onEdit, onDelete }) {
 
       {/* 5 : Liste des produits */}
       <div className="odm-card-products">
-        {order.items.map((item, i) => (
-          <div key={i} className="odm-item">
-            <div className="odm-item-top">
-              <span className="odm-item-name">{item.label}</span>
-              <span className="odm-item-qty">× {item.qty}</span>
+        {order.items.map((item, i) => {
+          const product  = item.productId ? getProduct?.(item.productId) : null
+          const photoUrl = product?.photoUrl ?? null
+          return (
+            <div key={i} className="odm-item">
+              <div className="odm-item-photo">
+                {photoUrl
+                  ? <img src={photoUrl} alt={item.label} />
+                  : <span className="odm-item-photo-placeholder">🍰</span>
+                }
+              </div>
+              <div className="odm-item-content">
+                <div className="odm-item-top">
+                  <span className="odm-item-name">{item.label}</span>
+                  <span className="odm-item-qty">× {item.qty}</span>
+                </div>
+                {item.size && <div className="odm-item-size">{item.size}</div>}
+              </div>
             </div>
-            {item.size && <div className="odm-item-size">{item.size}</div>}
-          </div>
-        ))}
+          )
+        })}
       </div>
 
       {/* Heure de retrait */}
@@ -150,7 +162,7 @@ function OrderCard({ order, onEdit, onDelete }) {
 
 // ── Modal principale ───────────────────────────────────────────────────────────
 
-export default function OrderDayModal({ date, orders, onNewOrder, onEdit, onDelete, onClose }) {
+export default function OrderDayModal({ date, orders, onNewOrder, onEdit, onDelete, onClose, getProduct }) {
   const isSaturday = date.getDay() === 6
 
   const today = new Date(); today.setHours(0, 0, 0, 0)
@@ -196,6 +208,7 @@ export default function OrderDayModal({ date, orders, onNewOrder, onEdit, onDele
                 order={order}
                 onEdit={onEdit}
                 onDelete={onDelete}
+                getProduct={getProduct}
               />
             ))
           )}

@@ -13,7 +13,13 @@ function fmtDate(dateStr) {
   })
 }
 
-export default function OrderDetailModal({ order, onDelete, onClose }) {
+const ALLERGEN_EMOJI = {
+  gluten: '🌾', crustaces: '🦐', oeufs: '🥚', poisson: '🐟', arachides: '🥜',
+  soja: '🫘', lait: '🥛', fruits_coque: '🌰', celeri: '🌿', moutarde: '🟡',
+  sesame: '🌻', sulfites: '🍷', lupin: '🌼', mollusques: '🦑',
+}
+
+export default function OrderDetailModal({ order, getProduct, onDelete, onClose }) {
   const [confirmDelete, setConfirmDelete] = useState(false)
 
   if (confirmDelete) {
@@ -81,16 +87,35 @@ export default function OrderDetailModal({ order, onDelete, onClose }) {
             <span>P.U.</span>
             <span>Total</span>
           </div>
-          {order.items.map((item, i) => (
-            <div key={i} className="order-detail-item">
-              <span className="order-detail-item-label">
-                {item.label}{item.size ? ` — ${item.size}` : ''}
-              </span>
-              <span className="order-detail-item-meta">× {item.qty}</span>
-              <span className="order-detail-item-meta">{fmtPrice(item.unitPrice)}</span>
-              <span className="order-detail-item-sub">{fmtPrice(item.qty * item.unitPrice)}</span>
-            </div>
-          ))}
+          {order.items.map((item, i) => {
+            const product = item.productId && getProduct ? getProduct(item.productId) : null
+            const allergens = product?.allergens ?? []
+            const dlc = product?.dlcDays != null ? `DLC : ${product.dlcDays}j` : null
+            return (
+              <div key={i} className="order-detail-item order-detail-item--with-product">
+                <span className="order-detail-item-label">
+                  {item.label}{item.size ? ` — ${item.size}` : ''}
+                </span>
+                <span className="order-detail-item-meta">× {item.qty}</span>
+                <span className="order-detail-item-meta">{fmtPrice(item.unitPrice)}</span>
+                <span className="order-detail-item-sub">{fmtPrice(item.qty * item.unitPrice)}</span>
+                {(allergens.length > 0 || dlc) && (
+                  <div className="order-detail-item-product">
+                    {allergens.length > 0 && (
+                      <span className="order-detail-allergens">
+                        {allergens.map(a => (
+                          <span key={a} className="order-detail-allergen-pill" title={a}>
+                            {ALLERGEN_EMOJI[a] ?? '⚠️'} {a}
+                          </span>
+                        ))}
+                      </span>
+                    )}
+                    {dlc && <span className="order-detail-dlc">{dlc}</span>}
+                  </div>
+                )}
+              </div>
+            )
+          })}
         </div>
 
         <div className="sep" style={{ margin: 'var(--gap) 0' }} />

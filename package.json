@@ -10,7 +10,7 @@
     "preview": "vite preview",
     "test": "vitest run",
     "proxy": "node --env-file=.env.local scripts/webflow-proxy.js",
-    "start": "concurrently --names \"PROXY,VITE\" --prefix-colors \"blue,green\" \"npm run proxy\" \"npm run dev\""
+    "start": "concurrently --names \"PROXY,VITE\" --prefix-colors \"blue,green\" \"npm run proxy\" \"npm run dev -- --host\""
   },
   "dependencies": {
     "html2canvas": "^1.4.1",

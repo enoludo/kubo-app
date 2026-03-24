@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { PdfIcon, MailIcon } from './Icons'
-import ConnectionDot from './ConnectionDot'
 
 function SaveIcon() {
   return (
@@ -171,7 +170,6 @@ const DATA_SOURCE_LABEL = {
 export default function Header({
   week, onOpenPicker, onPdfExport, pdfGenerating, onSendToAll,
   copiedPlan, templates, onCopyPlan, onPastePlan, onSaveTemplate, onLoadTemplate,
-  syncStatus, syncError, onSyncConnect, onSyncRetry,
   dataSource, onReset,
 }) {
   const { dates, prev, next } = week
@@ -261,17 +259,6 @@ export default function Header({
               {DATA_SOURCE_LABEL[dataSource]}
             </span>
           )}
-          <ConnectionDot connections={[{
-            label:     'Google Sheets',
-            status:    syncStatus === 'synced' ? 'connected' : syncStatus,
-            detail:    syncStatus === 'synced'       ? 'Synchronisé'
-                     : syncStatus === 'disconnected' ? 'Non connecté'
-                     : syncStatus === 'expired'      ? 'Session expirée'
-                     : syncStatus === 'error'        ? (syncError ?? 'Erreur de synchronisation')
-                     : 'Connexion en cours…',
-            onConnect: syncStatus === 'disconnected' ? onSyncConnect  : undefined,
-            onRetry:   (syncStatus === 'error' || syncStatus === 'expired') ? onSyncRetry : undefined,
-          }]} />
           <button
             ref={btnRef}
             className={`header-menu-btn${menuOpen ? ' active' : ''}`}

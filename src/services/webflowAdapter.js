@@ -149,6 +149,8 @@ function mapOrder(order) {
       size:      sizeCleaned,
       qty:       item.count        ?? 1,
       unitPrice: item.variantPrice?.value != null ? item.variantPrice.value / 100 : null,
+      // Préfixe wf- pour correspondre à product.id dans useProducts
+      productId: item.productId ? `wf-${item.productId}` : null,
     }
   })
 
@@ -193,7 +195,147 @@ function mapOrder(order) {
   }
 }
 
+// ── Mapping allergènes Webflow (IDs CMS → clés internes) ─────────────────────
+// Clés internes : 'gluten' | 'lait' | 'oeufs' | 'fruits-a-coques' |
+//                 'arachides' | 'soja' | 'poisson' | 'sesame'
+
+const WEBFLOW_ALLERGEN_MAP = {
+  '68cd0a4b8979761c86bafd01': 'lait',            // Produits laitiers (confirmé)
+  '68cd0a4b8979761c86bafcbe': 'oeufs',           // Œuf (confirmé)
+  '68cd0a4b8979761c86bafc37': 'gluten',          // Farine de blé (confirmé par sarrasin)
+  '68cd0a4b8979761c86bafc36': 'fruits-a-coques', // Amandes
+  '68cd0a4b8979761c86bafced': 'poisson',         // Gélatine de poisson
+  '68cd0a4b8979761c86bafc89': 'fruits-a-coques', // Noisettes
+  '68cd0a4b8979761c86bafc71': 'fruits-a-coques', // Noix / pécan
+  '68cd0a4b8979761c86bafcd6': 'fruits-a-coques', // Pistache
+  '68cd0a4b8979761c86bafd0f': 'sesame',          // Tahini / sésame
+  '68cd0a4b8979761c86bafc38': 'arachides',       // Cacahuète (confirmé)
+  '68f7f43e45ded89ea808c607': 'soja',            // Poudre de soja grillé
+}
+
+function resolveAllergens(ids = []) {
+  const seen = new Set()
+  const result = []
+  for (const id of ids) {
+    const key = WEBFLOW_ALLERGEN_MAP[id]
+    if (key && !seen.has(key)) {
+      seen.add(key)
+      result.push(key)
+    }
+  }
+  return result
+}
+
+// ── Mapping produits Webflow → format interne ─────────────────────────────────
+
+function buildSizeValueMap(skuProperties) {
+  // Construit : { propertyId: { valueId: labelString } }
+  // pour la propriété "Taille" uniquement
+  const tailleProp = (skuProperties ?? []).find(
+    p => p.name?.toLowerCase().includes('taille')
+  )
+  if (!tailleProp) return null
+
+  const valueMap = {}
+  for (const entry of tailleProp.enum ?? []) {
+    valueMap[entry.id] = entry.name
+  }
+  return { propertyId: tailleProp.id, valueMap }
+}
+
+function mapProduct(item) {
+  // item.product + item.skus depuis l'API v2 Webflow ecommerce
+  const p           = item.product ?? item
+  const skus        = item.skus    ?? []
+  const fd          = p.fieldData  ?? {}
+  const productName = fd.name      ?? ''
+
+  // Construit le dictionnaire Taille à partir de sku-properties
+  const taille = buildSizeValueMap(fd['sku-properties'])
+
+  const sizes = skus.map(sku => {
+    const sfd        = sku.fieldData ?? {}
+    const price      = sfd.price?.value != null ? sfd.price.value / 100 : null
+    const skuValues  = sfd['sku-values'] ?? {}
+
+    // Résolution via sku-properties (source fiable)
+    let label = null
+    if (taille) {
+      const valueId = skuValues[taille.propertyId]
+      label = valueId ? taille.valueMap[valueId] ?? null : null
+    }
+    // Fallback : extraire "Taille: XXX" du nom du SKU
+    if (!label) {
+      const match = (sfd.name ?? '').match(/Taille\s*:\s*(.+)/i)
+      label = match ? match[1].trim() : (sfd.name?.replace(productName, '').trim() || 'Standard')
+    }
+
+    return { id: sku.id ?? crypto.randomUUID(), label, price, costPerUnit: null }
+  }).filter(s => s.price != null)
+
+  // Actif = publié et ni archivé ni brouillon
+  const active = !p.isArchived && !p.isDraft
+
+  return {
+    id:                `wf-${p.id}`,
+    webflowProductId:  p.id,
+    name:              productName || p.slug || '',
+    description:       fd.description ?? null,
+    category:          fd.categorie   ?? '',
+    photoUrl:          fd['image-01']?.url ?? null,
+    active,
+    sizes:             sizes.length ? sizes : [],
+    allergens:         resolveAllergens(fd['produits-allergene']),
+    pregnancySafe:     'check',
+    pregnancyNote:     null,
+    ingredients:       [],
+    recipeSteps:       [],
+    totalProductionTimeMin: null,
+    restTimeMin:            null,
+    advancePrepDays:        0,
+    storageConditions:      '',
+    shelfLifeHours:         null,
+    sanitaryNotes:          '',
+    internalNotes:          '',
+    createdAt:              new Date().toISOString(),
+    updatedAt:              new Date().toISOString(),
+  }
+}
+
 // ── Export principal ──────────────────────────────────────────────────────────
+
+/**
+ * Récupère les produits Webflow.
+ * RÈGLE : exclut les produits dont le nom contient "Brunch du Samedi" (insensible à la casse).
+ * @returns {Promise<Array>} Produits mappés au format interne
+ */
+export async function fetchProducts() {
+  const url = `${API_BASE}/api/webflow-products?limit=100`
+  console.log('[webflow] fetchProducts appelé →', url)
+
+  const res = await fetch(url)
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}))
+    const err  = new Error(body.error ?? `HTTP ${res.status}`)
+    err.status = res.status
+    throw err
+  }
+
+  const data  = await res.json()
+  // Webflow v2 retourne { items: [...] } pour les produits
+  const items = data.items ?? data.products ?? []
+
+  const mapped = items
+    .filter(item => {
+      const name = item.product?.fieldData?.name ?? item.product?.name ?? item.fieldData?.name ?? ''
+      return !name.toLowerCase().includes('brunch du samedi')
+    })
+    .map(mapProduct)
+
+  console.log('[webflow] produits reçus:', mapped.length)
+  return mapped
+}
 
 /**
  * Récupère les commandes Webflow et retourne uniquement les nouvelles.

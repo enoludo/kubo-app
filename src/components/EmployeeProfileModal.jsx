@@ -307,7 +307,7 @@ export default function EmployeeProfileModal({
               </button>
               <button
                 className="btn-primary modal-confirm"
-                style={{ background: employee.email ? employee.color : undefined, flex: canPaste ? undefined : 1 }}
+                style={{background: employee.color,  opacity: employee.email ? 1 : 0.8,  flex: canPaste ? undefined : 1 }}
                 onClick={employee.email ? () => setActivePanel('email') : onEdit}
               >
                 <MailIcon size={13} style={{ marginRight: 6 }} />

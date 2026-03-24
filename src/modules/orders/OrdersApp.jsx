@@ -10,7 +10,7 @@ import OrderDetailModal     from './OrderDetailModal'
 import { dateToStr }        from '../../utils/date'
 import './OrdersApp.css'
 
-export default function OrdersApp({ ordersCtx, showToast }) {
+export default function OrdersApp({ ordersCtx, productsCtx, showToast }) {
   const now = new Date()
   const [year,  setYear]  = useState(now.getFullYear())
   const [month, setMonth] = useState(now.getMonth())
@@ -166,6 +166,7 @@ export default function OrdersApp({ ordersCtx, showToast }) {
           onDelete={handleDelete}
           onOpenDetail={handleOpenDetail}
           onClose={() => setDayModal(null)}
+          getProduct={productsCtx?.getById}
         />
       )}
 
@@ -211,6 +212,7 @@ export default function OrdersApp({ ordersCtx, showToast }) {
       {detailOrder && (
         <OrderDetailModal
           order={detailOrder}
+          getProduct={productsCtx?.getById}
           onDelete={handleDelete}
           onClose={() => setDetailOrder(null)}
         />

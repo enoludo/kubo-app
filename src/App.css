@@ -106,6 +106,15 @@
   pointer-events: none;
 }
 
+.nav-badge--dot {
+  width: 8px;
+  min-width: 8px;
+  height: 8px;
+  padding: 0;
+  top: 4px;
+  right: 4px;
+}
+
 .nav-item:hover:not(:disabled) {
   background: var(--bg-3);
   color: var(--bg-4);
@@ -114,11 +123,7 @@
 .nav-item--active {
   background: var(--bg-4);
   color: var(--bg-2);
-}
-
-.nav-item--active:hover {
-  background: var(--bg-4);
-  color: var(--bg-2);
+  pointer-events: none;
 }
 
 .nav-item--disabled {
@@ -280,6 +285,7 @@
 /* ─── Badge source de données ────────────────────────────────────── */
 .data-source-badge {
   font-size: 11px;
+  display: none;
   font-weight: 500;
   padding: 3px 9px;
   border-radius: var(--radius-pill);
@@ -951,6 +957,7 @@
   border-radius: var(--radius-sm);
   padding: 8px 12px;
   outline: none;
+  min-height: 3rem;
 }
 .modal-field-balance-row input { width: 72px; }
 
@@ -1113,7 +1120,7 @@
 .modal {
   background: var(--bg);
   border-radius: var(--radius-lg);
-  padding: 32px;
+  padding: var(--pad-h);
   width: 460px;
   max-width: calc(100vw - 32px);
   font-family: 'Poppins', sans-serif;
@@ -1175,6 +1182,7 @@
 .modal-field select,
 .modal-pause select,
 .modal-field-balance-row select {
+  height: 3rem;
   font-family: 'Poppins', sans-serif;
   font-size: 13px;
   background: var(--bg-2);
@@ -1201,7 +1209,7 @@
 .modal-type-selector {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: var(--gap-small);
   margin-bottom: 14px;
 }
 
@@ -1414,7 +1422,7 @@
 
 .modal-actions {
   display: flex;
-  gap: 10px;
+  gap: var(--gap-smallêm);
 }
 
 .modal-cancel {
@@ -1448,6 +1456,7 @@
   /* extends .btn-primary — ajoute flex et gap pour icône+texte */
   flex: 2;
   gap: 8px;
+  color: var(--color-gray-900);
 }
 .modal-confirm:hover { opacity: 0.85; }
 .modal-confirm:disabled { opacity: 0.4; cursor: not-allowed; }
@@ -1522,10 +1531,12 @@
   padding: 5px 14px;
   border-radius: var(--radius-sm);
   border: none;
+  min-height: 3rem;
   background: var(--accent-sub);
   color: var(--accent);
   font-family: 'Poppins', sans-serif;
-  font-size: 11px;
+  font-size: 12px;
+  padding: 0 1.25rem;
   font-weight: 600;
   cursor: pointer;
   transition: background var(--t-base), color var(--t-base);
@@ -1533,8 +1544,8 @@
 .week-picker-today-btn:hover { background: var(--accent); color: var(--bg); }
 
 .week-picker-close {
-  width: 28px;
-  height: 28px;
+  width: 3rem;
+  height: 3rem;
   border-radius: var(--radius-full);
   border: none;
   background: var(--bg-2);
@@ -1754,6 +1765,7 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
+  gap: var(--gap-small);
   background: var(--bg-2);
 }
 
@@ -1762,12 +1774,13 @@
   display: flex;
   height: 5rem;
   align-items: stretch;
-  padding: 12px var(--pad-h);
-  gap: var(--gap);
+  padding: 0px var(--pad-h);
+  gap: var(--gap-small);
   background: var(--bg-2);
   flex-shrink: 0;
   position: relative;
   z-index: var(--z-sticky);
+  align-items: flex-end;
 }
 
 .tv-emp-col {
@@ -1786,7 +1799,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
   padding: 10px 4px;
   gap: 2px;
 }
@@ -1839,7 +1852,7 @@
   padding: 0 var(--pad-h) var(--pad-h);
   display: flex;
   flex-direction: column;
-  gap: var(--gap);
+  gap: var(--gap-small);
   overflow-x: hidden;
 }
 
@@ -1850,6 +1863,7 @@
 
 .tv-add-employee-btn {
   width: 100%;
+  height: 3rem;;
 }
 
 .tv-add-avatar {
@@ -1874,7 +1888,7 @@
   flex-direction: row;
   align-items: stretch;
   position: relative;
-  gap: var(--gap);
+  gap: var(--gap-small);
 }
 
 /* Cellule jour dans une ligne */
@@ -1908,7 +1922,7 @@
 
 .day-card--empty {
   /* override .day-card's solid border with dashed */
-  border: 1.5px dashed var(--bg-3);
+  border: 1.5px dashed var(--color-purple-400);
 }
 
 /* Badge statut */
@@ -1982,6 +1996,7 @@
 
 /* Label journée entière */
 .day-card-label {
+  display: none;
   font-family: 'Poppins', sans-serif;
   font-size: 10.5px;
   color: var(--text-3); /* ⚠ #888 → --text-3 (#9999aa) : légèrement plus clair */
@@ -2014,6 +2029,7 @@
 ═══════════════════════════════════════════ */
 
 /* ── Petit laptop : ≤ 1280px ── */
+/*
 @media (max-width: 1280px) {
   :root {
     --tv-emp-col: 180px;
@@ -2032,6 +2048,7 @@
   .modal { width: 460px; padding: 20px; }
   .week-picker-panel { width: min(640px, 96vw); }
 }
+*/
 
 /* ── Standard : 1440px (valeurs par défaut, pas d'override nécessaire) ── */
 
@@ -2075,6 +2092,8 @@
   font-family: 'Poppins', sans-serif;
   font-size: 12px;
   font-weight: 600;
+  min-height: 3rem;
+  padding: 0 1.25rem;
   cursor: pointer;
   white-space: nowrap;
   transition: background var(--t-base), color var(--t-base);

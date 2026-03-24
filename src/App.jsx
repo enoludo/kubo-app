@@ -7,6 +7,7 @@ import WeekPickerPanel      from './components/WeekPickerPanel'
 import TableView            from './components/TableView'
 import NavSidebar           from './components/NavSidebar'
 import OrdersApp            from './modules/orders/OrdersApp'
+import ProductsApp          from './modules/products/ProductsApp'
 import StartupModal         from './components/StartupModal'
 import { useSchedule }      from './hooks/useSchedule'
 import { useGoogleSync }    from './hooks/useGoogleSync'
@@ -16,6 +17,7 @@ import { useShiftActions }  from './hooks/useShiftActions'
 import { useTemplates }     from './hooks/useTemplates'
 import { useExports }       from './hooks/useExports'
 import { useOrders }        from './hooks/useOrders'
+import { useProducts }      from './hooks/useProducts'
 import { sessionHasData }   from './utils/session'
 import { mondayOf, dateToStr } from './utils/date'
 import initialTeam from './data/team.json'
@@ -77,7 +79,8 @@ export default function App() {
     }
   }, [sync.status]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const ordersCtx   = useOrders({ onToast: showToast })
+  const ordersCtx    = useOrders({ onToast: showToast })
+  const productsCtx  = useProducts({ onToast: showToast })
 
   // Auto-dismiss startup modal quand les deux services sont connectés
   useEffect(() => {
@@ -112,9 +115,35 @@ export default function App() {
         activeModule={activeModule}
         onModuleChange={setActiveModule}
         badges={{ orders: ordersCtx.upcomingCount }}
+        connections={[
+          {
+            label:     'Google Sheets',
+            status:    sync.status === 'synced' ? 'connected' : sync.status,
+            detail:    sync.status === 'synced'       ? 'Synchronisé'
+                     : sync.status === 'disconnected' ? 'Non connecté'
+                     : sync.status === 'expired'      ? 'Session expirée'
+                     : sync.status === 'error'        ? (sync.errMsg ?? 'Erreur de synchronisation')
+                     : 'Connexion en cours…',
+            onConnect: sync.status === 'disconnected' ? sync.connect : undefined,
+            onRetry:   (sync.status === 'error' || sync.status === 'expired') ? sync.retry : undefined,
+          },
+          {
+            label:     'Webflow',
+            status:    ordersCtx.webflowStatus === 'connected' ? 'connected'
+                     : ordersCtx.webflowStatus === 'loading'   ? 'connecting'
+                     : ordersCtx.webflowStatus === 'error'     ? 'error'
+                     : 'disconnected',
+            detail:    ordersCtx.webflowStatus === 'connected' ? 'Connecté'
+                     : ordersCtx.webflowStatus === 'loading'   ? 'Connexion en cours…'
+                     : ordersCtx.webflowStatus === 'error'     ? (ordersCtx.webflowError ?? 'Erreur de connexion')
+                     : 'Non connecté',
+            onRetry:   ordersCtx.webflowStatus === 'error' ? ordersCtx.retryWebflow : undefined,
+          },
+        ]}
       />
 
-      {activeModule === 'orders' && <OrdersApp ordersCtx={ordersCtx} showToast={showToast} />}
+      {activeModule === 'orders'   && <OrdersApp   ordersCtx={ordersCtx} productsCtx={productsCtx} showToast={showToast} />}
+      {activeModule === 'products' && <ProductsApp productsCtx={productsCtx} showToast={showToast} getToken={sync.getToken} />}
 
       {activeModule === 'planning' && <>
       {sync.loading && (
@@ -136,10 +165,6 @@ export default function App() {
           onPastePlan={templateCtx.handlePastePlan}
           onSaveTemplate={templateCtx.handleSaveTemplate}
           onLoadTemplate={templateCtx.handleLoadTemplate}
-          syncStatus={sync.status}
-          syncError={sync.errMsg}
-          onSyncConnect={sync.connect}
-          onSyncRetry={sync.retry}
           dataSource={dataSource}
           onReset={teamCtx.handleReset}
         />

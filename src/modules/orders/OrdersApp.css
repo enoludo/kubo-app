@@ -62,7 +62,7 @@
   flex-direction: column;
   min-height: 0;
   padding: 0 var(--pad-h) var(--pad-h);
-  gap: var(--gap);
+  gap: var(--gap-small);
 }
 
 /* En-tête des jours — même gap que .tv-header-row */
@@ -92,7 +92,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: var(--gap);
+  gap: var(--gap-small);
   min-height: 0;
 }
 
@@ -101,7 +101,7 @@
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   flex: 1;
-  gap: var(--gap);
+  gap: var(--gap-small);
   min-height: clamp(80px, 9vh, 140px);
 }
 
@@ -118,19 +118,22 @@
   position: relative;
   min-height: clamp(80px, 9vh, 140px);
   overflow: hidden;
-  border: 1px solid transparent;
+  border: 1.5px dashed var(--bg-3);
   transition: border-color var(--t-base), background var(--t-base);
 }
 
 /* Jours hors du mois courant */
 .order-day-cell--outside {
-  opacity: 0.35;
+  opacity: 0.5;
   pointer-events: none;
 }
 
-/* Cases vides — pas de bordure sur la cellule, le bouton .add-trigger la fournit */
+/* Cases vides — la bordure vient du bouton .add-trigger, pas de la cellule */
+.order-day-cell--empty {
+  border: none;
+}
 .order-day-cell--empty.order-day-cell--clickable:hover {
-  border-color: transparent; /* le hover vient du bouton .add-trigger */
+  border: none;
   background: transparent;
 }
 
@@ -138,6 +141,7 @@
 .order-day-cell--past {
   opacity: 1;
   background-color: var(--accent-sub);
+  border: none;
 }
 .order-day-cell--past:not(.order-day-cell--has-orders) {
   cursor: default;
@@ -149,18 +153,23 @@
   background: var(--type-sick-bg);
 }
 
+/* Cellules avec commandes — bordure add-trigger */
+.order-day-cell--has-orders:not(.order-day-cell--past) {
+  border-color: var(--color-purple-400);
+}
+.order-day-cell--has-orders:not(.order-day-cell--past):hover {
+  background: transparent;
+}
+
 /* Cellule cliquable (mois courant) — même effet que .day-card:hover */
 .order-day-cell--clickable {
   cursor: pointer;
 }
-.order-day-cell--clickable:hover {
-  border-color: var(--color-purple-400);
-  background: var(--bg-3);
+.order-day-cell--clickable:not(.order-day-cell--has-orders):not(.order-day-cell--empty):hover {
+  border: solid 1px var(--color-purple-400);
 }
 .order-day-cell--today.order-day-cell--clickable:hover {
-  filter: brightness(0.97);
-  background: var(--accent-sub);
-  border-color: var(--color-purple-400);
+  border-color: var(--type-sick);
 }
 
 /* Numéro du jour — ancré en haut à droite, au-dessus du bouton add-trigger */
@@ -243,8 +252,7 @@
 .som-choices {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-bottom: 4px;
+  gap: var(--gap);
 }
 
 .som-btn {
@@ -296,39 +304,187 @@
 }
 .nom-section-label--invalid { color: var(--color-error); }
 
-/* Lignes produits dynamiques */
+/* Conteneur des lignes produits */
 .nom-product-rows {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
   margin-bottom: 8px;
 }
 
-.nom-product-row {
+/* ── Carte produit (remplace .nom-product-row) ────────────────────────────── */
+.nom-product-card {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--bg-2);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+}
+
+/* En-tête carte : bouton toggle mode */
+.nom-card-header {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Toggle mode catalogue ↔ libre */
+.nom-mode-toggle {
+  font-family: 'Poppins', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-3);
+  background: none;
+  border: 1px solid var(--bg-3);
+  border-radius: var(--radius-pill);
+  padding: 4px 12px;
+  min-height: 28px;
+  cursor: pointer;
+  transition: background var(--t-fast), color var(--t-fast), border-color var(--t-fast);
+  white-space: nowrap;
+}
+.nom-mode-toggle:hover:not(:disabled) {
+  background: var(--bg-3);
+  color: var(--text);
+}
+.nom-mode-toggle:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Corps carte : sélecteurs ou champs libres */
+.nom-card-body {
+  display: flex;
+  flex-direction: column;
   gap: 6px;
 }
 
-.nom-product-row input {
+/* Select produit — pleine largeur */
+.nom-product-select,
+.nom-size-select {
   font-family: 'Poppins', sans-serif;
   font-size: 13px;
   font-weight: 500;
   color: var(--text);
-  background: var(--bg-2);
+  background: var(--bg);
   border: none;
   border-radius: var(--radius-sm);
-  padding: 8px 10px;
+  padding: 0 10px;
+  height: 44px;
+  min-height: 44px;
+  width: 100%;
+  outline: none;
+  cursor: pointer;
+  appearance: auto;
+}
+
+/* Prix unitaire auto-calculé (mode catalogue) */
+.nom-unit-price {
+  display: none;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  min-height: 3rem;
+  font-weight: 700;
+  color: var(--text);
+  text-align: right;
+  padding: 2px 4px;
+}
+.nom-unit-price-label {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text-3);
+}
+
+/* Mode libre — input nom */
+.nom-libre-name {
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  background: var(--bg);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 0 10px;
+  height: 44px;
+  min-height: 44px;
+  width: 100%;
   outline: none;
   min-width: 0;
-  min-height: 38px;
+  box-sizing: border-box;
+}
+
+/* Mode libre — ligne taille + prix */
+.nom-libre-meta {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.nom-libre-size {
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  background: var(--bg);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 0 10px;
+  height: 44px;
+  min-height: 44px;
+  flex: 2;
+  min-width: 0;
+  outline: none;
+}
+
+.nom-libre-price-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 80px;
+}
+
+.nom-libre-price {
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  background: var(--bg);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 0 28px 0 10px;
+  height: 44px;
+  min-height: 44px;
+  width: 100%;
+  outline: none;
+  text-align: right;
+  box-sizing: border-box;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+.nom-libre-price::-webkit-inner-spin-button,
+.nom-libre-price::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+
+.nom-libre-euro {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-3);
+  pointer-events: none;
+}
+
+/* Pied carte : stepper + supprimer */
+.nom-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
 }
 
 /* Bouton × de suppression de ligne */
 .nom-row-remove {
-  width: 32px;
-  height: 32px;
-  min-width: 32px;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -336,7 +492,7 @@
   background: none;
   border: none;
   color: var(--text-3);
-  font-size: 18px;
+  font-size: 20px;
   cursor: pointer;
   border-radius: var(--radius-sm);
   padding: 0;
@@ -443,6 +599,7 @@
   cursor: pointer;
   appearance: none;
   -webkit-appearance: none;
+  min-height: 3rem;
 }
 
 /* .modal-save supprimé — remplacé par .btn-primary */
@@ -581,6 +738,50 @@
   text-align: right;
 }
 
+/* Infos produit liées (allergènes + DLC) */
+.order-detail-item--with-product {
+  grid-template-columns: 1fr 36px 60px 60px;
+  grid-template-rows: auto auto;
+}
+
+.order-detail-item-product {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.order-detail-allergens {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.order-detail-allergen-pill {
+  font-family: 'Poppins', sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  background: var(--color-warn-light, #FFF4E0);
+  color: var(--color-warn-dark, #7A4F00);
+  border-radius: var(--radius-pill);
+  padding: 2px 8px;
+  white-space: nowrap;
+}
+
+.order-detail-dlc {
+  font-family: 'Poppins', sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  background: var(--bg-2);
+  color: var(--text-3);
+  border-radius: var(--radius-pill);
+  padding: 2px 8px;
+  white-space: nowrap;
+  margin-left: auto;
+}
+
 /* Total */
 .order-detail-total {
   display: flex;
@@ -651,7 +852,7 @@
 
 /* Surcharge de .modal : padding 0, flex column, scroll interne */
 .modal.odm {
-  width: 560px;
+  width: 640px;
   max-height: 85vh;
   padding: 0;
   display: flex;
@@ -673,7 +874,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 4px;
+  gap: var(--gap);
 }
 
 /* .odm-title supprimé — remplacé par .modal-emp-name */
@@ -701,7 +902,7 @@
 }
 
 /* Boutons du header ODM — .som-btn en mode inline (pas full-width) */
-.odm-header-btns .som-btn { width: auto; min-height: 36px; padding: 0 14px; }
+.odm-header-btns .som-btn { width: auto; min-height: 3rem; padding: 0 1.5rem; }
 
 /* Corps scrollable — grille 2 colonnes */
 .odm-body {
@@ -710,7 +911,7 @@
   padding: 0 1.5rem 1.5rem;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
+  gap: var(--gap-small);
   align-items: stretch;
   align-content: start;
 }
@@ -815,7 +1016,39 @@
   line-height: 1.4;
 }
 
-.odm-item { display: flex; flex-direction: column; }
+.odm-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.odm-item-photo {
+  width: auto;
+  height: 3rem;
+  mix-blend-mode: multiply;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  flex-shrink: 0;
+  background: var(--bg-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.odm-item-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.odm-item-photo-placeholder {
+  font-size: 18px;
+}
+
+.odm-item-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
 
 .odm-item-top {
   display: flex;
@@ -823,12 +1056,19 @@
   align-items: center;
 }
 
-.odm-item-name { flex: 1; }
+.odm-item-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
 .odm-item-qty {
   font-weight: 600;
   color: var(--text-2);
   margin-left: 8px;
+  flex-shrink: 0;
 }
 
 .odm-item-size {

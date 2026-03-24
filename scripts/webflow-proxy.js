@@ -45,6 +45,34 @@ app.get('/api/webflow-orders', async (req, res) => {
   }
 })
 
+app.get('/api/webflow-products', async (req, res) => {
+  const siteId = process.env.WEBFLOW_SITE_ID
+  const token  = process.env.WEBFLOW_API_TOKEN
+
+  if (!siteId || !token) {
+    return res.status(500).json({ error: 'Missing Webflow credentials' })
+  }
+
+  const { limit = '100', offset = '0' } = req.query
+  const params = new URLSearchParams({ limit, offset })
+  const url = `https://api.webflow.com/v2/sites/${siteId}/products?${params}`
+
+  try {
+    const response = await fetch(url, {
+      headers: { 'Authorization': `Bearer ${token}` },
+    })
+    const data = await response.json()
+    if (!response.ok) {
+      return res.status(response.status).json({ error: data?.message ?? 'Webflow error' })
+    }
+    console.log(`[proxy] ${data.items?.length ?? 0} produit(s) reçu(s) de Webflow`)
+    res.json(data)
+  } catch (err) {
+    console.error('[proxy] fetch error:', err.message)
+    res.status(500).json({ error: err.message })
+  }
+})
+
 const server = app.listen(PORT, () => {
   console.log(`Webflow proxy prêt sur http://localhost:${PORT}`)
   console.log(`WEBFLOW_SITE_ID : ${process.env.WEBFLOW_SITE_ID ? 'OK' : 'MANQUANT'}`)

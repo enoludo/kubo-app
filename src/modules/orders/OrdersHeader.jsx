@@ -61,31 +61,7 @@ export default function OrdersHeader({
 
         {/* Droite : statut Webflow + nouvelle commande */}
         <div className="header-nav-right">
-          <ConnectionDot connections={[
-            {
-              label:     'Google Sheets',
-              status:    sheetsStatus === 'synced' ? 'connected' : sheetsStatus,
-              detail:    sheetsStatus === 'synced'       ? 'Commandes synchronisées'
-                       : sheetsStatus === 'disconnected' ? 'Non connecté'
-                       : sheetsStatus === 'expired'      ? 'Session expirée'
-                       : sheetsStatus === 'error'        ? (sheetsError ?? 'Erreur de synchronisation')
-                       : 'Connexion en cours…',
-              onConnect: sheetsStatus === 'disconnected' ? onSheetsConnect : undefined,
-              onRetry:   (sheetsStatus === 'error' || sheetsStatus === 'expired') ? onSheetsRetry : undefined,
-            },
-            {
-              label:   'Webflow',
-              status:  webflowStatus === 'connected' ? 'connected'
-                     : webflowStatus === 'loading'   ? 'loading'
-                     : webflowStatus === 'error'     ? 'error'
-                     : 'idle',
-              detail:  webflowStatus === 'connected' ? 'Commandes synchronisées'
-                     : webflowStatus === 'loading'   ? 'Chargement…'
-                     : webflowStatus === 'error'     ? (webflowError ?? 'Erreur de connexion')
-                     : null,
-              onRetry: webflowStatus === 'error' ? onRetryWebflow : undefined,
-            },
-          ]} />
+          
           <button className="orders-new-btn add-trigger add-trigger--labeled" onClick={onNewOrder}>
             + Nouvelle commande
           </button>
