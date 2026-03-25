@@ -21,6 +21,7 @@ import { useProducts }      from './hooks/useProducts'
 import { sessionHasData }   from './utils/session'
 import { mondayOf, dateToStr } from './utils/date'
 import initialTeam from './data/team.json'
+import './modules/planning/planning-tokens.css'
 import './App.css'
 
 export default function App() {

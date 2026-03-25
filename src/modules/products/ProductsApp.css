@@ -204,8 +204,8 @@
 }
 .product-card-seasonal-badge {
   right: 8px;
-  background: var(--color-amber-alpha-md);
-  color: var(--color-warn-dark);
+  background: var(--products-badge-seasonal-bg);
+  color: var(--products-badge-seasonal-text);
 }
 .product-card-webflow-badge {
   position: absolute;
@@ -215,8 +215,8 @@
   font-weight: var(--font-weight-semibold);
   padding: 2px 6px;
   border-radius: var(--radius-pill);
-  background: var(--color-blue-alpha-md, rgba(59, 130, 246, 0.15));
-  color: var(--color-blue-dark, #1d4ed8);
+  background: var(--products-integration-webflow-bg);
+  color: var(--products-integration-webflow-text);
   letter-spacing: 0.02em;
 }
 
@@ -289,14 +289,14 @@
   width: fit-content;
 }
 .product-card-pregnancy--no {
-  background: var(--color-error-bg);
-  color: var(--color-error-dark);
-  border: 1px solid var(--color-error-border);
+  background: var(--products-pregnancy-no-bg);
+  color: var(--products-pregnancy-no-text);
+  border: 1px solid var(--products-pregnancy-no-border);
 }
 .product-card-pregnancy--check {
-  background: var(--color-warn-bg);
-  color: var(--color-warn-dark);
-  border: 1px solid var(--color-warn-border);
+  background: var(--products-pregnancy-check-bg);
+  color: var(--products-pregnancy-check-text);
+  border: 1px solid var(--products-pregnancy-check-border);
 }
 
 /* Pied de card */
@@ -568,7 +568,7 @@
   background: var(--bg-2);
   border-radius: var(--radius-sm);
   padding: 12px;
-  border-left: 3px solid var(--color-yellow-300);
+  border-left: 3px solid var(--products-note-border);
 }
 
 .product-detail-info-grid {
@@ -723,7 +723,7 @@
   border-radius: var(--radius-pill);
 }
 
-.recipe-step-tag--temp  { background: var(--color-red-alpha-xs);    color: var(--color-error-dark); }
+.recipe-step-tag--temp  { background: var(--products-recipe-temp-bg);  color: var(--products-recipe-temp-text); }
 .recipe-step-tag--time  { background: var(--accent-sub);             color: var(--text-2); }
 .recipe-step-tag--equip { background: var(--bg-3);                   color: var(--text-3); }
 
@@ -794,9 +794,9 @@
   padding: 3px 8px;
   border-radius: var(--radius-pill);
 }
-.size-table-margin--good { background: var(--color-green-alpha);     color: var(--color-success-dark); }
-.size-table-margin--ok   { background: var(--color-amber-alpha-sm);  color: var(--color-warn-dark); }
-.size-table-margin--low  { background: var(--color-red-alpha-sm);    color: var(--color-error-dark); }
+.size-table-margin--good { background: var(--products-margin-good-bg);  color: var(--products-margin-good-text); }
+.size-table-margin--ok   { background: var(--products-margin-ok-bg);    color: var(--products-margin-ok-text); }
+.size-table-margin--low  { background: var(--products-margin-low-bg);   color: var(--products-margin-low-text); }
 
 /* ═══════════════════════════════════════════
    ALLERGEN BADGES — FULL
@@ -838,8 +838,8 @@
 }
 
 .allergen-badge--present {
-  background: var(--color-amber-alpha-md);
-  border: 1px solid var(--color-amber-alpha-xl);
+  background: var(--products-allergen-present-bg);
+  border: 1px solid var(--products-allergen-present-border);
 }
 
 .allergen-badge--absent {
@@ -861,7 +861,7 @@
 }
 
 .allergen-badge--present .allergen-badge-label {
-  color: var(--color-warn-dark);
+  color: var(--products-allergen-present-text);
 }
 
 /* ── Note coût ────────────────────────────────────────────────────────────── */
@@ -1286,19 +1286,19 @@
   background: var(--bg-3);
 }
 .pf-pregnancy-btn--yes.pf-pregnancy-btn--active {
-  border-color: var(--color-success-border);
-  background: var(--color-success-bg);
-  color: var(--color-success-dark);
+  border-color: var(--products-pregnancy-yes-border);
+  background: var(--products-pregnancy-yes-bg);
+  color: var(--products-pregnancy-yes-text);
 }
 .pf-pregnancy-btn--check.pf-pregnancy-btn--active {
-  border-color: var(--color-warn-border);
-  background: var(--color-warn-bg);
-  color: var(--color-warn-dark);
+  border-color: var(--products-pregnancy-check-border);
+  background: var(--products-pregnancy-check-bg);
+  color: var(--products-pregnancy-check-text);
 }
 .pf-pregnancy-btn--no.pf-pregnancy-btn--active {
-  border-color: var(--color-error-border);
-  background: var(--color-error-bg);
-  color: var(--color-error-dark);
+  border-color: var(--products-pregnancy-no-border);
+  background: var(--products-pregnancy-no-bg);
+  color: var(--products-pregnancy-no-text);
 }
 
 /* ── Indicateur grossesse (modal détail) ──────────────────────────────────── */
@@ -1310,9 +1310,9 @@
   padding: 12px 14px;
   border-radius: var(--radius-sm);
 }
-.product-detail-pregnancy--yes   { background: var(--color-success-bg); }
-.product-detail-pregnancy--check { background: var(--color-warn-bg);    }
-.product-detail-pregnancy--no    { background: var(--color-error-bg);   }
+.product-detail-pregnancy--yes   { background: var(--products-pregnancy-yes-bg);   }
+.product-detail-pregnancy--check { background: var(--products-pregnancy-check-bg); }
+.product-detail-pregnancy--no    { background: var(--products-pregnancy-no-bg);    }
 
 .product-detail-pregnancy-icon {
   font-size: 18px;
@@ -1332,9 +1332,9 @@
   font-weight: 600;
   line-height: 1.3;
 }
-.product-detail-pregnancy--yes   .product-detail-pregnancy-label { color: var(--color-success-dark); }
-.product-detail-pregnancy--check .product-detail-pregnancy-label { color: var(--color-warn-dark);    }
-.product-detail-pregnancy--no    .product-detail-pregnancy-label { color: var(--color-error-dark);   }
+.product-detail-pregnancy--yes   .product-detail-pregnancy-label { color: var(--products-pregnancy-yes-text);   }
+.product-detail-pregnancy--check .product-detail-pregnancy-label { color: var(--products-pregnancy-check-text); }
+.product-detail-pregnancy--no    .product-detail-pregnancy-label { color: var(--products-pregnancy-no-text);    }
 
 .product-detail-pregnancy-note {
   font-family: 'Poppins', sans-serif;

@@ -1,0 +1,59 @@
+/* ══════════════════════════════════════════════════════════════════════════════
+   PRODUCTS — Module tokens
+   Utilise les primitifs de /design-system/design-tokens.css
+   Ne jamais utiliser directement dans les composants non-products.
+══════════════════════════════════════════════════════════════════════════════ */
+
+:root {
+
+  /* ── Intégration externe ────────────────────────────────────────────────── */
+
+  --products-integration-webflow-bg:   var(--color-blue-100);
+  --products-integration-webflow-text: var(--color-blue-700);
+
+  /* ── Badge saisonnier ───────────────────────────────────────────────────── */
+
+  --products-badge-seasonal-bg:   var(--color-amber-alpha-md);
+  --products-badge-seasonal-text: var(--color-warn-dark);
+
+  /* ── Allergènes ─────────────────────────────────────────────────────────── */
+
+  --products-allergen-present-bg:     var(--color-amber-alpha-md);
+  --products-allergen-present-border: var(--color-amber-alpha-xl);
+  --products-allergen-present-text:   var(--color-warn-dark);
+
+  /* ── Grossesse / sécurité alimentaire ───────────────────────────────────── */
+
+  --products-pregnancy-yes-bg:     var(--color-success-bg);
+  --products-pregnancy-yes-text:   var(--color-success-dark);
+  --products-pregnancy-yes-border: var(--color-success-border);
+
+  --products-pregnancy-check-bg:     var(--color-warn-bg);
+  --products-pregnancy-check-text:   var(--color-warn-dark);
+  --products-pregnancy-check-border: var(--color-warn-border);
+
+  --products-pregnancy-no-bg:     var(--color-error-bg);
+  --products-pregnancy-no-text:   var(--color-error-dark);
+  --products-pregnancy-no-border: var(--color-error-border);
+
+  /* ── Marge / rentabilité ────────────────────────────────────────────────── */
+
+  --products-margin-good-bg:   var(--color-green-alpha);
+  --products-margin-good-text: var(--color-success-dark);
+
+  --products-margin-ok-bg:   var(--color-amber-alpha-sm);
+  --products-margin-ok-text: var(--color-warn-dark);
+
+  --products-margin-low-bg:   var(--color-red-alpha-sm);
+  --products-margin-low-text: var(--color-error-dark);
+
+  /* ── Recette — tag température ──────────────────────────────────────────── */
+
+  --products-recipe-temp-bg:   var(--color-red-alpha-xs);
+  --products-recipe-temp-text: var(--color-error-dark);
+
+  /* ── Note de coût ───────────────────────────────────────────────────────── */
+
+  --products-note-border: var(--color-yellow-300);
+
+}

@@ -139,11 +139,6 @@
   --color-warn-dark:   var(--color-amber-700);   /* texte foncé sur fond warn-bg */
   --color-warn-border: #F5C76B;
 
-  /* Jours fériés */
-  --color-holiday-bg:   #FFF8E7;
-  --color-holiday-cell: #FFFCF2;
-  --color-holiday-text: #B8860B;
-
   /* Overlays */
   --overlay-modal:  #53515425;
   --overlay-dark:   rgba(0, 0, 0, 0.35);
@@ -161,37 +156,9 @@
 
   /* ══════════════════════════════════════════════════════════════
      NIVEAU 3 — COMPOSANTS / MODULES
-     Préfixe --type-*, --order-*, --btn-*
+     Préfixe --btn-*
+     Les tokens planning-* et orders-* sont dans leurs modules.
   ══════════════════════════════════════════════════════════════ */
-
-  /* Planning — types de shifts (couleurs) */
-  --type-work:   var(--color-blue-300);
-  --type-leave:  var(--color-violet-300);
-  --type-sick:   var(--color-red-400);
-  --type-school: var(--color-yellow-300);
-  --type-rest:   var(--color-green-300);
-  --type-absent: var(--color-orange-300);
-
-  /* Planning — types de shifts (fonds — solides, migration depuis alphas 25%) */
-  --type-work-bg:   var(--color-blue-100);
-  --type-leave-bg:  var(--color-violet-100);
-  --type-sick-bg:   var(--color-red-100);
-  --type-school-bg: var(--color-yellow-100);
-  --type-rest-bg:   var(--color-green-100);
-  --type-absent-bg: var(--color-orange-100);
-
-  /* Orders — canaux */
-  --order-web:           var(--color-blue-300);
-  --order-web-bg:        var(--color-blue-100);
-  --order-web-text:      var(--color-blue-700);
-
-  --order-boutique:      var(--color-green-300);
-  --order-boutique-bg:   var(--color-green-100);
-  --order-boutique-text: var(--color-green-800);
-
-  --order-brunch:        var(--color-orange-300);
-  --order-brunch-bg:     var(--color-orange-100);
-  --order-brunch-text:   var(--color-amber-800);
 
   /* Boutons — couche composant */
   --btn-danger-bg:        var(--color-red-alpha-sm);

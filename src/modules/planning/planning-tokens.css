@@ -1,0 +1,46 @@
+/* ══════════════════════════════════════════════════════════════════════════════
+   PLANNING — Module tokens
+   Utilise les primitifs de /design-system/design-tokens.css
+   Ne jamais utiliser directement dans les composants non-planning.
+══════════════════════════════════════════════════════════════════════════════ */
+
+:root {
+
+  /* ── Shift types — couleur accent (barre, dot, bordure) ─────────────────── */
+
+  --planning-shift-work-color:   var(--color-blue-300);
+  --planning-shift-leave-color:  var(--color-violet-300);
+  --planning-shift-sick-color:   var(--color-red-400);
+  --planning-shift-school-color: var(--color-yellow-300);
+  --planning-shift-rest-color:   var(--color-green-300);
+  --planning-shift-absent-color: var(--color-orange-300);
+
+  /* ── Shift types — fond de carte ────────────────────────────────────────── */
+
+  --planning-shift-work-bg:   var(--color-blue-100);
+  --planning-shift-leave-bg:  var(--color-violet-100);
+  --planning-shift-sick-bg:   var(--color-red-100);
+  --planning-shift-school-bg: var(--color-yellow-100);
+  --planning-shift-rest-bg:   var(--color-green-100);
+  --planning-shift-absent-bg: var(--color-orange-100);
+
+  /* ── Shift types — texte (sur fond clair) ───────────────────────────────── */
+
+  --planning-shift-work-text:   var(--text);
+  --planning-shift-leave-text:  var(--text);
+  --planning-shift-sick-text:   var(--color-red-800);
+  --planning-shift-school-text: var(--color-amber-500);
+  --planning-shift-rest-text:   var(--color-success-dark);
+  --planning-shift-absent-text: var(--color-amber-800);
+
+  /* ── Statut validé ──────────────────────────────────────────────────────── */
+
+  --planning-shift-validated-color: var(--color-success);
+
+  /* ── Jours fériés ───────────────────────────────────────────────────────── */
+
+  --planning-holiday-bg:   #FFF8E7;
+  --planning-holiday-cell: #FFFCF2;
+  --planning-holiday-text: #B8860B;
+
+}

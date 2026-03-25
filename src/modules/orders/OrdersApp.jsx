@@ -8,6 +8,7 @@ import NewOrderModal        from './NewOrderModal'
 import BrunchModal          from './BrunchModal'
 import OrderDetailModal     from './OrderDetailModal'
 import { dateToStr }        from '../../utils/date'
+import './orders-tokens.css'
 import './OrdersApp.css'
 
 export default function OrdersApp({ ordersCtx, productsCtx, showToast }) {

@@ -1224,11 +1224,11 @@
   border-radius: var(--radius-sm);
   margin-top: 2px;
 }
-.preview-type-note--absent { background: var(--type-absent-bg); color: var(--color-amber-800); } /* ⚠ orange E65100 → amber-800 (#8a6500) : ton différent */
-.preview-type-note--leave  { background: var(--type-leave-bg);  color: var(--text); }
-.preview-type-note--sick   { background: var(--type-sick-bg);   color: var(--color-red-800); }    /* ⚠ #C62828 → red-800 (#C0392B) : quasi-identique */
-.preview-type-note--school { background: var(--type-school-bg); color: var(--color-amber-500); }  /* ⚠ #F57F17 → amber-500 (#F39C12) : quasi-identique */
-.preview-type-note--rest   { background: var(--type-rest-bg);   color: var(--color-success-dark); }
+.preview-type-note--absent { background: var(--planning-shift-absent-bg); color: var(--planning-shift-absent-text); }
+.preview-type-note--leave  { background: var(--planning-shift-leave-bg);  color: var(--planning-shift-leave-text); }
+.preview-type-note--sick   { background: var(--planning-shift-sick-bg);   color: var(--planning-shift-sick-text); }
+.preview-type-note--school { background: var(--planning-shift-school-bg); color: var(--planning-shift-school-text); }
+.preview-type-note--rest   { background: var(--planning-shift-rest-bg);   color: var(--planning-shift-rest-text); }
 
 .modal-pause {
   display: flex;
@@ -1349,7 +1349,7 @@
   display: flex;
   align-items: flex-start;
   gap: 10px;
-  background: var(--color-holiday-bg);
+  background: var(--planning-holiday-bg);
   border: 1px solid var(--color-warn);
   border-radius: var(--radius-sm);
   padding: 10px 12px;
@@ -1360,13 +1360,13 @@
 .modal-holiday-alert-title {
   font-size: 12px;
   font-weight: 600;
-  color: var(--color-holiday-text);
+  color: var(--planning-holiday-text);
   margin-bottom: 2px;
 }
 
 .modal-holiday-alert-sub {
   font-size: 11px;
-  color: var(--color-holiday-text);
+  color: var(--planning-holiday-text);
 }
 
 .modal-shift-validate {
@@ -1388,10 +1388,10 @@
   padding-bottom: 0;
   line-height: 1;
 }
-.modal-shift-validate:hover { border-color: var(--color-success); color: var(--color-success); }
+.modal-shift-validate:hover { border-color: var(--planning-shift-validated-color); color: var(--planning-shift-validated-color); }
 .modal-shift-validate.is-validated {
-  border-color: var(--color-success);
-  color: var(--color-success);
+  border-color: var(--planning-shift-validated-color);
+  color: var(--planning-shift-validated-color);
   background: var(--color-green-alpha);
 }
 
@@ -1636,7 +1636,7 @@
   flex-shrink: 0;
   margin-left: auto;
 }
-.week-card-dot--green  { background: var(--color-success); }
+.week-card-dot--green  { background: var(--planning-shift-validated-color); }
 .week-card-dot--orange { background: var(--color-warn); }
 .week-card-dot--red    { background: var(--color-error); }
 
@@ -1779,8 +1779,8 @@
   gap: 2px;
 }
 .tv-day-header.tv-weekend { opacity: 0.6; }
-.tv-day-header.tv-holiday { background: var(--color-holiday-bg); }
-.tv-day-cell.tv-holiday   { background: var(--color-holiday-cell); }
+.tv-day-header.tv-holiday { background: var(--planning-holiday-bg); }
+.tv-day-cell.tv-holiday   { background: var(--planning-holiday-cell); }
 
 .tv-hdr-holiday {
   display: flex;
@@ -1789,7 +1789,7 @@
   font-family: 'Poppins', sans-serif;
   font-size: 9px;
   font-weight: 500;
-  color: var(--color-holiday-text);
+  color: var(--planning-holiday-text);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1934,11 +1934,11 @@
   padding-bottom: 2px;
   line-height: 1;
 }
-.day-card-validate:hover { border-color: var(--color-success); color: var(--color-success); }
+.day-card-validate:hover { border-color: var(--planning-shift-validated-color); color: var(--planning-shift-validated-color); }
 .day-card-validate.is-validated {
-  border-color: var(--color-success);
-  border: 1px solid var(--color-success);
-  color: var(--color-success);
+  border-color: var(--planning-shift-validated-color);
+  border: 1px solid var(--planning-shift-validated-color);
+  color: var(--planning-shift-validated-color);
   background: var(--color-green-alpha);
 }
 
@@ -2512,7 +2512,7 @@
   padding: 0 24px;
   border-radius: var(--radius-sm);
   border: none;
-  background: var(--type-rest);
+  background: var(--planning-shift-rest-color);
   color: var(--text);
   font-family: 'Poppins', sans-serif;
   font-size: 14px;

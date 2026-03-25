@@ -406,7 +406,7 @@ export default function NewOrderModal({ onSave, onCancel, initialDate, initialCh
           <button className="btn-secondary modal-cancel" onClick={onCancel}>Annuler</button>
           <button
             className="btn-primary"
-            style={{ background: 'var(--type-rest)', color: 'var(--text)' }}
+            style={{ background: 'var(--planning-shift-rest-color)', color: 'var(--text)' }}
             onClick={handleSave}
           >
             {isEdit ? 'Enregistrer les modifications' : 'Enregistrer'}

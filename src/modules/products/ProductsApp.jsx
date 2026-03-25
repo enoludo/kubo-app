@@ -4,6 +4,7 @@ import { useProductsGoogleSync }  from '../../hooks/useProductsGoogleSync'
 import ProductsCatalog            from './ProductsCatalog'
 import ProductDetailModal         from './ProductDetailModal'
 import ProductForm                from './ProductForm'
+import './products-tokens.css'
 import './ProductsApp.css'
 
 export default function ProductsApp({ productsCtx, showToast, getToken }) {

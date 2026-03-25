@@ -4,38 +4,38 @@ function getCSSVar(name) {
 }
 
 export const COLORS = {
-  // Types de shifts
-  work:          () => getCSSVar('--type-work'),
-  leave:         () => getCSSVar('--type-leave'),
-  sick:          () => getCSSVar('--type-sick'),
-  school:        () => getCSSVar('--type-school'),
-  rest:          () => getCSSVar('--type-rest'),
-  absent:        () => getCSSVar('--type-absent'),
-  // Canaux commandes
-  orderWeb:      () => getCSSVar('--order-web'),
-  orderBoutique: () => getCSSVar('--order-boutique'),
-  orderBrunch:   () => getCSSVar('--order-brunch'),
+  // Types de shifts — planning-tokens.css
+  work:          () => getCSSVar('--planning-shift-work-color'),
+  leave:         () => getCSSVar('--planning-shift-leave-color'),
+  sick:          () => getCSSVar('--planning-shift-sick-color'),
+  school:        () => getCSSVar('--planning-shift-school-color'),
+  rest:          () => getCSSVar('--planning-shift-rest-color'),
+  absent:        () => getCSSVar('--planning-shift-absent-color'),
+  // Canaux commandes — orders-tokens.css
+  orderWeb:      () => getCSSVar('--orders-channel-web-color'),
+  orderBoutique: () => getCSSVar('--orders-channel-boutique-color'),
+  orderBrunch:   () => getCSSVar('--orders-channel-brunch-color'),
 }
 
-// Map type → couleur (appelée après montage DOM)
+// Map type → couleur accent (appelée après montage DOM)
 export function getTypeColor(type) {
   const map = {
-    work:   '--type-work',
-    leave:  '--type-leave',
-    sick:   '--type-sick',
-    school: '--type-school',
-    rest:   '--type-rest',
-    absent: '--type-absent',
+    work:   '--planning-shift-work-color',
+    leave:  '--planning-shift-leave-color',
+    sick:   '--planning-shift-sick-color',
+    school: '--planning-shift-school-color',
+    rest:   '--planning-shift-rest-color',
+    absent: '--planning-shift-absent-color',
   }
   return map[type] ? getCSSVar(map[type]) : '#cccccc'
 }
 
-// Map canal → couleur
+// Map canal → couleur accent
 export function getOrderChannelColor(channel) {
   const map = {
-    web:      '--order-web',
-    boutique: '--order-boutique',
-    brunch:   '--order-brunch',
+    web:      '--orders-channel-web-color',
+    boutique: '--orders-channel-boutique-color',
+    brunch:   '--orders-channel-brunch-color',
   }
   return map[channel] ? getCSSVar(map[channel]) : '#cccccc'
 }

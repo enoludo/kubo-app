@@ -150,7 +150,7 @@
 
 /* Aujourd'hui */
 .order-day-cell--today {
-  background: var(--type-sick-bg);
+  background: var(--orders-today-bg);
 }
 
 /* Cellules avec commandes — bordure add-trigger */
@@ -169,7 +169,7 @@
   border: solid 1px var(--color-purple-400);
 }
 .order-day-cell--today.order-day-cell--clickable:hover {
-  border-color: var(--type-sick);
+  border-color: var(--orders-today-border);
 }
 
 /* Numéro du jour — ancré en haut à droite, au-dessus du bouton add-trigger */
@@ -226,14 +226,14 @@
 }
 
 /* Couleurs canal — identiques aux badges de statut du Planning (DayCard) */
-.order-pill--boutique { background: var(--order-boutique-bg); color: var(--order-boutique-text); }
-.order-pill--boutique .order-pill-dot { background: var(--order-boutique); }
+.order-pill--boutique { background: var(--orders-channel-boutique-bg); color: var(--orders-channel-boutique-text); }
+.order-pill--boutique .order-pill-dot { background: var(--orders-channel-boutique-color); }
 
-.order-pill--web      { background: var(--order-web-bg); color: var(--order-web-text); }
-.order-pill--web      .order-pill-dot { background: var(--order-web); }
+.order-pill--web      { background: var(--orders-channel-web-bg); color: var(--orders-channel-web-text); }
+.order-pill--web      .order-pill-dot { background: var(--orders-channel-web-color); }
 
-.order-pill--brunch   { background: var(--order-brunch-bg); color: var(--order-brunch-text); }
-.order-pill--brunch   .order-pill-dot { background: var(--order-brunch); }
+.order-pill--brunch   { background: var(--orders-channel-brunch-bg); color: var(--orders-channel-brunch-text); }
+.order-pill--brunch   .order-pill-dot { background: var(--orders-channel-brunch-color); }
 
 .order-pill-dot {
   width: 0.5rem;
@@ -275,12 +275,12 @@
 .som-btn:hover { border-color: var(--border-m); background: var(--bg-3); } /* ⚠ #00000070 ≈ --border-m (0.11) : quasi-identique */
 
 .som-btn--brunch {
-  background: var(--order-brunch-bg);
+  background: var(--orders-channel-brunch-bg);
   border-color: rgba(255, 216, 102, 0.6); /* ⚠ dérivé de --type-school (#FFD866) — pas de token alpha school */
-  color: var(--order-brunch-text);
+  color: var(--orders-channel-brunch-text);
 }
 .som-btn--brunch:hover {
-  background: var(--order-brunch-bg);
+  background: var(--orders-channel-brunch-bg);
   border-color: rgba(255, 216, 102, 0.8); /* ⚠ même note */
 }
 
@@ -757,8 +757,8 @@
   font-family: 'Poppins', sans-serif;
   font-size: 10px;
   font-weight: 500;
-  background: var(--color-warning-bg);
-  color: var(--color-amber-800);
+  background: var(--orders-allergen-bg);
+  color: var(--orders-allergen-text);
   border-radius: var(--radius-pill);
   padding: 2px 8px;
   white-space: nowrap;
@@ -990,10 +990,10 @@
   padding: 2px 8px;
   border-radius: var(--radius-md);
 }
-.odm-badge--boutique { background: var(--order-boutique-bg); color: var(--order-boutique-text); }
-.odm-badge--web      { background: var(--order-web-bg);      color: var(--order-web-text); }
-.odm-badge--brunch   { background: var(--order-brunch-bg);   color: var(--order-brunch-text); }
-.odm-badge--paid     { background: var(--order-boutique-bg); color: var(--order-boutique-text); }
+.odm-badge--boutique { background: var(--orders-channel-boutique-bg); color: var(--orders-channel-boutique-text); }
+.odm-badge--web      { background: var(--orders-channel-web-bg);      color: var(--orders-channel-web-text); }
+.odm-badge--brunch   { background: var(--orders-channel-brunch-bg);   color: var(--orders-channel-brunch-text); }
+.odm-badge--paid     { background: var(--orders-payment-paid-bg);      color: var(--orders-payment-paid-text); }
 .odm-badge--unpaid   { background: var(--text-3); color: var(--bg); }
 
 /* Ligne 2 : Produits en liste */
@@ -1128,7 +1128,7 @@
 
 /* État confirmation suppression */
 .odm-card--confirm {
-  border: 1px solid var(--type-sick-bg);
+  border: 1px solid var(--color-error-border);
 }
 
 .odm-confirm-text {
@@ -1155,6 +1155,6 @@
   cursor: pointer;
   transition: opacity var(--t-fast);
 }
-.odm-paid-toggle--paid   { background: var(--order-boutique-bg); color: var(--order-boutique-text); }
-.odm-paid-toggle--unpaid { background: var(--type-sick-bg);      color: var(--color-red-800); }
+.odm-paid-toggle--paid   { background: var(--orders-payment-paid-bg);   color: var(--orders-payment-paid-text); }
+.odm-paid-toggle--unpaid { background: var(--orders-payment-unpaid-bg); color: var(--orders-payment-unpaid-text); }
 .odm-paid-toggle:hover   { opacity: 0.75; }
