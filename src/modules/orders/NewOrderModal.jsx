@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import { dateToStr } from '../../utils/date'
 import { useProducts } from '../../hooks/useProducts'
+import Modal from '../../design-system/components/Modal/Modal'
 
 const PICKUP_SLOTS = (() => {
   const slots = []
@@ -162,8 +163,7 @@ export default function NewOrderModal({ onSave, onCancel, initialDate, initialCh
   // ── Rendu ─────────────────────────────────────────────────────────────────
 
   return (
-    <div className="modal-overlay" onClick={onCancel}>
-      <div className="modal modal--nom" onClick={e => e.stopPropagation()}>
+    <Modal onClose={onCancel} scrollBody>
 
         <div className="modal-emp-form-title">{isEdit ? 'Modifier la commande' : 'Nouvelle commande'}</div>
         <div className="modal-date">{fmtDateLabel(pickupDate)}</div>
@@ -413,7 +413,6 @@ export default function NewOrderModal({ onSave, onCancel, initialDate, initialCh
           </button>
         </div>
 
-      </div>
-    </div>
+    </Modal>
   )
 }

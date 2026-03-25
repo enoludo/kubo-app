@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import Modal from '../design-system/components/Modal/Modal'
 
 export const PASTEL_COLORS = [
   '#F5A7B8', '#A7C4F5', '#A8D5B5', '#C5B4E8',
@@ -41,16 +42,14 @@ export default function EmployeeModal({ employee, onSave, onCancel, onArchive, o
   if (confirmMode === 'archive') {
     const firstName = employee.name.split(' ')[0]
     return (
-      <div className="modal-overlay" onClick={onCancel}>
-        <div className="modal" onClick={e => e.stopPropagation()}>
-          <div className="modal-emp-form-title">Archiver {firstName} ?</div>
-          <div className="archive-modal-body">Il n'apparaîtra plus dans le planning actif.</div>
-          <div className="modal-actions">
-            <button className="btn-secondary modal-cancel" onClick={() => setConfirmMode(null)}>Retour</button>
-            <button className="modal-archive-confirm" onClick={onArchive}>Archiver</button>
-          </div>
+      <Modal onClose={onCancel}>
+        <div className="modal-emp-form-title">Archiver {firstName} ?</div>
+        <div className="archive-modal-body">Il n'apparaîtra plus dans le planning actif.</div>
+        <div className="modal-actions">
+          <button className="btn-secondary modal-cancel" onClick={() => setConfirmMode(null)}>Retour</button>
+          <button className="modal-archive-confirm" onClick={onArchive}>Archiver</button>
         </div>
-      </div>
+      </Modal>
     )
   }
 
@@ -58,26 +57,22 @@ export default function EmployeeModal({ employee, onSave, onCancel, onArchive, o
   if (confirmMode === 'delete') {
     const firstName = employee.name.split(' ')[0]
     return (
-      <div className="modal-overlay" onClick={onCancel}>
-        <div className="modal" onClick={e => e.stopPropagation()}>
-          <div className="modal-emp-form-title">Supprimer définitivement {firstName} ?</div>
-          <div className="archive-modal-body">
-            Tous ses shifts seront également supprimés. Cette action est irréversible.
-          </div>
-          <div className="modal-actions">
-            <button className="btn-secondary modal-cancel" onClick={() => setConfirmMode(null)}>Retour</button>
-            <button className="btn-danger modal-delete" onClick={onDelete}>Supprimer définitivement</button>
-          </div>
+      <Modal onClose={onCancel}>
+        <div className="modal-emp-form-title">Supprimer définitivement {firstName} ?</div>
+        <div className="archive-modal-body">
+          Tous ses shifts seront également supprimés. Cette action est irréversible.
         </div>
-      </div>
+        <div className="modal-actions">
+          <button className="btn-secondary modal-cancel" onClick={() => setConfirmMode(null)}>Retour</button>
+          <button className="btn-danger modal-delete" onClick={onDelete}>Supprimer définitivement</button>
+        </div>
+      </Modal>
     )
   }
 
   // ── Main form ────────────────────────────────────────────────────────────
   return (
-    <div className="modal-overlay" onClick={onCancel}>
-      <div className="modal" onClick={e => e.stopPropagation()}>
-
+    <Modal onClose={onCancel}>
         <div className="modal-emp-form-title">
           {isEdit ? 'Modifier le profil' : 'Nouvel employé'}
         </div>
@@ -193,7 +188,6 @@ export default function EmployeeModal({ employee, onSave, onCancel, onArchive, o
           </div>
         )}
 
-      </div>
-    </div>
+    </Modal>
   )
 }

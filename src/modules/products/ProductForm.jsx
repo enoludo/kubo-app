@@ -1,7 +1,7 @@
 // ─── Formulaire produit — création et édition ────────────────────────────────
 import { useState } from 'react'
-import { createPortal } from 'react-dom'
 import { ALLERGENS_EU } from './AllergenBadges'
+import Modal from '../../design-system/components/Modal/Modal'
 
 // ── Constantes ────────────────────────────────────────────────────────────────
 
@@ -653,14 +653,7 @@ export default function ProductForm({ product, onSave, onClose, onDelete }) {
   const canSave = data.name.trim().length > 0
 
   const modal = (
-    <div className="modal-overlay product-form-overlay" onClick={onClose}>
-      <div
-        className="product-form-modal"
-        onClick={e => e.stopPropagation()}
-        role="dialog"
-        aria-modal="true"
-        aria-label={isEdit ? `Modifier ${product.name}` : 'Nouveau produit'}
-      >
+    <Modal onClose={onClose} align="bottom" className="product-form-modal">
         {/* En-tête */}
         <div className="product-form-header">
           <h2 className="product-form-title">
@@ -720,9 +713,8 @@ export default function ProductForm({ product, onSave, onClose, onDelete }) {
             </>
           )}
         </div>
-      </div>
-    </div>
+    </Modal>
   )
 
-  return createPortal(modal, document.body)
+  return modal
 }

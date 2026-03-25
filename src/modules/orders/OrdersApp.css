@@ -284,13 +284,7 @@
   border-color: rgba(255, 216, 102, 0.8); /* ⚠ même note */
 }
 
-/* ── NewOrderModal / BrunchModal — form plat ─────────────────────────────── */
-
-/* Scroll interne si la liste de produits est longue */
-.modal--nom {
-  max-height: calc(100vh - 64px);
-  overflow-y: auto;
-}
+/* ── NewOrderModal / BrunchModal — scroll via Modal scrollBody prop ────────── */
 
 /* Section produits */
 .nom-products {

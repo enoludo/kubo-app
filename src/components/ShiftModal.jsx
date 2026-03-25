@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import Modal from '../design-system/components/Modal/Modal'
 import { TIME_OPTIONS, fmtH, WEEKLY_CONTRACT, MAX_HOURS_PER_DAY, END_HOUR, weeksElapsed, dateToStr, shiftEffective } from '../hooks/useSchedule'
 import { getHolidayName } from '../utils/frenchHolidays'
 
@@ -189,8 +190,7 @@ export default function ShiftModal({ info, onSave, onDelete, onCancel, onToggleV
   }
 
   return (
-    <div className="modal-overlay" onClick={onCancel}>
-      <div className="modal" onClick={e => e.stopPropagation()}>
+    <Modal onClose={onCancel}>
 
         {/* Bouton validation — édition uniquement, masqué pour Repos */}
         {isEdit && type !== 'rest' && (
@@ -425,7 +425,6 @@ export default function ShiftModal({ info, onSave, onDelete, onCancel, onToggleV
           )}
         </div>
 
-      </div>
-    </div>
+    </Modal>
   )
 }

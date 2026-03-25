@@ -1,5 +1,6 @@
 // ─── Modale détail commande ────────────────────────────────────────────────────
 import { useState } from 'react'
+import Modal from '../../design-system/components/Modal/Modal'
 
 const CHANNEL_LABEL = { web: 'Site web', boutique: 'Boutique', brunch: 'Brunch' }
 
@@ -24,26 +25,23 @@ export default function OrderDetailModal({ order, getProduct, onDelete, onClose 
 
   if (confirmDelete) {
     return (
-      <div className="modal-overlay" onClick={onClose}>
-        <div className="modal" onClick={e => e.stopPropagation()}>
-          <div className="modal-emp-form-title">Supprimer cette commande ?</div>
-          <div className="archive-modal-body">
-            La commande de <strong>{order.customer.name}</strong> sera définitivement supprimée.
-          </div>
-          <div className="modal-actions">
-            <button className="btn-secondary modal-cancel" onClick={() => setConfirmDelete(false)}>Retour</button>
-            <button className="btn-danger modal-delete" onClick={() => { onDelete(order.id); onClose() }}>
-              Supprimer
-            </button>
-          </div>
+      <Modal onClose={onClose}>
+        <div className="modal-emp-form-title">Supprimer cette commande ?</div>
+        <div className="archive-modal-body">
+          La commande de <strong>{order.customer.name}</strong> sera définitivement supprimée.
         </div>
-      </div>
+        <div className="modal-actions">
+          <button className="btn-secondary modal-cancel" onClick={() => setConfirmDelete(false)}>Retour</button>
+          <button className="btn-danger modal-delete" onClick={() => { onDelete(order.id); onClose() }}>
+            Supprimer
+          </button>
+        </div>
+      </Modal>
     )
   }
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal modal--order-detail" onClick={e => e.stopPropagation()}>
+    <Modal onClose={onClose} className="modal--order-detail">
 
         {/* ── En-tête : canal + statut + fermer ── */}
         <div className="order-detail-header">
@@ -144,7 +142,6 @@ export default function OrderDetailModal({ order, getProduct, onDelete, onClose 
           </button>
         </div>
 
-      </div>
-    </div>
+    </Modal>
   )
 }

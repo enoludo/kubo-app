@@ -1,7 +1,7 @@
 // ─── Fiche produit — modal plein écran avec onglets ──────────────────────────
 import { useState } from 'react'
-import { createPortal } from 'react-dom'
 import { AllergenBadgesFull } from './AllergenBadges'
+import Modal from '../../design-system/components/Modal/Modal'
 import RecipeStepList from './RecipeStepList'
 import SizeTable from './SizeTable'
 
@@ -211,14 +211,7 @@ export default function ProductDetailModal({ product, onClose, onEdit, onDelete 
     : null
 
   const modal = (
-    <div className="modal-overlay product-detail-overlay" onClick={onClose}>
-      <div
-        className="product-detail-modal"
-        onClick={e => e.stopPropagation()}
-        role="dialog"
-        aria-modal="true"
-        aria-label={product.name}
-      >
+    <Modal onClose={onClose} align="bottom" size="xl">
         {/* En-tête */}
         <div className="product-detail-header">
           <div className="product-detail-header-photo">
@@ -300,9 +293,8 @@ export default function ProductDetailModal({ product, onClose, onEdit, onDelete 
             )}
           </div>
         )}
-      </div>
-    </div>
+    </Modal>
   )
 
-  return createPortal(modal, document.body)
+  return modal
 }

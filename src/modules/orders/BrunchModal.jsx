@@ -1,5 +1,6 @@
 // ─── Modale nouveau brunch (samedi) ───────────────────────────────────────────
 import { useState } from 'react'
+import Modal from '../../design-system/components/Modal/Modal'
 
 const BRUNCH_TIMES = ['10h30', '12h00', '13h30']
 
@@ -37,8 +38,7 @@ export default function BrunchModal({ onSave, onCancel, initialDate }) {
   }
 
   return (
-    <div className="modal-overlay" onClick={onCancel}>
-      <div className="modal modal--nom" onClick={e => e.stopPropagation()}>
+    <Modal onClose={onCancel} scrollBody>
 
         <div className="modal-emp-form-title">Nouveau brunch</div>
         <div className="modal-date">{fmtDateLabel(initialDate)}</div>
@@ -106,7 +106,6 @@ export default function BrunchModal({ onSave, onCancel, initialDate }) {
           <button className="btn-primary" onClick={handleSave}>Enregistrer</button>
         </div>
 
-      </div>
-    </div>
+    </Modal>
   )
 }

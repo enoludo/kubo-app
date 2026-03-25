@@ -1,0 +1,21 @@
+/* ── Dropdown — composant générique ────────────────────────────────────────
+   Usage : menus contextuels positionnés en fixed via createPortal
+   ─────────────────────────────────────────────────────────────────────────── */
+
+.dropdown {
+  position: fixed;
+  z-index: var(--z-toast);
+  background: var(--bg);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.14);
+  overflow: hidden;
+  min-width: 188px;
+  padding: 4px 0;
+}
+
+/* ── Séparateur ──────────────────────────────────────────────────────────── */
+
+.dropdown-divider {
+  border-top: 1px solid var(--bg-3);
+  margin: 2px 0;
+}

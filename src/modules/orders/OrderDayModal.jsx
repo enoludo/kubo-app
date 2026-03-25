@@ -1,6 +1,7 @@
 // ─── Modal "Commandes du jour" ─────────────────────────────────────────────────
 import { useState } from 'react'
 import ArchiveModal from '../../components/ArchiveModal'
+import Modal from '../../design-system/components/Modal/Modal'
 
 const CHANNEL_LABEL = { web: 'Site web', boutique: 'Boutique', brunch: 'Brunch' }
 
@@ -170,8 +171,7 @@ export default function OrderDayModal({ date, orders, onNewOrder, onEdit, onDele
   const isPast = d < today
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal odm" onClick={e => e.stopPropagation()}>
+    <Modal onClose={onClose} size="lg" className="odm">
 
         {/* ── Header ── */}
         <div className="odm-header">
@@ -214,7 +214,6 @@ export default function OrderDayModal({ date, orders, onNewOrder, onEdit, onDele
           )}
         </div>
 
-      </div>
-    </div>
+    </Modal>
   )
 }

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { buildIndividualMailto } from '../utils/emailPlanning'
 import { dateToStr, fmtTime, mondayOf } from '../utils/date'
 import { MailIcon, CopyIcon } from './Icons'
+import Modal from '../design-system/components/Modal/Modal'
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -149,8 +150,7 @@ export default function EmployeeProfileModal({
 
   // ── Rendu ────────────────────────────────────────────────────────────────────
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal emp-profile-modal" onClick={e => e.stopPropagation()}>
+    <Modal onClose={onClose} className="emp-profile-modal">
 
         {/* Header */}
         <div className="emp-profile-modal-header">
@@ -317,7 +317,6 @@ export default function EmployeeProfileModal({
           )}
         </div>
 
-      </div>
-    </div>
+    </Modal>
   )
 }

@@ -344,25 +344,8 @@
    PRODUCT DETAIL MODAL
 ═══════════════════════════════════════════ */
 
-.product-detail-overlay {
-  z-index: var(--z-overlay);
-  align-items: flex-end;
-}
-
-.product-detail-modal {
-  background: var(--bg);
-  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-  width: 100%;
-  max-width: 860px;
-  max-height: 92vh;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  /* Centré sur desktop, slide depuis le bas sur tablette */
-  margin: 0 auto;
-  border-radius: var(--radius-lg);
-  margin-bottom: 0;
-}
+/* .product-detail-overlay → Modal overlayVariant implicite via align="bottom" */
+/* .product-detail-modal → layout via modal modal--xl modal--bottom */
 
 /* ── En-tête modal ────────────────────────────────────────────────────────── */
 
@@ -894,21 +877,11 @@
    PRODUCT FORM MODAL
 ═══════════════════════════════════════════ */
 
-.product-form-overlay {
-  z-index: var(--z-overlay);
-  align-items: flex-end;
-}
-
+/* .product-form-overlay → Modal align="bottom" (modal-overlay--bottom) */
+/* Surcharge : max-width spécifique (720px) + max-height (96vh) */
 .product-form-modal {
-  background: var(--bg);
-  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-  width: 100%;
   max-width: 720px;
   max-height: 96vh;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  margin: 0 auto;
 }
 
 /* ── En-tête ──────────────────────────────────────────────────────────────── */

@@ -6,6 +6,8 @@ import './design-system/typography.css'
 import './design-system/components/Button/Button.css'
 import './design-system/components/Input/Input.css'
 import './design-system/components/Badge/Badge.css'
+import './design-system/components/Modal/Modal.css'
+import './design-system/components/Dropdown/Dropdown.css'
 import './index.css'
 import App from './App.jsx'
 

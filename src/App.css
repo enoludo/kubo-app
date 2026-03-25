@@ -614,16 +614,7 @@
 .header-menu-btn:hover,
 .header-menu-btn.active { background: var(--bg-4); color: var(--bg); }
 
-.header-menu-dropdown {
-  position: fixed;
-  z-index: var(--z-toast);
-  background: var(--bg);
-  border-radius: var(--radius-lg);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.14);
-  overflow: hidden;
-  min-width: 188px;
-  padding: 4px 0;
-}
+/* .header-menu-dropdown base → design-system/components/Dropdown/Dropdown.css (.dropdown) */
 .header-menu-dropdown button {
   display: flex;
   align-items: center;
@@ -902,10 +893,7 @@
 .emp-menu-dropdown button.delete-option  { color: var(--color-error); }
 .emp-menu-dropdown button.send-option    { color: var(--accent); }
 
-.emp-menu-divider {
-  border-top: 1px solid var(--bg-3);
-  margin: 2px 0;
-}
+/* .emp-menu-divider → remplacé par .dropdown-divider (Dropdown.css) */
 
 /* ─── Employee modal form ──────────────────────────────────────── */
 .modal-emp-form-title {
@@ -1110,27 +1098,9 @@
 }
 
 /* ═══════════════════════════════════════════
-   MODAL
+   MODAL — styles de composant spécifiques au planning
+   Base (.modal-overlay, .modal) → design-system/components/Modal/Modal.css
 ═══════════════════════════════════════════ */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: var(--overlay-modal);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: var(--z-dropdown);
-}
-
-.modal {
-  background: var(--bg);
-  border-radius: var(--radius-lg);
-  padding: var(--pad-h);
-  width: 460px;
-  max-width: calc(100vw - 32px);
-  font-family: 'Poppins', sans-serif;
-  position: relative;
-}
 
 .modal-header {
   display: flex;
@@ -2396,15 +2366,8 @@
 
 /* ═══════════════════════════════════════════
    STARTUP MODAL — Connexion aux services
+   Overlay + taille → Modal overlayVariant="dark" size="sm"
 ═══════════════════════════════════════════ */
-.startup-overlay {
-  z-index: var(--z-overlay);
-  background: var(--overlay-dark);
-}
-
-.startup-modal {
-  width: 420px;
-}
 
 .startup-head {
   margin-bottom: 24px;

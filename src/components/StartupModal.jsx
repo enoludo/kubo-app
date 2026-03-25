@@ -1,4 +1,5 @@
 // ─── Startup Connection Modal ─────────────────────────────────────────────────
+import Modal from '../design-system/components/Modal/Modal'
 
 const LOADING  = new Set(['connecting', 'syncing', 'loading', 'reconnecting', 'idle'])
 const CONNECTED = new Set(['synced', 'connected'])
@@ -22,8 +23,7 @@ export default function StartupModal({
   const allOk = CONNECTED.has(sheetsStatus) && CONNECTED.has(webflowStatus)
 
   return (
-    <div className="modal-overlay startup-overlay">
-      <div className="modal startup-modal">
+    <Modal overlayVariant="dark" size="sm">
 
         <div className="startup-head">
           <p className="startup-title">Connexion aux services</p>
@@ -67,7 +67,6 @@ export default function StartupModal({
           )}
         </div>
 
-      </div>
-    </div>
+    </Modal>
   )
 }

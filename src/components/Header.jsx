@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
-import { createPortal } from 'react-dom'
 import { PdfIcon, MailIcon } from './Icons'
+import Dropdown from '../design-system/components/Dropdown/Dropdown'
 
 function SaveIcon() {
   return (
@@ -31,32 +31,21 @@ function PlanDropdown({
   copiedPlan, templates, onPastePlan, onLoadTemplate,
   onCopyPlan, onSaveTemplate, onReset,
 }) {
-  const [open,    setOpen]    = useState(false)
-  const [mode,    setMode]    = useState('menu') // 'menu' | 'naming' | 'confirm-reset'
-  const [name,    setName]    = useState('')
-  const [pos,     setPos]     = useState({ top: 0, left: 0 })
+  const [open, setOpen] = useState(false)
+  const [mode, setMode] = useState('menu') // 'menu' | 'naming' | 'confirm-reset'
+  const [name, setName] = useState('')
   const btnRef   = useRef(null)
-  const dropRef  = useRef(null)
   const inputRef = useRef(null)
 
   function toggle() {
     if (open) { setOpen(false); return }
-    const rect = btnRef.current.getBoundingClientRect()
-    setPos({ top: rect.bottom + 6, left: rect.left })
     setMode('menu')
     setName('')
     setOpen(true)
   }
 
   useEffect(() => {
-    if (!open) return
-    if (mode === 'naming') inputRef.current?.focus()
-    function onDown(e) {
-      if (dropRef.current?.contains(e.target) || btnRef.current?.contains(e.target)) return
-      setOpen(false); setMode('menu')
-    }
-    document.addEventListener('mousedown', onDown)
-    return () => document.removeEventListener('mousedown', onDown)
+    if (open && mode === 'naming') inputRef.current?.focus()
   }, [open, mode])
 
   function action(fn) { fn(); setOpen(false) }
@@ -66,70 +55,6 @@ function PlanDropdown({
     onSaveTemplate(name.trim())
     setOpen(false); setMode('menu'); setName('')
   }
-
-  const dropdown = open && createPortal(
-    <div ref={dropRef} className="header-menu-dropdown" style={{ top: pos.top, left: pos.left }}>
-      {mode === 'menu' ? (
-        <>
-          {/* Section Importer */}
-          <button
-            onClick={() => action(onPastePlan)}
-            disabled={!copiedPlan}
-            title={copiedPlan ? `Planning copié : ${copiedPlan.weekLabel}` : 'Aucun planning copié'}
-          >
-            Coller un planning
-            {copiedPlan && <span className="header-dropdown-hint">{copiedPlan.weekLabel}</span>}
-          </button>
-          {templates.length > 0 && templates.map(tpl => (
-            <button key={tpl.id} onClick={() => action(() => onLoadTemplate(tpl.id))}>
-              {tpl.name}
-            </button>
-          ))}
-          <div className="emp-menu-divider" />
-          {/* Section Enregistrer */}
-          <button onClick={() => action(onCopyPlan)}>Copier ce planning</button>
-          <button onClick={() => setMode('naming')}>Enregistrer comme modèle</button>
-          <div className="emp-menu-divider" />
-          <button className="header-dropdown-danger" onClick={() => setMode('confirm-reset')}>
-            Réinitialiser les données de démo
-          </button>
-        </>
-      ) : mode === 'naming' ? (
-        <div className="header-dropdown-naming">
-          <input
-            ref={inputRef}
-            type="text"
-            placeholder="Nom du modèle…"
-            value={name}
-            onChange={e => setName(e.target.value)}
-            onKeyDown={e => {
-              if (e.key === 'Enter') handleSave()
-              if (e.key === 'Escape') setMode('menu')
-            }}
-          />
-          <div className="header-dropdown-naming-actions">
-            <button className="header-dropdown-cancel" onClick={() => setMode('menu')}>Annuler</button>
-            <button className="header-dropdown-confirm" onClick={handleSave} disabled={!name.trim()}>
-              Sauvegarder
-            </button>
-          </div>
-        </div>
-      ) : (
-        <div className="header-dropdown-naming">
-          <span className="header-dropdown-confirm-msg">
-            Effacer toutes les modifications et revenir aux données de démonstration ?
-          </span>
-          <div className="header-dropdown-naming-actions">
-            <button className="header-dropdown-cancel" onClick={() => setMode('menu')}>Annuler</button>
-            <button className="header-dropdown-danger-confirm" onClick={() => { onReset(); setOpen(false); setMode('menu') }}>
-              Réinitialiser
-            </button>
-          </div>
-        </div>
-      )}
-    </div>,
-    document.body
-  )
 
   return (
     <>
@@ -141,7 +66,70 @@ function PlanDropdown({
       >
         <SaveIcon />
       </button>
-      {dropdown}
+      <Dropdown
+        triggerRef={btnRef}
+        isOpen={open}
+        onClose={() => { setOpen(false); setMode('menu') }}
+        align="left"
+        className="header-menu-dropdown"
+      >
+        {mode === 'menu' ? (
+          <>
+            <button
+              onClick={() => action(onPastePlan)}
+              disabled={!copiedPlan}
+              title={copiedPlan ? `Planning copié : ${copiedPlan.weekLabel}` : 'Aucun planning copié'}
+            >
+              Coller un planning
+              {copiedPlan && <span className="header-dropdown-hint">{copiedPlan.weekLabel}</span>}
+            </button>
+            {templates.length > 0 && templates.map(tpl => (
+              <button key={tpl.id} onClick={() => action(() => onLoadTemplate(tpl.id))}>
+                {tpl.name}
+              </button>
+            ))}
+            <Dropdown.Divider />
+            <button onClick={() => action(onCopyPlan)}>Copier ce planning</button>
+            <button onClick={() => setMode('naming')}>Enregistrer comme modèle</button>
+            <Dropdown.Divider />
+            <button className="header-dropdown-danger" onClick={() => setMode('confirm-reset')}>
+              Réinitialiser les données de démo
+            </button>
+          </>
+        ) : mode === 'naming' ? (
+          <div className="header-dropdown-naming">
+            <input
+              ref={inputRef}
+              type="text"
+              placeholder="Nom du modèle…"
+              value={name}
+              onChange={e => setName(e.target.value)}
+              onKeyDown={e => {
+                if (e.key === 'Enter') handleSave()
+                if (e.key === 'Escape') setMode('menu')
+              }}
+            />
+            <div className="header-dropdown-naming-actions">
+              <button className="header-dropdown-cancel" onClick={() => setMode('menu')}>Annuler</button>
+              <button className="header-dropdown-confirm" onClick={handleSave} disabled={!name.trim()}>
+                Sauvegarder
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="header-dropdown-naming">
+            <span className="header-dropdown-confirm-msg">
+              Effacer toutes les modifications et revenir aux données de démonstration ?
+            </span>
+            <div className="header-dropdown-naming-actions">
+              <button className="header-dropdown-cancel" onClick={() => setMode('menu')}>Annuler</button>
+              <button className="header-dropdown-danger-confirm" onClick={() => { onReset(); setOpen(false); setMode('menu') }}>
+                Réinitialiser
+              </button>
+            </div>
+          </div>
+        )}
+      </Dropdown>
     </>
   )
 }
@@ -174,53 +162,15 @@ export default function Header({
 }) {
   const { dates, prev, next } = week
   const [menuOpen, setMenuOpen] = useState(false)
-  const [menuPos,  setMenuPos]  = useState({ top: 0, right: 0 })
-  const btnRef  = useRef(null)
-  const dropRef = useRef(null)
+  const btnRef = useRef(null)
 
   const fmt   = (d, opts) => d.toLocaleDateString('fr-FR', opts)
   const month = fmt(dates[0], { month: 'long', year: 'numeric' })
   const range = `${dates[0].getDate()} – ${dates[6].getDate()} ${month}`
 
-  function openMenu() {
-    const rect = btnRef.current.getBoundingClientRect()
-    setMenuPos({ top: rect.bottom + 6, right: window.innerWidth - rect.right })
-    setMenuOpen(v => !v)
-  }
-
-  useEffect(() => {
-    if (!menuOpen) return
-    function onMouseDown(e) {
-      if (dropRef.current?.contains(e.target)) return
-      if (btnRef.current?.contains(e.target)) return
-      setMenuOpen(false)
-    }
-    document.addEventListener('mousedown', onMouseDown)
-    return () => document.removeEventListener('mousedown', onMouseDown)
-  }, [menuOpen])
-
   function action(fn) { setMenuOpen(false); fn() }
 
   const sheetId = import.meta.env.VITE_GOOGLE_SHEET_ID
-
-  const dropdown = menuOpen && createPortal(
-    <div ref={dropRef} className="header-menu-dropdown"
-      style={{ top: menuPos.top, right: menuPos.right }}>
-      {sheetId && (
-        <button onClick={() => action(() => window.open(`https://docs.google.com/spreadsheets/d/${sheetId}`, '_blank'))}>
-          <SheetsIcon /><span>Ouvrir Google Sheet</span>
-        </button>
-      )}
-      <button onClick={() => action(onPdfExport)} disabled={pdfGenerating}>
-        <PdfIcon size={15} /><span>{pdfGenerating ? 'Génération…' : 'Exporter PDF'}</span>
-      </button>
-      <div className="emp-menu-divider" />
-      <button onClick={() => action(onSendToAll)}>
-        <MailIcon size={15} /><span>Envoyer à tous</span>
-      </button>
-    </div>,
-    document.body
-  )
 
   return (
     <header className="header">
@@ -262,7 +212,7 @@ export default function Header({
           <button
             ref={btnRef}
             className={`header-menu-btn${menuOpen ? ' active' : ''}`}
-            onClick={openMenu}
+            onClick={() => setMenuOpen(v => !v)}
             aria-label="Menu actions"
           >
             <ShareIcon />
@@ -270,7 +220,26 @@ export default function Header({
         </div>
 
       </div>
-      {dropdown}
+      <Dropdown
+        triggerRef={btnRef}
+        isOpen={menuOpen}
+        onClose={() => setMenuOpen(false)}
+        align="right"
+        className="header-menu-dropdown"
+      >
+        {sheetId && (
+          <button onClick={() => action(() => window.open(`https://docs.google.com/spreadsheets/d/${sheetId}`, '_blank'))}>
+            <SheetsIcon /><span>Ouvrir Google Sheet</span>
+          </button>
+        )}
+        <button onClick={() => action(onPdfExport)} disabled={pdfGenerating}>
+          <PdfIcon size={15} /><span>{pdfGenerating ? 'Génération…' : 'Exporter PDF'}</span>
+        </button>
+        <Dropdown.Divider />
+        <button onClick={() => action(onSendToAll)}>
+          <MailIcon size={15} /><span>Envoyer à tous</span>
+        </button>
+      </Dropdown>
     </header>
   )
 }
