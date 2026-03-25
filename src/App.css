@@ -123,7 +123,12 @@
 .nav-item--active {
   background: var(--bg-4);
   color: var(--bg-2);
-  pointer-events: none;
+}
+
+.nav-item--active:hover {
+  background: var(--bg-4);
+  color: var(--bg-2);
+  cursor: default;
 }
 
 .nav-item--disabled {
@@ -1250,7 +1255,7 @@
   margin-top: 2px;
 }
 .preview-type-note--absent { background: var(--type-absent-bg); color: var(--color-amber-800); } /* ⚠ orange E65100 → amber-800 (#8a6500) : ton différent */
-.preview-type-note--leave  { background: var(--type-leave-bg);  color: var(--color-purple-500); } /* ⚠ violet 5E35B1 → purple-500 (#7c6fcd) : plus clair */
+.preview-type-note--leave  { background: var(--type-leave-bg);  color: var(--text); }
 .preview-type-note--sick   { background: var(--type-sick-bg);   color: var(--color-red-800); }    /* ⚠ #C62828 → red-800 (#C0392B) : quasi-identique */
 .preview-type-note--school { background: var(--type-school-bg); color: var(--color-amber-500); }  /* ⚠ #F57F17 → amber-500 (#F39C12) : quasi-identique */
 .preview-type-note--rest   { background: var(--type-rest-bg);   color: var(--color-success-dark); }
@@ -1456,7 +1461,7 @@
   /* extends .btn-primary — ajoute flex et gap pour icône+texte */
   flex: 2;
   gap: 8px;
-  color: var(--color-gray-900);
+  color: var(--text);
 }
 .modal-confirm:hover { opacity: 0.85; }
 .modal-confirm:disabled { opacity: 0.4; cursor: not-allowed; }

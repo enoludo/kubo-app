@@ -1,0 +1,149 @@
+/* ══════════════════════════════════════════════════════════════════
+   DESIGN TOKENS — Source de vérité globale
+   Importé avant index.css dans main.jsx
+   ══════════════════════════════════════════════════════════════════ */
+
+:root {
+
+  /* ──────────────────────────────────────────────────────────────
+     NIVEAU 1 — PRIMITIFS
+     Valeurs brutes. Ne jamais utiliser directement dans les composants.
+     ────────────────────────────────────────────────────────────── */
+
+  /* Violet */
+  --color-violet-100: #EEE7FF;
+  --color-violet-200: #DACBFF;
+  --color-violet-300: #C8AFFF;
+
+  /* Rouge — note: --color-red-400 migré en ÉTAPE 4 (conflict index.css) */
+  --color-red-100: #FFF4F4;
+  --color-red-200: #FFE4E4;
+  --color-red-300: #FFCAC9;
+
+  /* Orange */
+  --color-orange-100: #FFEADB;
+  --color-orange-200: #FFD2B1;
+  --color-orange-300: #FFBB88;
+
+  /* Jaune */
+  --color-yellow-100: #FFF3D1;
+  --color-yellow-200: #FFE59B;
+  --color-yellow-300: #FFD866;
+
+  /* Vert */
+  --color-green-100: #D1F4E1;
+  --color-green-200: #9BE6BE;
+  --color-green-300: #66DA9B;
+
+  /* Bleu */
+  --color-blue-100: #BCE2FF;
+  --color-blue-200: #9AD3FF;
+  --color-blue-300: #7AC5FF;
+
+  /* Gris */
+  --color-grey-100: #F5F4F9;
+  --color-grey-200: #E9E7F1;
+  --color-grey-300: #D5D1E4;
+  --color-grey-400: #B2ABCC;
+  --color-grey-500: #7C73A3;
+
+  /* Neutres */
+  --color-black:      #000000;
+  --color-white:      #FFFFFF;
+  --color-text-muted: #737277;
+
+  /* États */
+  --color-success:    #76CB7A;
+  --color-success-bg: #DCF2DD;
+  --color-warning:    #FFB12F;
+  --color-warning-bg: #FFEFD5;
+  --color-danger:     #EF7171;
+  --color-danger-bg:  #FAD4D4;
+
+
+  /* ──────────────────────────────────────────────────────────────
+     NIVEAU 2 — SÉMANTIQUES
+     Rôle fonctionnel. Utiliser dans les composants.
+     ────────────────────────────────────────────────────────────── */
+
+  /* Surfaces */
+  --bg-default: var(--color-white);
+  --bg-subtle:  var(--color-grey-100);
+
+  /* Texte */
+  --text-primary:   var(--color-black);
+  --text-secondary: var(--color-text-muted);
+
+  /* Bordures */
+  --border-default: var(--color-grey-300);
+
+
+  /* ──────────────────────────────────────────────────────────────
+     TYPOGRAPHIE
+     ────────────────────────────────────────────────────────────── */
+
+  --font-family-base: 'Poppins', sans-serif;
+
+  --font-size-xs: 0.625rem;   /* 10px */
+  --font-size-sm: 0.75rem;    /* 12px */
+  --font-size-md: 0.875rem;   /* 14px */
+  --font-size-lg: 1rem;       /* 16px */
+  --font-size-xl: 1.25rem;    /* 20px */
+
+  --line-height-tight:  1.1;
+  --line-height-normal: 1.25;
+
+  --font-weight-regular:  400;
+  --font-weight-medium:   500;
+  --font-weight-semibold: 600;
+
+
+  /* ──────────────────────────────────────────────────────────────
+     SPACING
+     ────────────────────────────────────────────────────────────── */
+
+  --space-xs: 0.25rem;  /* 4px  */
+  --space-sm: 0.5rem;   /* 8px  */
+  --space-md: 1rem;     /* 16px */
+  --space-lg: 1.5rem;   /* 24px */
+  --space-xl: 2rem;     /* 32px */
+
+
+  /* ──────────────────────────────────────────────────────────────
+     RADIUS
+     ────────────────────────────────────────────────────────────── */
+
+  --radius-sm:   0.5rem;   /* 8px  — cards */
+  --radius-md:   1rem;     /* 16px — modals */
+  --radius-lg:   1.5rem;   /* 24px */
+  --radius-full: 9999px;   /* badges, pills */
+
+
+  /* ──────────────────────────────────────────────────────────────
+     OMBRES
+     ────────────────────────────────────────────────────────────── */
+
+  --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.07);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.10);
+
+
+  /* ──────────────────────────────────────────────────────────────
+     TRANSITIONS
+     ────────────────────────────────────────────────────────────── */
+
+  --transition-fast: 0.12s ease;
+  --transition-base: 0.15s ease;
+  --transition-slow: 0.30s ease;
+
+
+  /* ──────────────────────────────────────────────────────────────
+     Z-INDEX
+     ────────────────────────────────────────────────────────────── */
+
+  --z-header:   30;
+  --z-sticky:   90;
+  --z-dropdown: 100;
+  --z-overlay:  9000;
+  --z-toast:    9999;
+
+}

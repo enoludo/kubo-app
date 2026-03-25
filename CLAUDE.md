@@ -4,8 +4,9 @@
 
 Consulte le skill approprié avant chaque tâche :
 - Design UI/UX → `.claude/skills/ux-designer.md`
-- Design system & tokens → `.claude/skills/design-system.md`
-  À lire pour toute modification de styles, variables CSS ou création de nouveaux composants
+- Design System → `.claude/skills/design-system.md`
+  À lire OBLIGATOIREMENT avant toute modification
+  de styles, tokens, composants ou création de UI
 - Composants React → `.claude/skills/frontend-engineer.md`
 - Intégration Google Sheets → `.claude/skills/integration-engineer.md`
 - Architecture → `.claude/skills/software-architect.md`

@@ -763,8 +763,8 @@
   font-family: 'Poppins', sans-serif;
   font-size: 10px;
   font-weight: 500;
-  background: var(--color-warn-light, #FFF4E0);
-  color: var(--color-warn-dark, #7A4F00);
+  background: var(--color-warning-bg);
+  color: var(--color-amber-800);
   border-radius: var(--radius-pill);
   padding: 2px 8px;
   white-space: nowrap;

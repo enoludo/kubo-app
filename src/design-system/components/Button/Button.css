@@ -1,0 +1,64 @@
+/* ── Button — composant générique ──────────────────────────────────────────
+   Styles migrés depuis index.css
+   Importé dans main.jsx pour compatibilité avec les usages directs de classe
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* Bouton principal — fond sombre, texte clair */
+.btn-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 1.5rem;
+  min-height: 3rem;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--bg-4);
+  color: var(--bg-2);
+  font-family: var(--font-family-base);
+  font-size: 13px;
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: opacity var(--transition-base);
+}
+.btn-primary:hover    { opacity: 0.85; }
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Bouton secondaire — fond clair, texte atténué */
+.btn-secondary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  min-height: 3rem;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--bg-2);
+  color: var(--text-2);
+  font-family: var(--font-family-base);
+  font-size: 13px;
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: background var(--transition-base);
+  mix-blend-mode: multiply;
+}
+.btn-secondary:hover { background: var(--bg-3); }
+
+/* Bouton destructif — rouge pastel */
+.btn-danger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  min-height: 3rem;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--btn-danger-bg);
+  color: var(--color-error);
+  font-family: var(--font-family-base);
+  font-size: 13px;
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: background var(--transition-base);
+}
+.btn-danger:hover  { background: var(--btn-danger-bg-hover); }
+.btn-danger:active { background: var(--btn-danger-bg-active); }

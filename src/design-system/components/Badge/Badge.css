@@ -1,0 +1,75 @@
+/* ── Badge — composant générique ──────────────────────────────────────────
+   Usage : statuts, canaux, étiquettes
+   ─────────────────────────────────────────────────────────────────────────── */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
+  line-height: 1.4;
+}
+
+/* ── Variantes sémantiques ──────────────────────────────────────────────── */
+
+.badge--success {
+  background: var(--color-success-bg);
+  color: var(--color-success-dark);
+}
+
+.badge--warning {
+  background: var(--color-warn-bg);
+  color: var(--color-warn-dark);
+}
+
+.badge--danger {
+  background: var(--color-error-bg);
+  color: var(--color-error-dark);
+}
+
+.badge--neutral {
+  background: var(--bg-3);
+  color: var(--text-2);
+}
+
+.badge--accent {
+  background: var(--accent-sub);
+  color: var(--text-2);
+}
+
+/* ── Tailles ────────────────────────────────────────────────────────────── */
+
+.badge--sm {
+  font-size: 9px;
+  padding: 1px 6px;
+}
+
+.badge--md {
+  font-size: var(--font-size-xs);
+  padding: 2px 8px;
+}
+
+.badge--lg {
+  font-size: var(--font-size-sm);
+  padding: 4px 12px;
+}
+
+/* ── Pill (radius full) ─────────────────────────────────────────────────── */
+
+.badge--pill {
+  border-radius: var(--radius-full);
+}
+
+/* ── Point coloré (dot badge) ────────────────────────────────────────────── */
+
+.badge-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}

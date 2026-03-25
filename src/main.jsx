@@ -1,6 +1,11 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { migrateSessionIds } from './utils/migrateSession'
+import './design-system/design-tokens.css'
+import './design-system/typography.css'
+import './design-system/components/Button/Button.css'
+import './design-system/components/Input/Input.css'
+import './design-system/components/Badge/Badge.css'
 import './index.css'
 import App from './App.jsx'
 

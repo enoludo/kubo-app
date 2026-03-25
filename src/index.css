@@ -8,83 +8,65 @@
 
   /* ══════════════════════════════════════════════════════════════
      NIVEAU 1 — PRIMITIFS
-     Valeurs brutes. Ne pas utiliser directement dans les composants.
+     Les couleurs communes sont désormais dans design-tokens.css
+     On ne garde ici que les primitifs sans équivalent dans la nouvelle palette.
   ══════════════════════════════════════════════════════════════ */
 
-  /* Neutres */
-  --color-white:    #FFFFFF;
-  --color-gray-50:  #f5f4f9;
-  --color-gray-100: #eeedf5;
-  --color-gray-200: #E9E7F1;
-  --color-gray-800: #555566;
-  --color-gray-900: #111111;
-  --color-gray-950: #000000;
-  --color-muted:    #9999aa;
-
-  /* Violet (accent principal) */
+  /* Violet (accent UI — alpha, pas dans la nouvelle palette de couleurs) */
   --color-purple-100: rgba(124, 111, 205, 0.12);
   --color-purple-200: #a095e0;
   --color-purple-400: rgba(124, 111, 205, 0.4);
-  --color-purple-500: #000000;
 
-  /* Vert */
+  /* Vert — variantes legacy sans équivalent dans la palette principale */
   --color-green-400: #4CAF50;
   --color-green-500: #2ECC71;
-  --color-green-600: #66DA9B;
   --color-green-700: #2E7D32;
   --color-green-800: #1e7a4a;
 
-  /* Rouge */
-  --color-red-400: #E05555;
+  /* Rouge — variantes legacy */
   --color-red-500: #E74C3C;
   --color-red-700: #A52B2B;
   --color-red-800: #C0392B;
 
-  /* Ambre */
-  --color-amber-300: #FFD866;
+  /* Ambre — variantes legacy */
   --color-amber-400: #F5A623;
   --color-amber-500: #F39C12;
   --color-amber-700: #B06A00;
   --color-amber-800: #8a6500;
 
-  /* Bleu */
-  --color-blue-400: #7AC5FF;
+  /* Bleu — foncé (lien, texte) */
   --color-blue-700: #2d86c7;
 
-  /* Palette shifts (couleurs uniques) */
-  --color-lavender: #C8AFFF;
-  --color-salmon:   #FF9594;
-  --color-mint:     #66DA9B;
-  --color-peach:    #FFBB88;
+  /* Muted — pas d'équivalent exact dans la nouvelle palette */
+  --color-muted: #9999aa;
 
-  /* Alphas error */
-  --color-red-alpha-xs: rgba(224, 85, 85, 0.08);
-  --color-red-alpha-sm: rgba(224, 85, 85, 0.10);
-  --color-red-alpha-md: rgba(224, 85, 85, 0.18);
-  --color-red-alpha-lg: rgba(224, 85, 85, 0.26);
+  /* Alphas error (basés sur --color-danger: #EF7171 = rgb 239,113,113) */
+  --color-red-alpha-xs: rgba(239, 113, 113, 0.08);
+  --color-red-alpha-sm: rgba(239, 113, 113, 0.10);
+  --color-red-alpha-md: rgba(239, 113, 113, 0.18);
+  --color-red-alpha-lg: rgba(239, 113, 113, 0.26);
 
-  /* Alphas warn */
-  --color-amber-alpha-sm: rgba(245, 166, 35, 0.10);
-  --color-amber-alpha:    rgba(245, 166, 35, 0.12);
-  --color-amber-alpha-md: rgba(245, 166, 35, 0.14);
-  --color-amber-alpha-lg: rgba(245, 166, 35, 0.20);
-  --color-amber-alpha-xl: rgba(245, 166, 35, 0.26);
+  /* Alphas warn (basés sur --color-warning: #FFB12F = rgb 255,177,47) */
+  --color-amber-alpha-sm: rgba(255, 177, 47, 0.10);
+  --color-amber-alpha:    rgba(255, 177, 47, 0.12);
+  --color-amber-alpha-md: rgba(255, 177, 47, 0.14);
+  --color-amber-alpha-lg: rgba(255, 177, 47, 0.20);
+  --color-amber-alpha-xl: rgba(255, 177, 47, 0.26);
 
-  /* Alphas success */
-  --color-green-alpha: rgba(76, 175, 80, 0.12);
+  /* Alphas success (basés sur --color-success: #76CB7A = rgb 118,203,122) */
+  --color-green-alpha: rgba(118, 203, 122, 0.12);
 
-  /* Radius */
+  /* Radius — héritage (--radius-sm identique, --radius-md/lg à migrer en ÉTAPE 5) */
   --radius-xs:   0.25rem;
-  --radius-sm:   0.5rem;
-  --radius-md:   0.75rem;
-  --radius-lg:   1rem;
+  --radius-md:   0.75rem;   /* TODO ÉTAPE 5 → 1rem (design-tokens.css) */
+  --radius-lg:   1rem;      /* TODO ÉTAPE 5 → 1.5rem */
   --radius-pill: 2rem;
   --radius-full: 50%;
 
-  /* Transitions */
-  --t-fast: 0.12s ease;
-  --t-base: 0.15s ease;
-  --t-slow: 0.3s  ease;
+  /* Transitions — alias des nouveaux tokens */
+  --t-fast: var(--transition-fast);
+  --t-base: var(--transition-base);
+  --t-slow: var(--transition-slow);
 
 
   /* ══════════════════════════════════════════════════════════════
@@ -94,19 +76,19 @@
 
   /* Surfaces */
   --bg:    var(--color-white);
-  --bg-2:  var(--color-gray-50);
-  --bg-3:  var(--color-gray-100);
-  --bg-4:  var(--color-gray-950);
-  --hover: var(--color-gray-200);
+  --bg-2:  var(--color-grey-100);   /* ex --color-gray-50 */
+  --bg-3:  var(--color-grey-200);   /* ex --color-gray-100 — décalage mineur accepté */
+  --bg-4:  var(--color-black);      /* ex --color-gray-950 */
+  --hover: var(--color-grey-200);   /* ex --color-gray-200 */
 
   /* Texte */
-  --text:   var(--color-gray-900);
-  --text-2: var(--color-gray-800);
+  --text:   var(--color-black);     /* ex --color-gray-900 */
+  --text-2: var(--color-grey-500);  /* ex --color-gray-800 — décalage accepté */
   --text-3: var(--color-muted);
 
   /* Accent */
-  --accent:      var(--color-purple-500);  /* violet — couleur de marque */
-  --accent-dark: var(--color-gray-950);    /* noir — actions principales lourdes */
+  --accent:      var(--color-black);      /* ex --color-purple-500 (= #000000) */
+  --accent-dark: var(--color-black);      /* ex --color-gray-950 */
   --accent-l:    var(--color-purple-200);
   --accent-sub:  var(--color-purple-100);
 
@@ -136,27 +118,25 @@
   --footer-h:   88px;
   --tv-emp-col: 200px;
   --gap:        1rem;
-  --gap-small:  0.5rem;   
+  --gap-small:  0.5rem;
   --pad-h:      1.5rem;
 
   /* États — error */
-  --color-error:        var(--color-red-400);
-  --color-error-bg:     #FFF0F0;
-  --color-error-dark:   var(--color-red-700);
+  --color-error:        var(--color-danger);
+  --color-error-bg:     var(--color-danger-bg);
+  --color-error-dark:   var(--color-red-700);    /* texte foncé sur fond error-bg */
   --color-error-border: #F5AAAA;
   --color-error-hover:  #FFE5E5;
 
-  /* États — success */
-  --color-success:        var(--color-green-400);
-  --color-success-bg:     #F0FAF4;
-  --color-success-dark:   var(--color-green-700);
+  /* États — success (--color-success et --color-success-bg viennent de design-tokens.css) */
+  --color-success-dark:   var(--color-green-700); /* texte foncé sur fond success-bg */
   --color-success-border: #A3D9B5;
   --color-success-hover:  #E2F5EA;
 
   /* États — warn */
-  --color-warn:        var(--color-amber-400);
-  --color-warn-bg:     #FFF8EC;
-  --color-warn-dark:   var(--color-amber-700);
+  --color-warn:        var(--color-warning);
+  --color-warn-bg:     var(--color-warning-bg);
+  --color-warn-dark:   var(--color-amber-700);   /* texte foncé sur fond warn-bg */
   --color-warn-border: #F5C76B;
 
   /* Jours fériés */
@@ -185,32 +165,32 @@
   ══════════════════════════════════════════════════════════════ */
 
   /* Planning — types de shifts (couleurs) */
-  --type-work:   var(--color-blue-400);
-  --type-leave:  var(--color-lavender);
-  --type-sick:   var(--color-salmon);
-  --type-school: var(--color-amber-300);
-  --type-rest:   var(--color-mint);
-  --type-absent: var(--color-peach);
+  --type-work:   var(--color-blue-300);
+  --type-leave:  var(--color-violet-300);
+  --type-sick:   var(--color-red-400);
+  --type-school: var(--color-yellow-300);
+  --type-rest:   var(--color-green-300);
+  --type-absent: var(--color-orange-300);
 
-  /* Planning — types de shifts (fonds 25%) */
-  --type-work-bg:   #7AC5FF40;
-  --type-leave-bg:  #C8AFFF40;
-  --type-sick-bg:   #FF959440;
-  --type-school-bg: #FFD86640;
-  --type-rest-bg:   #66DA9B40;
-  --type-absent-bg: #FFBB8840;
+  /* Planning — types de shifts (fonds — solides, migration depuis alphas 25%) */
+  --type-work-bg:   var(--color-blue-100);
+  --type-leave-bg:  var(--color-violet-100);
+  --type-sick-bg:   var(--color-red-100);
+  --type-school-bg: var(--color-yellow-100);
+  --type-rest-bg:   var(--color-green-100);
+  --type-absent-bg: var(--color-orange-100);
 
   /* Orders — canaux */
-  --order-web:           var(--color-blue-400);
-  --order-web-bg:        #7AC5FF40;
+  --order-web:           var(--color-blue-300);
+  --order-web-bg:        var(--color-blue-100);
   --order-web-text:      var(--color-blue-700);
 
-  --order-boutique:      var(--color-mint);
-  --order-boutique-bg:   #66DA9B40;
+  --order-boutique:      var(--color-green-300);
+  --order-boutique-bg:   var(--color-green-100);
   --order-boutique-text: var(--color-green-800);
 
-  --order-brunch:        var(--color-peach);
-  --order-brunch-bg:     #FFBB8840;
+  --order-brunch:        var(--color-orange-300);
+  --order-brunch-bg:     var(--color-orange-100);
   --order-brunch-text:   var(--color-amber-800);
 
   /* Boutons — couche composant */
@@ -245,91 +225,7 @@ button { font-family: inherit; cursor: pointer; }
    Usage : ajouter la classe générique + la classe module si override nécessaire
    ─────────────────────────────────────────────────────────────────────────── */
 
-/* Label de champ — uppercase, 10px, text-3 */
-.field-label {
-  font-family: 'Poppins', sans-serif;
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--text-3);
-}
-
-/* Input/select de formulaire — 13px, bg-2, sans bordure */
-.field-input {
-  font-family: 'Poppins', sans-serif;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text);
-  background: var(--bg-2);
-  border: none;
-  border-radius: var(--radius-sm);
-  padding: 8px 12px;
-  outline: none;
-  width: 100%;
-  min-height: 3rem;
-  box-sizing: border-box;
-}
-
-/* Bouton principal — fond sombre, texte clair */
-.btn-primary {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px 1.5rem;
-  min-height: 3rem;
-  border-radius: var(--radius-sm);
-  border: none;
-  background: var(--bg-4);
-  color: var(--bg-2);
-  font-family: 'Poppins', sans-serif;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: opacity var(--t-base);
-}
-.btn-primary:hover    { opacity: 0.85; }
-.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
-
-/* Bouton secondaire — fond clair, texte atténué */
-.btn-secondary {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px;
-  min-height: 3rem;
-  border-radius: var(--radius-sm);
-  border: none;
-  background: var(--bg-2);
-  color: var(--text-2);
-  font-family: 'Poppins', sans-serif;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background var(--t-base);
-  mix-blend-mode: multiply;
-}
-.btn-secondary:hover { background: var(--bg-3); }
-
-/* Bouton destructif — rouge pastel */
-.btn-danger {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px;
-  min-height: 3rem;
-  border-radius: var(--radius-sm);
-  border: none;
-  background: var(--btn-danger-bg);
-  color: var(--color-error);
-  font-family: 'Poppins', sans-serif;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background var(--t-base);
-}
-.btn-danger:hover  { background: var(--btn-danger-bg-hover); }
-.btn-danger:active { background: var(--btn-danger-bg-active); }
+/* Styles btn-*, field-* migrés dans /design-system/components/ */
 
 /* Séparateur horizontal */
 .sep {

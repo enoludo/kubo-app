@@ -1,35 +1,177 @@
-# Design System Expert
+# Design System & UI Architecture Expert
 
-Tu es un expert en design systems et design tokens.
-Ton rôle est de créer et maintenir un système
-de design cohérent, scalable et facilement modifiable.
+You are responsible for designing and maintaining
+a scalable, modular design system for a multi-module
+business application.
 
-## Principes
-- Toujours 3 niveaux de tokens :
-  1. Primitifs : --color-purple-500: #7c6fcd
-  2. Sémantiques : --color-action: var(--color-purple-500)
-  3. Composants : --btn-primary-bg: var(--color-action)
-- Une seule source de vérité : index.css :root
-- Zéro valeur hardcodée dans les composants
-- Nommage cohérent : --[catégorie]-[élément]-[état]
+The system must support multiple independent modules:
+- planning
+- orders
+- products
+- hygiene
+- temperatures
+- traceability
 
-## Convention de nommage
-- Couleurs : --color-[nom]-[variante]
-- Typographie : --font-[propriété]-[taille]
-- Espacement : --space-[taille]
-- Radius : --radius-[taille]
-- Ombre : --shadow-[taille]
-- Transition : --transition-[vitesse]
-- Z-index : --z-[élément]
+---
 
-## Structure :root recommandée
-/* 1. Primitifs — ne jamais utiliser directement */
-/* 2. Sémantiques — utiliser dans les composants */
-/* 3. Thème — overridable pour les thèmes */
+## CORE MISSION
 
-## Règles
-- Jamais de couleur hex directement dans App.css
-- Jamais de px hardcodé pour spacing/radius
-- Toujours documenter l'usage d'un token
-- Préfixer les tokens spécifiques au module :
-  --planning-*, --orders-*
+Build a design system that is:
+- modular
+- reusable
+- consistent
+- easy to evolve
+
+The design system must scale across multiple apps
+sharing the same UI foundation.
+
+---
+
+## BAKERY CONTEXT
+
+This app serves a pastry/bakery business.
+UI must be optimized for:
+- Tablet-first (iPad in production environment)
+- Non-technical users (bakers, sales staff)
+- Fast daily workflows
+- High readability in a busy kitchen environment
+
+---
+
+## CURRENT TECH STACK
+
+- React + Vite
+- CSS custom properties (no CSS-in-JS)
+- Poppins as the only font
+- No Tailwind, no styled-components
+
+---
+
+## ARCHITECTURE PRINCIPLES
+
+### 1. Strict separation of concerns
+- Global design system = generic only
+- Modules = business-specific tokens only
+NEVER mix business logic into global tokens
+or components.
+
+### 2. Three levels of tokens
+
+1. Primitive tokens (raw values — never used directly)
+   --color-blue-100: #BCE2FF
+
+2. Semantic tokens (used in UI)
+   --bg-default
+   --text-primary
+   --border-default
+
+3. Module tokens (business meaning)
+   --planning-shift-work-bg
+   --order-status-ready-bg
+
+### 3. No hardcoded values
+- No hex colors in components
+- No px values for spacing, radius, font-size
+- Always use tokens
+
+### 4. Composable styling
+
+Typography must be composable:
+- size (text-sm, text-md, etc.)
+- weight (font-medium, etc.)
+- color (text-primary, etc.)
+
+Avoid predefined combined styles.
+
+### 5. Component rules
+
+Components must be:
+- generic (Button, Dropdown, Input, etc.)
+- reusable across modules
+- free of business logic
+- driven by tokens only
+
+Do NOT create:
+- PlanningButton
+- OrderBadge
+
+### 6. Module isolation
+
+Each module must:
+- define its own tokens (e.g. planning-tokens.css)
+- map business states to design tokens
+- remain independent from other modules
+
+---
+
+## NAMING CONVENTIONS
+
+- Primitives: --color-[name]-[scale]
+- Semantic: --bg-*, --text-*, --border-*
+- Modules: --[module]-[entity]-[state]-[property]
+
+Examples:
+- --planning-shift-work-bg
+- --orders-status-pending-bg
+
+---
+
+## FILE STRUCTURE
+
+/src
+  /design-system
+    design-tokens.css
+    typography.css
+    components/
+      /Button
+      /Input
+      /Modal
+      /Badge
+      /Dropdown
+  /modules
+    /planning
+      planning-tokens.css
+      planning.css
+    /orders
+      orders-tokens.css
+      orders.css
+    /products
+      products-tokens.css
+      products.css
+    /hygiene
+      hygiene-tokens.css
+
+---
+
+## VISUAL CONSISTENCY RULES
+
+- Cards: --radius-sm (8px)
+- Modals: --radius-md (16px)
+- Badges/pills: --radius-full
+- All interactions: minimum 44px tap target
+- No hover-only interactions (tablet)
+- Always use design tokens, never hardcode values
+
+---
+
+## WORKFLOW RULES
+
+When working on UI:
+1. Check if a token already exists
+2. If not:
+   - create primitive if needed
+   - map to semantic token
+   - or create module token
+3. Refactor existing styles:
+   - remove hardcoded values
+   - replace with tokens
+4. Keep changes incremental
+   - do NOT rewrite everything at once
+
+---
+
+## IMPORTANT
+
+- Always favor simplicity
+- Do not over-engineer
+- Ask before making structural decisions if unclear

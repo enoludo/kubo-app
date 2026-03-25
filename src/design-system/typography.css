@@ -1,0 +1,44 @@
+/* ══════════════════════════════════════════════════════════════════
+   TYPOGRAPHY — Classes composables
+   Usage : combiner taille + poids + couleur indépendamment
+   Ex : <span class="text-sm font-semibold text-secondary">
+   ══════════════════════════════════════════════════════════════════ */
+
+/* ── Tailles ────────────────────────────────────────────────────── */
+
+.text-xs { font-size: var(--font-size-xs); }
+.text-sm { font-size: var(--font-size-sm); }
+.text-md { font-size: var(--font-size-md); }
+.text-lg { font-size: var(--font-size-lg); }
+.text-xl { font-size: var(--font-size-xl); }
+
+
+/* ── Poids ──────────────────────────────────────────────────────── */
+
+.font-regular  { font-weight: var(--font-weight-regular); }
+.font-medium   { font-weight: var(--font-weight-medium); }
+.font-semibold { font-weight: var(--font-weight-semibold); }
+
+
+/* ── Couleurs ───────────────────────────────────────────────────── */
+
+.text-primary   { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-muted     { color: var(--color-text-muted); }
+.text-danger    { color: var(--color-danger); }
+.text-success   { color: var(--color-success); }
+.text-warning   { color: var(--color-warning); }
+
+
+/* ── Utilitaires ────────────────────────────────────────────────── */
+
+.text-uppercase {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.text-truncate {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
