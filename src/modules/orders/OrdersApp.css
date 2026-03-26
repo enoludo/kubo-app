@@ -6,6 +6,14 @@
 /* ── Header ──────────────────────────────────────────────────────────────── */
 
 /* Badge "X commandes à venir" — cercle vert + label noir */
+.orders-upcoming-empty {
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  color: var(--text-secondary);
+  font-style: italic;
+  white-space: nowrap;
+}
+
 .orders-upcoming-badge {
   display: inline-flex;
   align-items: center;
@@ -55,13 +63,13 @@
 
 /* ── Calendrier ──────────────────────────────────────────────────────────── */
 
-/* Même structure que .tv-body : padding var(--pad-h), gap var(--gap) */
+/* Même structure que .tv-body : padding var(--space-lg), gap var(--gap) */
 .orders-calendar {
   flex: 1;
   display: flex;
   flex-direction: column;
   min-height: 0;
-  padding: 0 var(--pad-h) var(--pad-h);
+  padding: 0 var(--space-lg) var(--space-lg);
   gap: var(--gap-small);
 }
 
@@ -69,7 +77,7 @@
 .orders-cal-header {
   display: grid;
   align-items: center;
-  height:5rem;
+  height:3rem;
   grid-template-columns: repeat(7, 1fr);
   gap: var(--gap);
   flex-shrink: 0;
@@ -80,12 +88,13 @@
   font-family: 'Poppins', sans-serif;
   font-size: clamp(10px, 0.75vw, 12px);
   font-weight: 600;
-  color: var(--text-2);
+  color: var(--text-primary);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   text-align: center;
-  padding: 10px 4px;
+  padding: var(--space-sm) var(--space-xs);
 }
+.orders-cal-day-name--today { color: var(--color-danger); }
 
 /* Corps du calendrier : 6 rangées — même gap que .tv-body */
 .orders-cal-body {
@@ -110,7 +119,7 @@
 .order-day-cell {
   background: var(--bg);
   border-radius: var(--radius-sm);
-  padding: 8px;
+  padding: var(--space-sm);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -118,14 +127,21 @@
   position: relative;
   min-height: clamp(80px, 9vh, 140px);
   overflow: hidden;
-  border: 1.5px dashed var(--bg-3);
+  border: 1px dashed var(--bg-3);
   transition: border-color var(--t-base), background var(--t-base);
 }
 
 /* Jours hors du mois courant */
 .order-day-cell--outside {
-  opacity: 0.5;
   pointer-events: none;
+}
+.order-day-cell--outside-past {
+  background-color: var(--color-red-100);
+  border: none;
+}
+.order-day-cell--outside-future {
+  background-color: var(--bg-subtle);
+  opacity: 0.5;
 }
 
 /* Cases vides — la bordure vient du bouton .add-trigger, pas de la cellule */
@@ -140,7 +156,7 @@
 /* Dates passées — atténuées, non interactives si sans commande */
 .order-day-cell--past {
   opacity: 1;
-  background-color: var(--accent-sub);
+  background-color: var(--color-red-200);
   border: none;
 }
 .order-day-cell--past:not(.order-day-cell--has-orders) {
@@ -150,15 +166,22 @@
 
 /* Aujourd'hui */
 .order-day-cell--today {
-  background: var(--orders-today-bg);
+  background: var(--color-white) !important;
+  border: none !important;
+  box-shadow: none;
+  cursor: pointer;
+}
+.order-day-cell--today:hover {
+  background: var(--color-white) !important;
 }
 
 /* Cellules avec commandes — bordure add-trigger */
 .order-day-cell--has-orders:not(.order-day-cell--past) {
-  border-color: var(--color-purple-400);
+  border-color: var(--color-grey-500);
+      background-color: var(--bg-subtle);
 }
 .order-day-cell--has-orders:not(.order-day-cell--past):hover {
-  background: transparent;
+  background: var(--color-grey-200);
 }
 
 /* Cellule cliquable (mois courant) — même effet que .day-card:hover */
@@ -166,7 +189,7 @@
   cursor: pointer;
 }
 .order-day-cell--clickable:not(.order-day-cell--has-orders):not(.order-day-cell--empty):hover {
-  border: solid 1px var(--color-purple-400);
+  border: solid 1px var(--color-grey-500);
 }
 .order-day-cell--today.order-day-cell--clickable:hover {
   border-color: var(--orders-today-border);
@@ -181,12 +204,30 @@
   font-family: 'Poppins', sans-serif;
   font-size: 12px;
   font-weight: 500;
-  color: var(--text-2);
+  color: var(--text-primary);
+}
+/* Dans le header today, le numéro est en flux flex — annule le positionnement absolu */
+.order-day-today-header .order-day-num {
+  position: static;
   line-height: 1;
 }
-.order-day-cell--today .order-day-num {
-  color: var(--accent);
-  font-weight: 700;
+.order-day-today-header {
+  position: absolute;
+  top: var(--space-sm);
+  left: var(--space-sm);
+  right: var(--space-sm);
+  padding: var(--space-sm);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 1;
+}
+.order-day-today-label {
+  color: var(--color-danger);
+  font-family: 'Poppins', sans-serif;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1;
 }
 
 
@@ -196,7 +237,7 @@
   justify-content: center;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: var(--space-xs);
   flex: 1;
   overflow: hidden;
 }
@@ -214,12 +255,12 @@
 .order-pill {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 2px 7px 2px 5px;
-  border-radius: var(--radius-sm);
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-sm) var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-md);
   font-family: 'Poppins', sans-serif;
-  font-size: 10px;
-  font-weight: 600;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -261,12 +302,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 12px 16px;
+  padding: var(--space-md);
   border-radius: var(--radius-sm);
-  border: 1px dashed var(--border-m);
-  background: transparent;
+  border: 1px dashed var(--color-grey-500);
+  background: var(c--bg-subtle);
   font-family: 'Poppins', sans-serif;
-  font-size: 13px;
+  font-size: var(--font-size-md);
   font-weight: 600;
   color: var(--text);
   cursor: pointer;
@@ -276,25 +317,25 @@
 
 .som-btn--brunch {
   background: var(--orders-channel-brunch-bg);
-  border-color: rgba(255, 216, 102, 0.6); /* ⚠ dérivé de --type-school (#FFD866) — pas de token alpha school */
+  border-color: var(--color-grey-500);
   color: var(--orders-channel-brunch-text);
 }
 .som-btn--brunch:hover {
   background: var(--orders-channel-brunch-bg);
-  border-color: rgba(255, 216, 102, 0.8); /* ⚠ même note */
+  border-color: var(--color-grey-500);
 }
 
 /* ── NewOrderModal / BrunchModal — scroll via Modal scrollBody prop ────────── */
 
 /* Section produits */
 .nom-products {
-  margin-bottom: 4px;
+  margin-bottom: var(--space-xs);
 }
 
 .nom-section-label {
   /* extends .field-label */
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: var(--space-sm);
 }
 .nom-section-label--invalid { color: var(--color-error); }
 
@@ -302,18 +343,18 @@
 .nom-product-rows {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-bottom: 8px;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
 }
 
 /* ── Carte produit (remplace .nom-product-row) ────────────────────────────── */
 .nom-product-card {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--space-sm);
   background: var(--bg-2);
   border-radius: var(--radius-sm);
-  padding: 10px 12px;
+  padding: var(--space-sm) var(--space-md);
 }
 
 /* En-tête carte : bouton toggle mode */
@@ -325,14 +366,14 @@
 /* Toggle mode catalogue ↔ libre */
 .nom-mode-toggle {
   font-family: 'Poppins', sans-serif;
-  font-size: 11px;
+  font-size: var(--font-size-sm);
   font-weight: 500;
   color: var(--text-3);
   background: none;
   border: 1px solid var(--bg-3);
   border-radius: var(--radius-pill);
-  padding: 4px 12px;
-  min-height: 28px;
+  padding: var(--space-xs) var(--space-md);
+  min-height: var(--space-lg);
   cursor: pointer;
   transition: background var(--t-fast), color var(--t-fast), border-color var(--t-fast);
   white-space: nowrap;
@@ -347,14 +388,14 @@
 .nom-card-body {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--space-sm);
 }
 
 /* Select produit — pleine largeur */
 .nom-product-select,
 .nom-size-select {
   font-family: 'Poppins', sans-serif;
-  font-size: 13px;
+  font-size: var(--font-size-md);
   font-weight: 500;
   color: var(--text);
   background: var(--bg);
@@ -378,10 +419,10 @@
   font-weight: 700;
   color: var(--text);
   text-align: right;
-  padding: 2px 4px;
+  padding: var(--space-xs) var(--space-xs);
 }
 .nom-unit-price-label {
-  font-size: 11px;
+  font-size: var(--font-size-sm);
   font-weight: 400;
   color: var(--text-3);
 }
@@ -389,7 +430,7 @@
 /* Mode libre — input nom */
 .nom-libre-name {
   font-family: 'Poppins', sans-serif;
-  font-size: 13px;
+  font-size: var(--font-size-md);
   font-weight: 500;
   color: var(--text);
   background: var(--bg);
@@ -407,13 +448,13 @@
 /* Mode libre — ligne taille + prix */
 .nom-libre-meta {
   display: flex;
-  gap: 6px;
+  gap: var(--space-sm);
   align-items: center;
 }
 
 .nom-libre-size {
   font-family: 'Poppins', sans-serif;
-  font-size: 13px;
+  font-size: var(--font-size-md);
   font-weight: 500;
   color: var(--text);
   background: var(--bg);
@@ -435,13 +476,13 @@
 
 .nom-libre-price {
   font-family: 'Poppins', sans-serif;
-  font-size: 13px;
+  font-size: var(--font-size-md);
   font-weight: 500;
   color: var(--text);
   background: var(--bg);
   border: none;
   border-radius: var(--radius-sm);
-  padding: 0 28px 0 10px;
+  padding: 0 var(--space-lg) 0 var(--space-sm);
   height: 44px;
   min-height: 44px;
   width: 100%;
@@ -460,7 +501,7 @@
   top: 50%;
   transform: translateY(-50%);
   font-family: 'Poppins', sans-serif;
-  font-size: 13px;
+  font-size: var(--font-size-md);
   font-weight: 500;
   color: var(--text-3);
   pointer-events: none;
@@ -471,7 +512,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: var(--space-sm);
 }
 
 /* Bouton × de suppression de ligne */
@@ -501,7 +542,7 @@
 .qty-stepper {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--space-xs);
   flex-shrink: 0;
 }
 
@@ -529,7 +570,7 @@
   height: 44px;
   text-align: center;
   font-family: 'Poppins', sans-serif;
-  font-size: 13px;
+  font-size: var(--font-size-md);
   font-weight: 600;
   color: var(--text);
   background: var(--bg-2);
@@ -547,7 +588,7 @@
 /* Deux champs côte à côte (date + heure, nb personnes + heure) */
 .nom-row-2col {
   display: flex;
-  gap: 12px;
+  gap: var(--space-md);
 }
 .nom-row-2col .modal-field-full { flex: 1; }
 
@@ -558,9 +599,9 @@
 .nom-checkbox-label {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-sm);
   font-family: 'Poppins', sans-serif;
-  font-size: 13px;
+  font-size: var(--font-size-md);
   font-weight: 500;
   color: var(--text);
   cursor: pointer;
@@ -582,13 +623,13 @@
 /* Select dans modal-field-full (heure brunch) */
 .modal-field-full select {
   font-family: 'Poppins', sans-serif;
-  font-size: 13px;
+  font-size: var(--font-size-md);
   font-weight: 500;
   color: var(--text);
   background: var(--bg-2);
   border: none;
   border-radius: var(--radius-sm);
-  padding: 8px 12px;
+  padding: var(--space-sm) var(--space-md);
   outline: none;
   cursor: pointer;
   appearance: none;
@@ -610,35 +651,18 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 20px;
+  margin-bottom: var(--space-lg);
 }
 
 .order-detail-badges {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-sm);
 }
 
-
-/* Bouton fermer — même style que .emp-menu-btn */
-.order-detail-close {
-  width: 32px;
-  height: 32px;
-  border-radius: var(--radius-sm);
-  border: none;
-  background: var(--bg-2);
-  color: var(--text-3);
-  font-size: 14px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background var(--t-fast);
-}
-.order-detail-close:hover { background: var(--bg-3); color: var(--text); }
 
 /* Client */
-.order-detail-customer { margin-bottom: 16px; }
+.order-detail-customer { margin-bottom: var(--space-md); }
 
 .order-detail-name {
   font-family: 'Poppins', sans-serif;
@@ -651,20 +675,20 @@
 .order-detail-contact {
   display: block;
   font-family: 'Poppins', sans-serif;
-  font-size: 13px;
+  font-size: var(--font-size-md);
   color: var(--text);
-  margin-top: 3px;
+  margin-top: var(--space-xs);
   text-decoration: none;
 }
 .order-detail-contact--link { color: var(--text); text-decoration: none; }
 .order-detail-contact--link:hover { text-decoration: underline; }
 
 /* Date & heure de retrait */
-.order-detail-pickup { margin-bottom: 16px; }
+.order-detail-pickup { margin-bottom: var(--space-md); }
 
 .order-detail-pickup-date {
   font-family: 'Poppins', sans-serif;
-  font-size: 13px;
+  font-size: var(--font-size-md);
   font-weight: 600;
   color: var(--text);
   text-transform: capitalize;
@@ -674,7 +698,7 @@
   font-family: 'Poppins', sans-serif;
   font-size: 12px;
   color: var(--text-3);
-  margin-top: 2px;
+  margin-top: var(--space-xs);
 }
 
 /* .order-detail-sep supprimé — remplacé par .sep */
@@ -684,33 +708,33 @@
 .order-detail-items {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--space-xs);
 }
 
 .order-detail-items-header {
   display: grid;
   grid-template-columns: 1fr 36px 60px 60px;
-  gap: 8px;
+  gap: var(--space-sm);
   font-family: 'Poppins', sans-serif;
   font-size: 9px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.07em;
   color: var(--text-3);
-  padding-bottom: 6px;
+  padding-bottom: var(--space-sm);
 }
 
 .order-detail-item {
   display: grid;
   grid-template-columns: 1fr 36px 60px 60px;
-  gap: 8px;
+  gap: var(--space-sm);
   align-items: center;
-  padding: 6px 0;
+  padding: var(--space-sm) 0;
 }
 
 .order-detail-item-label {
   font-family: 'Poppins', sans-serif;
-  font-size: 13px;
+  font-size: var(--font-size-md);
   color: var(--text);
   white-space: nowrap;
   overflow: hidden;
@@ -726,7 +750,7 @@
 
 .order-detail-item-sub {
   font-family: 'Poppins', sans-serif;
-  font-size: 13px;
+  font-size: var(--font-size-md);
   font-weight: 600;
   color: var(--text-2);
   text-align: right;
@@ -743,35 +767,35 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 4px;
-  margin-top: 4px;
+  gap: var(--space-xs);
+  margin-top: var(--space-xs);
 }
 
 .order-detail-allergens {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: var(--space-xs);
 }
 
 .order-detail-allergen-pill {
   font-family: 'Poppins', sans-serif;
-  font-size: 10px;
+  font-size: var(--font-size-xs);
   font-weight: 500;
   background: var(--orders-allergen-bg);
   color: var(--orders-allergen-text);
   border-radius: var(--radius-pill);
-  padding: 2px 8px;
+  padding: var(--space-xs) var(--space-sm);
   white-space: nowrap;
 }
 
 .order-detail-dlc {
   font-family: 'Poppins', sans-serif;
-  font-size: 10px;
+  font-size: var(--font-size-xs);
   font-weight: 500;
   background: var(--bg-2);
   color: var(--text-3);
   border-radius: var(--radius-pill);
-  padding: 2px 8px;
+  padding: var(--space-xs) var(--space-sm);
   white-space: nowrap;
   margin-left: auto;
 }
@@ -782,7 +806,7 @@
   justify-content: space-between;
   align-items: baseline;
   font-family: 'Poppins', sans-serif;
-  padding: 4px 0 2px;
+  padding: var(--space-xs) 0 var(--space-xs);
 }
 .order-detail-total span:first-child {
   font-size: 12px;
@@ -792,7 +816,7 @@
   color: var(--text-3);
 }
 .order-detail-total span:last-child {
-  font-size: 18px;
+  font-size: var(--font-size-xl);
   font-weight: 700;
   color: var(--text);
 }
@@ -801,10 +825,10 @@
 .order-detail-note {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: var(--space-xs);
   background: var(--bg-2);
   border-radius: var(--radius-sm);
-  padding: var(--gap) 14px;
+  padding: var(--gap) var(--space-md);
   margin-top: var(--gap);
 }
 
@@ -819,7 +843,7 @@
 
 .order-detail-note-text {
   font-family: 'Poppins', sans-serif;
-  font-size: 13px;
+  font-size: var(--font-size-md);
   color: var(--text-2);
   font-style: italic;
   line-height: 1.45;
@@ -834,23 +858,21 @@
   background: var(--bg-4);
   color: var(--bg-2);
   font-family: 'Poppins', sans-serif;
-  font-size: 13px;
+  font-size: var(--font-size-md);
   font-weight: 600;
   cursor: pointer;
-  margin-top: 16px;
+  margin-top: var(--space-md);
   transition: opacity var(--t-base);
 }
 .order-detail-advance-btn:hover { opacity: 0.85; }
 
 /* ── Modal "Commandes du jour" (.odm) ────────────────────────────────────── */
 
-/* Surcharge de .modal : padding 0, flex column, scroll interne */
+/* Surcharge de .modal : padding 0, hauteur max, overflow caché */
 .modal.odm {
   width: 640px;
   max-height: 85vh;
   padding: 0;
-  display: flex;
-  flex-direction: column;
   overflow: hidden;
 }
 
@@ -858,8 +880,8 @@
 .odm-header {
   display: flex;
   align-items: center;
-  gap: var(--gap);
-  padding: 1.5rem;
+  gap: var(--gap) ;
+  padding: var(--space-lg) var(--space-lg) 0 var(--space-lg);
   flex-shrink: 0;
 }
 
@@ -876,12 +898,12 @@
 /* Badge compteur "X commande(s)" */
 .odm-count-badge {
   font-family: 'Poppins', sans-serif;
-  font-size: 11px;
+  font-size: var(--font-size-sm);
   font-weight: 500;
   color: var(--text-3);
   background: var(--bg-2);
   border-radius: var(--radius-pill);
-  padding: 3px 10px;
+  padding: var(--space-xs) var(--space-sm);
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -891,7 +913,7 @@
   margin-bottom: auto;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-sm);
   flex-shrink: 0;
 }
 
@@ -918,10 +940,10 @@
 .odm-empty {
   grid-column: 1 / -1;
   font-family: 'Poppins', sans-serif;
-  font-size: 13px;
+  font-size: var(--font-size-md);
   color: var(--text-3);
   text-align: center;
-  padding: 32px 0;
+  padding: var(--space-xl) 0;
   margin: 0;
 }
 
@@ -942,19 +964,19 @@
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: 8px;
+  gap: var(--space-sm);
 }
 
 /* Bloc contact indépendant (téléphone + email) */
 .odm-card-contact-block {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--space-xs);
 }
 
 .odm-card-name {
   font-family: 'Poppins', sans-serif;
-  font-size: 13px;
+  font-size: var(--font-size-md);
   font-weight: 600;
   color: var(--text);
   line-height: 1.2;
@@ -967,7 +989,7 @@
 
 .odm-card-total-amount {
   font-family: 'Poppins', sans-serif;
-  font-size: 13px;
+  font-size: var(--font-size-md);
   font-weight: 600;
   color: var(--text);
   flex-shrink: 0;
@@ -978,16 +1000,16 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 6px;
-  margin-bottom: 2px;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xs);
 }
 
 /* Badges canal / paiement */
 .odm-badge {
   font-family: 'Poppins', sans-serif;
-  font-size: 10px;
+  font-size: var(--font-size-xs);
   font-weight: 600;
-  padding: 2px 8px;
+  padding: var(--space-xs) var(--space-sm);
   border-radius: var(--radius-md);
 }
 .odm-badge--boutique { background: var(--orders-channel-boutique-bg); color: var(--orders-channel-boutique-text); }
@@ -1013,7 +1035,7 @@
 .odm-item {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-sm);
 }
 
 .odm-item-photo {
@@ -1034,7 +1056,7 @@
   object-fit: cover;
 }
 .odm-item-photo-placeholder {
-  font-size: 18px;
+  font-size: var(--font-size-xl);
 }
 
 .odm-item-content {
@@ -1061,14 +1083,14 @@
 .odm-item-qty {
   font-weight: 600;
   color: var(--text-2);
-  margin-left: 8px;
+  margin-left: var(--space-sm);
   flex-shrink: 0;
 }
 
 .odm-item-size {
   font-size: 12px;
   color: var(--text-3);
-  margin-top: 2px;
+  margin-top: var(--space-xs);
 }
 
 /* Ligne 3 : Heure de retrait */
@@ -1083,16 +1105,16 @@
 /* Contact (téléphone + email) — directement sous le nom */
 .odm-card-contact {
   display: block;
-  font-size: 11px;
+  font-size: var(--font-size-sm);
 }
 
 /* Note — fond var(--bg) pour contraste sur fond var(--bg-2) de la carte */
 .odm-card-note {
   display: flex;
-  gap: 8px;
+  gap: var(--space-sm);
   background: var(--bg);
   border-radius: var(--radius-sm);
-  padding: 8px 10px;
+  padding: var(--space-sm);
 }
 
 .odm-card-note-label {
@@ -1103,7 +1125,7 @@
   letter-spacing: 0.07em;
   color: var(--accent);
   flex-shrink: 0;
-  padding-top: 2px;
+  padding-top: var(--space-xs);
 }
 
 .odm-card-note-text {
@@ -1118,10 +1140,11 @@
 /* Footer actions (modifier + supprimer) */
 .odm-card-actions {
   display: flex;
-  gap: 8px;
-  margin-top: 4px;
+  gap: var(--space-sm);
+  margin-top: var(--space-xs);
 }
-.odm-card-edit   { flex: 1; gap: 6px; }
+.odm-card-edit   { flex: 1; gap: 6px; background-color: var(--color-grey-200) }
+.odm-card-edit:hover   { background-color: var(--color-grey-400) }
 .odm-card-delete { flex: 1; gap: 6px; }
 .odm-card-delete:hover  { background: var(--btn-danger-bg-hover); }
 .odm-card-delete:active { background: var(--btn-danger-bg-active); }
@@ -1133,21 +1156,21 @@
 
 .odm-confirm-text {
   font-family: 'Poppins', sans-serif;
-  font-size: 13px;
+  font-size: var(--font-size-md);
   color: var(--text);
-  margin: 0 0 12px;
+  margin: 0 0 var(--space-md);
   line-height: 1.4;
 }
 
 .odm-confirm-actions {
   display: flex;
-  gap: 8px;
+  gap: var(--space-sm);
 }
 
 /* Toggle Payé/Non payé dans NewOrderModal récap */
 .odm-paid-toggle {
   font-family: 'Poppins', sans-serif;
-  font-size: 11px;
+  font-size: var(--font-size-sm);
   font-weight: 600;
   padding: 4px 12px;
   border-radius: var(--radius-full);

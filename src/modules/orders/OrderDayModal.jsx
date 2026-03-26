@@ -1,7 +1,8 @@
 // ─── Modal "Commandes du jour" ─────────────────────────────────────────────────
 import { useState } from 'react'
-import ArchiveModal from '../../components/ArchiveModal'
+import ArchiveModal from '../planning/components/ArchiveModal'
 import Modal from '../../design-system/components/Modal/Modal'
+import Button from '../../design-system/components/Button/Button'
 
 const CHANNEL_LABEL = { web: 'Site web', boutique: 'Boutique', brunch: 'Brunch' }
 
@@ -139,20 +140,14 @@ function OrderCard({ order, onEdit, onDelete, getProduct }) {
       {(canEdit || canDelete) && (
         <div className="odm-card-actions">
           {canEdit && (
-            <button
-              className="btn-secondary odm-card-edit"
-              onClick={() => onEdit(order)}
-            >
+            <Button variant="default" className="odm-card-edit" onClick={() => onEdit(order)}>
               <PencilIcon /> Modifier
-            </button>
+            </Button>
           )}
           {canDelete && (
-            <button
-              className="btn-danger odm-card-delete"
-              onClick={() => setConfirmDelete(true)}
-            >
+            <Button variant="danger" className="odm-card-delete" onClick={() => setConfirmDelete(true)}>
               Supprimer
-            </button>
+            </Button>
           )}
         </div>
       )}
@@ -163,7 +158,7 @@ function OrderCard({ order, onEdit, onDelete, getProduct }) {
 
 // ── Modal principale ───────────────────────────────────────────────────────────
 
-export default function OrderDayModal({ date, orders, onNewOrder, onEdit, onDelete, onClose, getProduct }) {
+export default function OrderDayModal({ date, orders, onNewOrder, onNewBrunch, onEdit, onDelete, onClose, getProduct }) {
   const isSaturday = date.getDay() === 6
 
   const today = new Date(); today.setHours(0, 0, 0, 0)
@@ -185,7 +180,7 @@ export default function OrderDayModal({ date, orders, onNewOrder, onEdit, onDele
           </div>
           <div className="odm-header-btns">
             {!isPast && isSaturday && (
-              <button className="som-btn som-btn--brunch" onClick={() => onNewOrder(date, 'brunch')}>
+              <button className="som-btn som-btn--brunch" onClick={() => onNewBrunch(date)}>
                 + Brunch
               </button>
             )}

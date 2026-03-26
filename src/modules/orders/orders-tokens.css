@@ -10,23 +10,23 @@
 
   --orders-channel-web-color:    var(--color-blue-300);
   --orders-channel-web-bg:       var(--color-blue-100);
-  --orders-channel-web-text:     var(--color-blue-700);
+  --orders-channel-web-text:     var(--text-primary);
 
   --orders-channel-boutique-color: var(--color-green-300);
   --orders-channel-boutique-bg:    var(--color-green-100);
-  --orders-channel-boutique-text:  var(--color-green-800);
+  --orders-channel-boutique-text:  var(--text-primary);
 
   --orders-channel-brunch-color: var(--color-orange-300);
   --orders-channel-brunch-bg:    var(--color-orange-100);
-  --orders-channel-brunch-text:  var(--color-amber-800);
+  --orders-channel-brunch-text:  var(--text-primary);
 
   /* ── Statut de paiement ─────────────────────────────────────────────────── */
 
   --orders-payment-paid-bg:      var(--color-green-100);
-  --orders-payment-paid-text:    var(--color-green-800);
+  --orders-payment-paid-text:    var(--text-primary);
 
   --orders-payment-unpaid-bg:    var(--color-red-100);
-  --orders-payment-unpaid-text:  var(--color-red-800);
+  --orders-payment-unpaid-text:  var(--text-primary);
 
   /* ── Calendrier — jour courant ──────────────────────────────────────────── */
 
@@ -36,6 +36,6 @@
   /* ── Allergènes (affichage dans le détail commande) ─────────────────────── */
 
   --orders-allergen-bg:   var(--color-warning-bg);
-  --orders-allergen-text: var(--color-amber-800);
+  --orders-allergen-text: var(--text-primary);
 
 }

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { shiftEffective, WEEKLY_CONTRACT } from '../../hooks/useSchedule'
+import { shiftEffective, WEEKLY_CONTRACT } from '../../modules/planning/hooks/useSchedule'
 import { dateToStr, mondayOf } from '../date'
 
 // ── Pure balance helpers (miroir de la logique du hook) ────────────────────────

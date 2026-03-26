@@ -11,7 +11,7 @@
 //             col 10+d*5+4 : Validé  (checkbox BOOLEAN)
 //  Colonnes K–AS masquées, groupées, éditables manuellement si besoin.
 
-import { START_HOUR, END_HOUR } from '../hooks/useSchedule'
+import { START_HOUR, END_HOUR } from '../modules/planning/hooks/useSchedule'
 import { dateToStr, fmtTime, mondayOf, weekDatesFromMonday, weekSheetName } from '../utils/date'
 import { getTypeColor } from '../utils/theme'
 

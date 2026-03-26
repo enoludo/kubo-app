@@ -1,21 +1,68 @@
 /* ── Button — composant générique ──────────────────────────────────────────
-   Styles migrés depuis index.css
-   Importé dans main.jsx pour compatibilité avec les usages directs de classe
+   Importé dans main.jsx
    ─────────────────────────────────────────────────────────────────────────── */
 
-/* Bouton principal — fond sombre, texte clair */
+/* ── Base partagée ────────────────────────────────────────────────────────── */
+
+.btn--default,
+.btn--danger,
+.btn--success {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: var(--space-sm) 1.5rem;
+  min-height: 3rem;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: background var(--transition-base), color var(--transition-base), border-color var(--transition-base);
+}
+
+.btn--default:disabled,
+.btn--danger:disabled,
+.btn--success:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ── Variantes ────────────────────────────────────────────────────────────── */
+
+.btn--default {
+  background: var(--color-grey-100);
+  color: var(--text-primary);
+  border: none;
+}
+.btn--default:hover:not(:disabled) { background: var(--color-grey-200); }
+
+.btn--danger {
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+  border: none;
+}
+.btn--danger:hover:not(:disabled) { background: var(--color-danger); color: var(--color-white); }
+
+.btn--success {
+  background: var(--color-success-bg);
+  color: var(--text-primary);
+  border: none;
+}
+.btn--success:hover:not(:disabled) { background: var(--color-success); color: var(--text-primary); }
+
+
+/* ── Legacy — boutons hors-modales non encore migrés ─────────────────────── */
+
 .btn-primary {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 10px 1.5rem;
+  padding: var(--space-sm) 1.5rem;
   min-height: 3rem;
   border-radius: var(--radius-sm);
   border: none;
   background: var(--bg-4);
   color: var(--bg-2);
   font-family: var(--font-family-base);
-  font-size: 13px;
+  font-size: var(--font-size-md);
   font-weight: var(--font-weight-semibold);
   cursor: pointer;
   transition: opacity var(--transition-base);
@@ -23,19 +70,18 @@
 .btn-primary:hover    { opacity: 0.85; }
 .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
 
-/* Bouton secondaire — fond clair, texte atténué */
 .btn-secondary {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 10px;
+  padding: var(--space-sm);
   min-height: 3rem;
   border-radius: var(--radius-sm);
   border: none;
   background: var(--bg-2);
   color: var(--text-2);
   font-family: var(--font-family-base);
-  font-size: 13px;
+  font-size: var(--font-size-md);
   font-weight: var(--font-weight-medium);
   cursor: pointer;
   transition: background var(--transition-base);
@@ -43,19 +89,18 @@
 }
 .btn-secondary:hover { background: var(--bg-3); }
 
-/* Bouton destructif — rouge pastel */
 .btn-danger {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 10px;
+  padding: var(--space-sm);
   min-height: 3rem;
   border-radius: var(--radius-sm);
   border: none;
   background: var(--btn-danger-bg);
   color: var(--color-error);
   font-family: var(--font-family-base);
-  font-size: 13px;
+  font-size: var(--font-size-md);
   font-weight: var(--font-weight-medium);
   cursor: pointer;
   transition: background var(--transition-base);

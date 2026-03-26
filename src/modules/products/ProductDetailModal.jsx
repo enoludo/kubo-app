@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { AllergenBadgesFull } from './AllergenBadges'
 import Modal from '../../design-system/components/Modal/Modal'
+import Button from '../../design-system/components/Button/Button'
 import RecipeStepList from './RecipeStepList'
 import SizeTable from './SizeTable'
 
@@ -27,7 +28,7 @@ function TabInfos({ product }) {
     <div className="product-detail-tab-content">
       <SizeTable sizes={product.sizes} showCost={false} />
 
-      <div className="sep" style={{ margin: '20px 0' }} />
+      <div className="sep" style={{ margin: 'var(--space-lg) 0' }} />
 
       {product.description && (
         <div className="product-detail-section">
@@ -64,7 +65,7 @@ function TabRecette({ product }) {
         </div>
       )}
 
-      <div className="sep" style={{ margin: '20px 0' }} />
+      <div className="sep" style={{ margin: 'var(--space-lg) 0' }} />
 
       <div className="product-detail-section">
         <p className="product-detail-section-label field-label">Étapes</p>
@@ -109,7 +110,7 @@ function TabProduction({ product }) {
         </div>
       </div>
 
-      <div className="sep" style={{ margin: '20px 0' }} />
+      <div className="sep" style={{ margin: 'var(--space-lg) 0' }} />
 
       <div className="product-detail-section">
         <p className="product-detail-section-label field-label">Conservation</p>
@@ -148,7 +149,7 @@ function TabAllergenes({ product }) {
     <div className="product-detail-tab-content">
       <AllergenBadgesFull allergens={product.allergens} />
 
-      <div className="sep" style={{ margin: '20px 0' }} />
+      <div className="sep" style={{ margin: 'var(--space-lg) 0' }} />
 
       <div className="product-detail-section">
         <p className="product-detail-section-label field-label">Femmes enceintes</p>
@@ -165,7 +166,7 @@ function TabAllergenes({ product }) {
 
       {product.sanitaryNotes && (
         <>
-          <div className="sep" style={{ margin: '20px 0' }} />
+          <div className="sep" style={{ margin: 'var(--space-lg) 0' }} />
           <div className="product-detail-section">
             <p className="product-detail-section-label field-label">Notes sanitaires</p>
             <p className="product-detail-text product-detail-text--note">{product.sanitaryNotes}</p>
@@ -211,7 +212,7 @@ export default function ProductDetailModal({ product, onClose, onEdit, onDelete 
     : null
 
   const modal = (
-    <Modal onClose={onClose} align="bottom" size="xl">
+    <Modal onClose={onClose} size="xl" className="product-detail-modal">
         {/* En-tête */}
         <div className="product-detail-header">
           <div className="product-detail-header-photo">
@@ -234,13 +235,10 @@ export default function ProductDetailModal({ product, onClose, onEdit, onDelete 
           </div>
           <div className="product-detail-header-actions">
             {onEdit && (
-              <button className="btn-secondary product-detail-edit-btn" onClick={() => onEdit(product)}>
+              <Button variant="default" className="product-detail-edit-btn" onClick={() => onEdit(product)}>
                 Modifier
-              </button>
+              </Button>
             )}
-            <button className="product-detail-close" onClick={onClose} aria-label="Fermer">
-              ✕
-            </button>
           </div>
         </div>
 
@@ -270,24 +268,21 @@ export default function ProductDetailModal({ product, onClose, onEdit, onDelete 
         {canDelete && onDelete && (
           <div className="product-detail-footer">
             {!confirmDel ? (
-              <button
-                className="btn-danger product-detail-delete-btn"
-                onClick={() => setConfirmDel(true)}
-              >
+              <Button variant="danger" className="product-detail-delete-btn" onClick={() => setConfirmDel(true)}>
                 Supprimer
-              </button>
+              </Button>
             ) : (
               <div className="product-detail-confirm-del">
                 <span className="product-detail-confirm-msg">
                   Supprimer <strong>{product.name}</strong> ? Cette action est irréversible.
                 </span>
                 <div className="product-detail-confirm-actions">
-                  <button className="btn-secondary" onClick={() => setConfirmDel(false)}>
+                  <Button variant="default" onClick={() => setConfirmDel(false)}>
                     Annuler
-                  </button>
-                  <button className="btn-danger" onClick={() => onDelete(product.id)}>
+                  </Button>
+                  <Button variant="danger" onClick={() => onDelete(product.id)}>
                     Supprimer
-                  </button>
+                  </Button>
                 </div>
               </div>
             )}

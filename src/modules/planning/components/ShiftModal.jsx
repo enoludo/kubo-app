@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import Modal from '../design-system/components/Modal/Modal'
+import Modal from '../../../design-system/components/Modal/Modal'
+import Button from '../../../design-system/components/Button/Button'
 import { TIME_OPTIONS, fmtH, WEEKLY_CONTRACT, MAX_HOURS_PER_DAY, END_HOUR, weeksElapsed, dateToStr, shiftEffective } from '../hooks/useSchedule'
 import { getHolidayName } from '../utils/frenchHolidays'
 
@@ -148,7 +149,7 @@ export default function ShiftModal({ info, onSave, onDelete, onCancel, onToggleV
   const weeks    = weeksElapsed()
   const expected = weeks * empContract
   const pct      = Math.min((newTotal / expected) * 100, 100)
-  const barColor = newTotal > expected ? '#E05555' : pct >= 90 ? '#F5A623' : '#4CAF50'
+  const barColor = newTotal > expected ? 'var(--color-danger)' : pct >= 90 ? 'var(--color-warning)' : 'var(--color-success)'
 
   // Solde semaine avec report
   const { prevBalance } = schedule.getWeekBalance(info.employee.id, weekDates, empContract)
@@ -207,7 +208,7 @@ export default function ShiftModal({ info, onSave, onDelete, onCancel, onToggleV
 
         {/* Header */}
         <div className="modal-header">
-          <div className="modal-avatar" style={{ background: info.employee.color }}>
+          <div className="modal-avatar">
             {info.employee.initials}
           </div>
           <div>
@@ -237,8 +238,8 @@ export default function ShiftModal({ info, onSave, onDelete, onCancel, onToggleV
 
         {/* Section Absence école */}
         {type === 'school' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', userSelect: 'none', fontFamily: "'Poppins', sans-serif", fontSize: 13, fontWeight: 500, color: 'var(--text)' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 'var(--space-lg)' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', userSelect: 'none', fontFamily: "'Poppins', sans-serif", fontSize: 'var(--font-size-md)', fontWeight: 500, color: 'var(--text)' }}>
               <input
                 type="checkbox"
                 checked={schoolAbsence}
@@ -269,7 +270,7 @@ export default function ShiftModal({ info, onSave, onDelete, onCancel, onToggleV
                     ))}
                   </select>
                 </div>
-                <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', userSelect: 'none', fontFamily: "'Poppins', sans-serif", fontSize: 13, fontWeight: 500, color: 'var(--text)' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', userSelect: 'none', fontFamily: "'Poppins', sans-serif", fontSize: 'var(--font-size-md)', fontWeight: 500, color: 'var(--text)' }}>
                   <input
                     type="checkbox"
                     checked={schoolAbsenceAllDay}
@@ -317,7 +318,7 @@ export default function ShiftModal({ info, onSave, onDelete, onCancel, onToggleV
         )}
 
         {/* Aperçu live */}
-        <div className="modal-preview" >
+        <div className={`modal-preview modal-preview--${type}`}>
           {!isFullDay && (
             <div className="preview-row">
               {pause > 0 ? (
@@ -361,25 +362,15 @@ export default function ShiftModal({ info, onSave, onDelete, onCancel, onToggleV
         {/* Alerte convention collective */}
         {dayExceeded && (
           <div className="modal-day-alert">
-            <span>⚠️</span>
-            <div>
-              <div className="modal-day-alert-title">Limite journalière dépassée (max {MAX_HOURS_PER_DAY}h/jour)</div>
-              <div className="modal-day-alert-sub">Ce shift porterait la journée à {fmtDur(dayTotal)}</div>
-            </div>
+            <div className="modal-day-alert-title">Limite journalière dépassée (max {MAX_HOURS_PER_DAY}h/jour)</div>
           </div>
         )}
 
         {/* Alerte conflit congés/travail */}
         {leaveConflict && (
           <div className="modal-day-alert">
-            <span>🌴</span>
-            <div>
-              <div className="modal-day-alert-title">
-                {type === 'leave' ? 'Conflit avec un shift existant' : 'Conflit avec des congés'}
-              </div>
-              <div className="modal-day-alert-sub">
-                Chevauchement avec le shift {fmtH(leaveConflict.startHour)}–{fmtH(leaveConflict.endHour)}
-              </div>
+            <div className="modal-day-alert-title">
+              {type === 'leave' ? 'Conflit avec un shift existant' : 'Conflit avec des congés'}
             </div>
           </div>
         )}
@@ -399,28 +390,28 @@ export default function ShiftModal({ info, onSave, onDelete, onCancel, onToggleV
         <div className="modal-actions">
           {isEdit ? (
             <>
-              <button className="btn-secondary modal-cancel" onClick={onCancel}>Annuler</button>
-              <button className="btn-danger modal-delete" onClick={onDelete}>Supprimer</button>
-              <button
-                className="btn-primary modal-confirm"
-                style={{ background: (dayExceeded || leaveConflict) ? '#E05555' : info.employee.color }}
+              <Button variant="default" style={{ flex: 1 }} onClick={onCancel}>Annuler</Button>
+              <Button variant="danger" style={{ flex: 1 }} onClick={onDelete}>Supprimer</Button>
+              <Button
+                variant="success"
+                style={{ flex: 2, ...((dayExceeded || leaveConflict) ? { background: 'var(--color-danger)', borderColor: 'var(--color-danger)', color: 'var(--color-white)' } : {}) }}
                 onClick={() => onSave(start, end, pause, type, buildExtra())}
                 disabled={(!isFullDay && end <= start) || !!leaveConflict}
               >
                 Enregistrer
-              </button>
+              </Button>
             </>
           ) : (
             <>
-              <button className="btn-secondary modal-cancel" onClick={onCancel}>Annuler</button>
-              <button
-                className="btn-primary modal-confirm"
-                style={{ background: (dayExceeded || leaveConflict) ? '#E05555' : info.employee.color }}
+              <Button variant="default" style={{ flex: 1 }} onClick={onCancel}>Annuler</Button>
+              <Button
+                variant="success"
+                style={{ flex: 2, ...((dayExceeded || leaveConflict) ? { background: 'var(--color-danger)', borderColor: 'var(--color-danger)', color: 'var(--color-white)' } : {}) }}
                 onClick={() => onSave(start, end, pause, type, buildExtra())}
                 disabled={(!isFullDay && end <= start) || !!leaveConflict}
               >
                 Ajouter le shift
-              </button>
+              </Button>
             </>
           )}
         </div>

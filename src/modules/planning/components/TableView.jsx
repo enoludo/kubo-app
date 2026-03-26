@@ -28,14 +28,15 @@ export default function TableView({
         </div>
         {weekDates.map((date, i) => {
           const holiday = getHolidayName(date)
+          const isToday = date.toDateString() === new Date().toDateString()
           return (
             <div
               key={i}
               className={`tv-day-header${i === 0 || i === 6 ? ' tv-weekend' : ''}${holiday ? ' tv-holiday' : ''}`}
               style={{ flex: DAY_FLEX[i] }}
             >
-              <span className="tv-hdr-name">{DAY_NAMES[i]}</span>
-              <span className="tv-hdr-date">
+              <span className={`tv-hdr-name${isToday ? ' is-today' : ''}`}>{DAY_NAMES[i]}</span>
+              <span className={`tv-hdr-date${isToday ? ' is-today' : ''}`}>
                 {String(date.getDate()).padStart(2, '0')}/{String(date.getMonth() + 1).padStart(2, '0')}
               </span>
               {holiday && (
@@ -50,7 +51,7 @@ export default function TableView({
       </div>
 
       {/* Lignes employés */}
-      <div className="tv-body">
+      <div className={`tv-body ${visibleTeam.length <= 5 ? 'tv-body--stretch' : 'tv-body--scroll'}`}>
         {visibleTeam.map(emp => {
           const wb = schedule.getWeekBalance(emp.id, weekDates, emp.contract ?? 35, emp.startBalance ?? 0)
 

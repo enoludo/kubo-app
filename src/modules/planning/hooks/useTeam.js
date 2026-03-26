@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { sessionSave, sessionLoad, sessionHasData, sessionClear } from '../utils/session'
+import { sessionSave, sessionLoad, sessionHasData, sessionClear } from '../../../utils/session'
 
 export function useTeam({ initialTeam, schedule, setDataSource, showToast }) {
   const [team,         setTeam]         = useState(() => sessionLoad('team') ?? initialTeam)

@@ -8,7 +8,6 @@ import { createPortal } from 'react-dom'
  * @param {'sm'|'md'|'lg'|'xl'}  size            largeur : sm=420 md=460 lg=640 xl=860 (défaut: md)
  * @param {boolean}               scrollBody      scroll interne du modal (max-height + overflow-y: auto)
  * @param {'default'|'dark'}      overlayVariant  dark = fond sombre + z-index élevé
- * @param {'center'|'bottom'}     align           bottom = sheet depuis le bas
  * @param {string}                className       classes additionnelles sur .modal
  */
 export default function Modal({
@@ -16,21 +15,18 @@ export default function Modal({
   size = 'md',
   scrollBody = false,
   overlayVariant = 'default',
-  align = 'center',
   className = '',
   children,
 }) {
   const overlayClasses = [
     'modal-overlay',
-    overlayVariant === 'dark'  ? 'modal-overlay--dark'   : '',
-    align           === 'bottom' ? 'modal-overlay--bottom' : '',
+    overlayVariant === 'dark' ? 'modal-overlay--dark' : '',
   ].filter(Boolean).join(' ')
 
   const modalClasses = [
     'modal',
-    size !== 'md'      ? `modal--${size}` : '',
-    scrollBody         ? 'modal--scroll'  : '',
-    align === 'bottom' ? 'modal--bottom'  : '',
+    size !== 'md' ? `modal--${size}` : '',
+    scrollBody    ? 'modal--scroll'  : '',
     className,
   ].filter(Boolean).join(' ')
 

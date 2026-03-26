@@ -14,7 +14,7 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
-  background: var(--bg-2);
+  background: var(--color-white);
   overflow: hidden;
 }
 
@@ -34,8 +34,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  padding: var(--pad-h);
+  gap: var(--space-md);
+  padding: var(--space-lg);
   flex-shrink: 0;
 }
 
@@ -43,7 +43,7 @@
 .products-filter-center {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-sm);
   flex: 1;
   max-width: 50%;
   min-width: 0;
@@ -52,13 +52,13 @@
 .products-filter-search {
   flex: 2;
   min-width: 0;
-  background: var(--bg);
+  background: var(--color-grey-100);
   border: none;
-  border-radius: 1.5rem;
+  border-radius: var(--radius-xl);
   height: 3rem;
   padding: 0 1.25rem;
   font-family: 'Poppins', sans-serif;
-  font-size: 13px;
+  font-size: var(--font-size-md);
   color: var(--text);
   outline: none;
 }
@@ -66,13 +66,13 @@
 .products-filter-select {
   flex: 1;
   min-width: 0;
-  background: var(--bg);
+  background: var(--color-grey-100);
   border: none;
-  border-radius: 1.5rem;
+  border-radius: var(--radius-xl);
   height: 3rem;
   padding: 0 1.25rem;
   font-family: 'Poppins', sans-serif;
-  font-size: 13px;
+  font-size: var(--font-size-md);
   color: var(--text);
   outline: none;
   cursor: pointer;
@@ -80,10 +80,10 @@
 }
 
 .products-filter-toggle {
-  height: 3rem;
+  min-height: var(--space-2xl);
   padding: 0 1.25rem;
-  border: 1px solid var(--border-m);
-  border-radius: 1.5rem;
+  border: px solid var(--border-m);
+  border-radius: var(--radius-sm);
   background: var(--bg-2);
   color: var(--text-2);
   font-family: 'Poppins', sans-serif;
@@ -107,32 +107,25 @@
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  padding: var(--pad-h);
+  padding: 0 var(--space-lg);
 }
 
 /* ── Grille ──────────────────────────────────────────────────────────────── */
 
 .products-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: var(--gap-small);
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: var(--space-sm);
   align-items: start;
-  width: 100%;
-}
-
-@media (max-width: 1024px) {
-  .products-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
 }
 
 .products-catalog-empty {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 48px 0;
+  padding: var(--space-2xl) 0;
   font-family: 'Poppins', sans-serif;
-  font-size: 13px;
+  font-size: var(--font-size-md);
   color: var(--text-3);
 }
 
@@ -142,7 +135,8 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  width: 100%;
+  min-width: 240px;
+  max-width: 100%;
   height: 100%;
   min-height: 120px;
   background: var(--bg);
@@ -191,16 +185,16 @@
   position: absolute;
   top: 8px;
   font-family: 'Poppins', sans-serif;
-  font-size: 10px;
+  font-size: var(--font-size-xs);
   font-weight: 600;
   letter-spacing: 0.05em;
-  padding: 3px 8px;
+  padding: var(--space-xs) var(--space-sm);
   border-radius: var(--radius-pill);
 }
 .product-card-inactive-badge {
   left: 8px;
-  background: var(--color-red-alpha-md);
-  color: var(--color-error-dark);
+  background: var(--color-danger);
+  color: var(--color-white);
 }
 .product-card-seasonal-badge {
   right: 8px;
@@ -213,7 +207,7 @@
   right: 8px;
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
-  padding: 2px 6px;
+  padding: var(--space-xs) var(--space-sm);
   border-radius: var(--radius-pill);
   background: var(--products-integration-webflow-bg);
   color: var(--products-integration-webflow-text);
@@ -224,14 +218,15 @@
 .product-card-body {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: var(--pad-h);
+  gap: var(--space-xs);
+  background-color: var(--color-grey-100);
+  padding: var(--space-lg);
   flex: 1;
 }
 
 .product-card-category {
   font-family: 'Poppins', sans-serif;
-  font-size: 10px;
+  font-size: var(--font-size-xs);
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -240,40 +235,39 @@
 
 .product-card-name {
   font-family: 'Poppins', sans-serif;
-  font-size: 14px;
-  font-weight: 600;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
   color: var(--text);
   line-height: 1.3;
 }
 
 .product-card-desc {
   font-family: 'Poppins', sans-serif;
-  font-size: 11px;
+  font-size: var(--font-size-sm);
   color: var(--text-3);
   line-height: 1.4;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  margin-top: 2px;
+  margin-top: var(--space-xs);
 }
 
 /* Allergènes */
 .product-card-allergens {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
-  margin-top: 4px;
+  gap: var(--space-xs);
+  margin-top: var(--space-xs);
 }
 .product-card-allergen {
   font-family: 'Poppins', sans-serif;
-  font-size: 10px;
-  font-weight: 500;
-  padding: 2px 7px;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-regular);
+  padding: var(--space-xs) var(--space-sm);
   border-radius: var(--radius-pill);
-  background: var(--color-red-alpha-sm);
-  color: var(--text-2);
-  border: 1px solid var(--color-red-alpha-lg);
+  background: var(--color-orange-100);
+  color: var(--text-primary);
 }
 
 /* Badge grossesse sur la card */
@@ -281,22 +275,19 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
+  color: var(--text-primary);
   font-family: 'Poppins', sans-serif;
-  font-size: 10px;
-  font-weight: 600;
-  padding: 3px 8px;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-regular);
+  padding: var(--space-xs) var(--space-sm);
   border-radius: var(--radius-pill);
   width: fit-content;
 }
 .product-card-pregnancy--no {
   background: var(--products-pregnancy-no-bg);
-  color: var(--products-pregnancy-no-text);
-  border: 1px solid var(--products-pregnancy-no-border);
 }
 .product-card-pregnancy--check {
   background: var(--products-pregnancy-check-bg);
-  color: var(--products-pregnancy-check-text);
-  border: 1px solid var(--products-pregnancy-check-border);
 }
 
 /* Pied de card */
@@ -304,29 +295,29 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: var(--space-sm);
   margin-top: auto;
-  padding-top: 10px;
+  padding-top: var(--space-sm);
 }
 
 .product-card-price {
   font-family: 'Poppins', sans-serif;
-  font-size: 13px;
-  font-weight: 700;
+  font-size: var(--font-size-md);
+  font-weight: var( --font-weight-semibold);
   color: var(--text);
 }
 
 .product-card-meta {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-sm);
 }
 
 .product-card-tag {
   font-family: 'Poppins', sans-serif;
-  font-size: 10px;
+  font-size: var(--font-size-xs);
   font-weight: 500;
-  padding: 2px 7px;
+  padding: var(--space-xs) var(--space-sm);
   border-radius: var(--radius-pill);
 }
 .product-card-tag--order {
@@ -335,8 +326,8 @@
 }
 
 .product-card-diff {
-  font-size: 10px;
-  color: var(--color-amber-400);
+  font-size: var(--font-size-xs);
+  color: var(--color-orange-300);
   letter-spacing: 1px;
 }
 
@@ -344,16 +335,18 @@
    PRODUCT DETAIL MODAL
 ═══════════════════════════════════════════ */
 
-/* .product-detail-overlay → Modal overlayVariant implicite via align="bottom" */
-/* .product-detail-modal → layout via modal modal--xl modal--bottom */
+/* .product-detail-modal → surcharge .modal : overflow caché, hauteur max */
+.product-detail-modal {
+  overflow: hidden;
+  max-height: 90vh;
+}
 
 /* ── En-tête modal ────────────────────────────────────────────────────────── */
 
 .product-detail-header {
   display: flex;
   align-items: flex-start;
-  gap: 16px;
-  padding: 24px 24px 0;
+  gap: var(--space-md);
   flex-shrink: 0;
 }
 
@@ -383,12 +376,12 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: var(--space-xs);
 }
 
 .product-detail-header-category {
   font-family: 'Poppins', sans-serif;
-  font-size: 10px;
+  font-size: var(--font-size-xs);
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -413,24 +406,24 @@
 .product-detail-header-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 4px;
+  gap: var(--space-sm);
+  margin-top: var(--space-xs);
 }
 
 .product-detail-header-tag {
   font-family: 'Poppins', sans-serif;
-  font-size: 10px;
+  font-size: var(--font-size-xs);
   font-weight: 600;
-  padding: 3px 9px;
+  padding: var(--space-xs) var(--space-sm);
   border-radius: var(--radius-pill);
 }
 .product-detail-header-tag--inactive {
-  background: var(--color-red-alpha-sm);
-  color: var(--color-error-dark);
+  background: var(--color-danger);
+  color: var(--color-white);
 }
 .product-detail-header-tag--seasonal {
-  background: var(--color-amber-alpha-sm);
-  color: var(--color-warn-dark);
+  background: var(--color-orange-100);
+  color: var(--text-primary);
 }
 .product-detail-header-tag--order {
   background: var(--accent-sub);
@@ -440,7 +433,7 @@
 .product-detail-header-actions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-sm);
   flex-shrink: 0;
 }
 
@@ -450,32 +443,11 @@
   font-size: 12px;
 }
 
-.product-detail-close {
-  width: 44px;
-  height: 44px;
-  border-radius: var(--radius-full);
-  border: none;
-  background: var(--bg-2);
-  color: var(--text-3);
-  font-size: 16px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background var(--t-fast), color var(--t-fast);
-  flex-shrink: 0;
-}
-.product-detail-close:active {
-  background: var(--bg-3);
-  color: var(--text);
-}
-
 /* ── Barre d'onglets ──────────────────────────────────────────────────────── */
 
 .product-detail-tabs {
   display: flex;
   gap: 0;
-  padding: 16px 24px 0;
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
   overflow-x: auto;
@@ -517,7 +489,7 @@
 
 .product-detail-footer {
   flex-shrink: 0;
-  padding: 12px 24px;
+  padding: 12px 0;
   border-top: 1px solid var(--border);
 }
 
@@ -529,37 +501,37 @@
 .product-detail-confirm-del {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--space-md);
 }
 
 .product-detail-confirm-msg {
   font-family: 'Poppins', sans-serif;
-  font-size: 13px;
+  font-size: var(--font-size-md);
   color: var(--text);
 }
 
 .product-detail-confirm-actions {
   display: flex;
-  gap: 8px;
+  gap: var(--space-sm);
 }
 
 .product-detail-tab-content {
-  padding: 24px;
+  padding: 0px;
 }
 
 /* ── Sections génériques ──────────────────────────────────────────────────── */
 
 .product-detail-section {
-  margin-bottom: 20px;
+  margin-bottom: var(--space-lg);
 }
 
 .product-detail-section-label {
-  margin-bottom: 10px;
+  margin-bottom: var(--space-sm);
 }
 
 .product-detail-text {
   font-family: 'Poppins', sans-serif;
-  font-size: 13px;
+  font-size: var(--font-size-md);
   color: var(--text-2);
   line-height: 1.6;
 }
@@ -567,28 +539,28 @@
 .product-detail-text--note {
   background: var(--bg-2);
   border-radius: var(--radius-sm);
-  padding: 12px;
+  padding: var(--space-md);
   border-left: 3px solid var(--products-note-border);
 }
 
 .product-detail-info-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 10px;
+  gap: var(--space-sm);
 }
 
 .product-detail-info-item {
   background: var(--bg-2);
   border-radius: var(--radius-sm);
-  padding: 10px 14px;
+  padding: var(--space-sm) var(--space-md);
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--space-xs);
 }
 
 .product-detail-info-key {
   font-family: 'Poppins', sans-serif;
-  font-size: 10px;
+  font-size: var(--font-size-xs);
   font-weight: 600;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -611,13 +583,13 @@
 .product-detail-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: var(--space-sm);
 }
 .product-detail-tag {
   font-family: 'Poppins', sans-serif;
   font-size: 12px;
   font-weight: 500;
-  padding: 5px 12px;
+  padding: var(--space-xs) var(--space-md);
   border-radius: var(--radius-pill);
   background: var(--bg-3);
   color: var(--text-2);
@@ -631,21 +603,21 @@
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--space-sm);
 }
 
 .product-ingredient-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 12px;
+  padding: var(--space-sm) var(--space-md);
   background: var(--bg-2);
   border-radius: var(--radius-sm);
   font-family: 'Poppins', sans-serif;
 }
 
 .product-ingredient-name {
-  font-size: 13px;
+  font-size: var(--font-size-md);
   color: var(--text);
   font-weight: 500;
 }
@@ -662,7 +634,7 @@
 
 .recipe-empty {
   font-family: 'Poppins', sans-serif;
-  font-size: 13px;
+  font-size: var(--font-size-md);
   color: var(--text-3);
 }
 
@@ -670,18 +642,18 @@
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: var(--space-md);
 }
 
 .recipe-step {
   display: flex;
-  gap: 14px;
+  gap: var(--space-md);
   align-items: flex-start;
 }
 
 .recipe-step-num {
-  width: 28px;
-  height: 28px;
+  width: var(--space-lg);
+  height: var(--space-lg);
   border-radius: var(--radius-full);
   background: var(--bg-4);
   color: var(--bg);
@@ -692,19 +664,19 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  margin-top: 2px;
+  margin-top: var(--space-xs);
 }
 
 .recipe-step-body {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--space-sm);
 }
 
 .recipe-step-desc {
   font-family: 'Poppins', sans-serif;
-  font-size: 13px;
+  font-size: var(--font-size-md);
   color: var(--text);
   line-height: 1.6;
 }
@@ -712,14 +684,14 @@
 .recipe-step-meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: var(--space-sm);
 }
 
 .recipe-step-tag {
   font-family: 'Poppins', sans-serif;
-  font-size: 11px;
+  font-size: var(--font-size-sm);
   font-weight: 500;
-  padding: 3px 10px;
+  padding: var(--space-xs) var(--space-sm);
   border-radius: var(--radius-pill);
 }
 
@@ -733,7 +705,7 @@
 
 .size-table-empty {
   font-family: 'Poppins', sans-serif;
-  font-size: 13px;
+  font-size: var(--font-size-md);
   color: var(--text-3);
 }
 
@@ -747,13 +719,13 @@
   width: 100%;
   border-collapse: collapse;
   font-family: 'Poppins', sans-serif;
-  font-size: 13px;
+  font-size: var(--font-size-md);
 }
 
 .size-table th {
-  padding: 10px 14px;
+  padding: var(--space-sm) var(--space-md);
   text-align: left;
-  font-size: 10px;
+  font-size: var(--font-size-xs);
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -764,7 +736,7 @@
 }
 
 .size-table td {
-  padding: 12px 14px;
+  padding: var(--space-md) var(--space-md);
   border-bottom: 1px solid var(--border);
   color: var(--text-2);
 }
@@ -791,7 +763,7 @@
   font-family: 'Poppins', sans-serif;
   font-size: 12px;
   font-weight: 700;
-  padding: 3px 8px;
+  padding: var(--space-xs) var(--space-sm);
   border-radius: var(--radius-pill);
 }
 .size-table-margin--good { background: var(--products-margin-good-bg);  color: var(--products-margin-good-text); }
@@ -804,36 +776,36 @@
 
 .allergen-full-none {
   font-family: 'Poppins', sans-serif;
-  font-size: 13px;
+  font-size: var(--font-size-md);
   color: var(--text-3);
 }
 
 .allergen-full-title {
   font-family: 'Poppins', sans-serif;
-  font-size: 10px;
+  font-size: var(--font-size-xs);
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--text-3);
-  margin-bottom: 10px;
+  margin-bottom: var(--space-sm);
 }
 .allergen-full-title--absent {
-  margin-top: 20px;
+  margin-top: var(--space-lg);
 }
 
 .allergen-full-present,
 .allergen-full-absent {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: var(--space-sm);
 }
 
 .allergen-badge {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-sm);
   border-radius: var(--radius-sm);
-  padding: 8px 12px;
+  padding: var(--space-sm) var(--space-md);
   font-family: 'Poppins', sans-serif;
 }
 
@@ -867,9 +839,9 @@
 /* ── Note coût ────────────────────────────────────────────────────────────── */
 
 .product-detail-cost-note {
-  margin-top: 16px;
+  margin-top: var(--space-md);
   font-family: 'Poppins', sans-serif;
-  font-size: 11px;
+  font-size: var(--font-size-sm);
   color: var(--text-3);
 }
 
@@ -877,11 +849,11 @@
    PRODUCT FORM MODAL
 ═══════════════════════════════════════════ */
 
-/* .product-form-overlay → Modal align="bottom" (modal-overlay--bottom) */
-/* Surcharge : max-width spécifique (720px) + max-height (96vh) */
+/* .product-form-modal → surcharge .modal : largeur max, hauteur max, overflow caché */
 .product-form-modal {
   max-width: 720px;
   max-height: 96vh;
+  overflow: hidden;
 }
 
 /* ── En-tête ──────────────────────────────────────────────────────────────── */
@@ -890,7 +862,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px 24px;
+  padding: var(--space-lg) 0;
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
 }
@@ -913,18 +885,18 @@
 /* ── Sections ─────────────────────────────────────────────────────────────── */
 
 .pf-section {
-  padding: 24px;
+  padding: var(--space-lg) 0;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: var(--space-md);
 }
 
 .pf-section-title {
   font-family: 'Poppins', sans-serif;
-  font-size: 13px;
+  font-size: var(--font-size-md);
   font-weight: 700;
   color: var(--text);
-  margin-bottom: 2px;
+  margin-bottom: var(--space-xs);
 }
 
 .pf-sep {
@@ -938,14 +910,14 @@
 .pf-field {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--space-sm);
 }
 
 .pf-label { /* extends .field-label */ }
 
 .pf-hint {
   font-family: 'Poppins', sans-serif;
-  font-size: 11px;
+  font-size: var(--font-size-sm);
   color: var(--text-3);
 }
 
@@ -960,7 +932,7 @@
 
 .pf-row {
   display: grid;
-  gap: 12px;
+  gap: var(--space-md);
 }
 .pf-row--2 { grid-template-columns: 1fr 1fr; }
 
@@ -969,17 +941,17 @@
 .pf-toggles-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: var(--space-md);
 }
 
 .pf-toggle {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-sm);
   background: none;
   border: none;
   cursor: pointer;
-  padding: 6px 0;
+  padding: var(--space-sm) 0;
   min-height: 44px;
 }
 
@@ -990,7 +962,7 @@
   background: var(--bg-3);
   display: flex;
   align-items: center;
-  padding: 3px;
+  padding: var(--space-xs);
   flex-shrink: 0;
   transition: background var(--t-base);
 }
@@ -1012,7 +984,7 @@
 
 .pf-toggle-label {
   font-family: 'Poppins', sans-serif;
-  font-size: 13px;
+  font-size: var(--font-size-md);
   font-weight: 500;
   color: var(--text-2);
 }
@@ -1022,14 +994,14 @@
 .pf-size-presets {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: var(--space-sm);
 }
 
 .pf-size-preset {
   height: 44px;
-  padding: 0 14px;
+  padding: 0 var(--space-md);
   border-radius: var(--radius-sm);
-  border: 1.5px dashed var(--color-purple-400);
+  border: 1.5px dashed var(--color-violet-300);
   background: var(--bg);
   color: var(--text-2);
   font-family: 'Poppins', sans-serif;
@@ -1057,27 +1029,27 @@
 .pf-sizes-list {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--space-sm);
   overflow-x: auto;
 }
 
 .pf-size-row {
   display: grid;
   grid-template-columns: 160px 80px 90px 70px 80px 60px 36px;
-  gap: 6px;
+  gap: var(--space-sm);
   align-items: center;
 }
 
 .pf-size-row--header {
   font-family: 'Poppins', sans-serif;
-  font-size: 10px;
+  font-size: var(--font-size-xs);
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--text-3);
-  padding: 0 2px;
+  padding: 0 var(--space-xs);
 }
-.pf-size-row--header span { padding: 0 4px; }
+.pf-size-row--header span { padding: 0 var(--space-xs); }
 
 .pf-size-input { min-height: 40px; font-size: 12px; }
 
@@ -1086,13 +1058,13 @@
 .pf-ingredient-list {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--space-sm);
 }
 
 .pf-ingredient-row {
   display: grid;
   grid-template-columns: 1fr 80px 80px 36px;
-  gap: 6px;
+  gap: var(--space-sm);
   align-items: center;
 }
 
@@ -1111,21 +1083,21 @@
 .pf-step-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--space-md);
 }
 
 .pf-step {
   display: flex;
-  gap: 12px;
+  gap: var(--space-md);
   align-items: flex-start;
   background: var(--bg-2);
   border-radius: var(--radius-sm);
-  padding: 14px;
+  padding: var(--space-md);
 }
 
 .pf-step-num {
-  width: 28px;
-  height: 28px;
+  width: var(--space-lg);
+  height: var(--space-lg);
   border-radius: var(--radius-full);
   background: var(--bg-4);
   color: var(--bg);
@@ -1143,20 +1115,20 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--space-sm);
   min-width: 0;
 }
 
 .pf-step-meta-row {
   display: flex;
-  gap: 8px;
+  gap: var(--space-sm);
   flex-wrap: wrap;
 }
 
 .pf-step-meta-field {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--space-xs);
   min-width: 90px;
 }
 
@@ -1170,7 +1142,7 @@
 .pf-step-controls {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--space-xs);
   flex-shrink: 0;
 }
 
@@ -1181,7 +1153,7 @@
   border: 1px solid var(--border-m);
   background: var(--bg);
   color: var(--text-3);
-  font-size: 10px;
+  font-size: var(--font-size-xs);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -1215,15 +1187,15 @@
 .pf-allergen-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-  gap: 8px;
+  gap: var(--space-sm);
 }
 
 .pf-allergen-btn {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  padding: 10px 8px;
+  gap: var(--space-xs);
+  padding: var(--space-sm);
   min-height: 64px;
   border-radius: var(--radius-sm);
   border: 1.5px solid var(--border);
@@ -1232,11 +1204,11 @@
   transition: border-color var(--t-fast), background var(--t-fast);
 }
 .pf-allergen-btn--active {
-  border-color: var(--color-amber-400);
-  background: var(--color-amber-alpha-sm);
+  border-color: var(--color-orange-300);
+  background: var(--color-orange-100);
 }
 .pf-allergen-btn:active {
-  background: var(--color-amber-alpha-md);
+  background: var(--color-orange-100);
 }
 
 .pf-allergen-emoji {
@@ -1246,7 +1218,7 @@
 
 .pf-allergen-label {
   font-family: 'Poppins', sans-serif;
-  font-size: 10px;
+  font-size: var(--font-size-xs);
   font-weight: 600;
   color: var(--text-2);
   text-align: center;
@@ -1260,18 +1232,18 @@
 
 .pf-pregnancy-selector {
   display: flex;
-  gap: 8px;
+  gap: var(--space-sm);
   flex-wrap: wrap;
 }
 
 .pf-pregnancy-btn {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-sm);
   font-family: 'Poppins', sans-serif;
   font-size: 12px;
   font-weight: 500;
-  padding: 8px 14px;
+  padding: var(--space-sm) var(--space-md);
   min-height: 44px;
   border-radius: var(--radius-sm);
   border: 1.5px solid var(--bg-3);
@@ -1306,8 +1278,8 @@
 .product-detail-pregnancy {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
-  padding: 12px 14px;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-md);
   border-radius: var(--radius-sm);
 }
 .product-detail-pregnancy--yes   { background: var(--products-pregnancy-yes-bg);   }
@@ -1315,7 +1287,7 @@
 .product-detail-pregnancy--no    { background: var(--products-pregnancy-no-bg);    }
 
 .product-detail-pregnancy-icon {
-  font-size: 18px;
+  font-size: var(--font-size-xl);
   flex-shrink: 0;
   line-height: 1.4;
 }
@@ -1323,12 +1295,12 @@
 .product-detail-pregnancy-body {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--space-xs);
 }
 
 .product-detail-pregnancy-label {
   font-family: 'Poppins', sans-serif;
-  font-size: 13px;
+  font-size: var(--font-size-md);
   font-weight: 600;
   line-height: 1.3;
 }
@@ -1349,7 +1321,7 @@
 
 .pf-difficulty {
   display: flex;
-  gap: 8px;
+  gap: var(--space-sm);
   flex-wrap: wrap;
 }
 
@@ -1357,8 +1329,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  padding: 10px 14px;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-md);
   min-height: 56px;
   border-radius: var(--radius-sm);
   border: 1.5px solid var(--border);
@@ -1374,14 +1346,14 @@
 }
 
 .pf-difficulty-stars {
-  font-size: 13px;
-  color: var(--color-amber-400);
+  font-size: var(--font-size-md);
+  color: var(--color-yellow-300);
   letter-spacing: 1px;
 }
 
 .pf-difficulty-label {
   font-family: 'Poppins', sans-serif;
-  font-size: 10px;
+  font-size: var(--font-size-xs);
   font-weight: 600;
   color: var(--text-3);
   white-space: nowrap;
@@ -1395,8 +1367,8 @@
 .product-form-footer {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 16px 24px;
+  gap: var(--space-sm);
+  padding: var(--space-md) 0;
   border-top: 1px solid var(--border);
   flex-shrink: 0;
 }
@@ -1414,10 +1386,10 @@
 .product-form-confirm-del {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-sm);
   flex: 1;
   font-family: 'Poppins', sans-serif;
-  font-size: 13px;
+  font-size: var(--font-size-md);
   font-weight: 500;
   color: var(--color-error-dark);
 }

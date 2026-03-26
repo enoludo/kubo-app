@@ -7,69 +7,6 @@
 :root {
 
   /* ══════════════════════════════════════════════════════════════
-     NIVEAU 1 — PRIMITIFS
-     Les couleurs communes sont désormais dans design-tokens.css
-     On ne garde ici que les primitifs sans équivalent dans la nouvelle palette.
-  ══════════════════════════════════════════════════════════════ */
-
-  /* Violet (accent UI — alpha, pas dans la nouvelle palette de couleurs) */
-  --color-purple-100: rgba(124, 111, 205, 0.12);
-  --color-purple-200: #a095e0;
-  --color-purple-400: rgba(124, 111, 205, 0.4);
-
-  /* Vert — variantes legacy sans équivalent dans la palette principale */
-  --color-green-400: #4CAF50;
-  --color-green-500: #2ECC71;
-  --color-green-700: #2E7D32;
-  --color-green-800: #1e7a4a;
-
-  /* Rouge — variantes legacy */
-  --color-red-500: #E74C3C;
-  --color-red-700: #A52B2B;
-  --color-red-800: #C0392B;
-
-  /* Ambre — variantes legacy */
-  --color-amber-400: #F5A623;
-  --color-amber-500: #F39C12;
-  --color-amber-700: #B06A00;
-  --color-amber-800: #8a6500;
-
-  /* Bleu — foncé (lien, texte) */
-  --color-blue-700: #2d86c7;
-
-  /* Muted — pas d'équivalent exact dans la nouvelle palette */
-  --color-muted: #9999aa;
-
-  /* Alphas error (basés sur --color-danger: #EF7171 = rgb 239,113,113) */
-  --color-red-alpha-xs: rgba(239, 113, 113, 0.08);
-  --color-red-alpha-sm: rgba(239, 113, 113, 0.10);
-  --color-red-alpha-md: rgba(239, 113, 113, 0.18);
-  --color-red-alpha-lg: rgba(239, 113, 113, 0.26);
-
-  /* Alphas warn (basés sur --color-warning: #FFB12F = rgb 255,177,47) */
-  --color-amber-alpha-sm: rgba(255, 177, 47, 0.10);
-  --color-amber-alpha:    rgba(255, 177, 47, 0.12);
-  --color-amber-alpha-md: rgba(255, 177, 47, 0.14);
-  --color-amber-alpha-lg: rgba(255, 177, 47, 0.20);
-  --color-amber-alpha-xl: rgba(255, 177, 47, 0.26);
-
-  /* Alphas success (basés sur --color-success: #76CB7A = rgb 118,203,122) */
-  --color-green-alpha: rgba(118, 203, 122, 0.12);
-
-  /* Radius — héritage (--radius-sm identique, --radius-md/lg à migrer en ÉTAPE 5) */
-  --radius-xs:   0.25rem;
-  --radius-md:   0.75rem;   /* TODO ÉTAPE 5 → 1rem (design-tokens.css) */
-  --radius-lg:   1rem;      /* TODO ÉTAPE 5 → 1.5rem */
-  --radius-pill: 2rem;
-  --radius-full: 50%;
-
-  /* Transitions — alias des nouveaux tokens */
-  --t-fast: var(--transition-fast);
-  --t-base: var(--transition-base);
-  --t-slow: var(--transition-slow);
-
-
-  /* ══════════════════════════════════════════════════════════════
      NIVEAU 2 — SÉMANTIQUES
      Rôle fonctionnel. Utiliser dans les composants.
   ══════════════════════════════════════════════════════════════ */
@@ -97,8 +34,13 @@
   --border-m: rgba(0, 0, 0, 0.11);
 
   /* Ombres */
-  --shadow-s: 0 1px 4px rgba(0, 0, 0, 0.07), 0 2px 8px rgba(0, 0, 0, 0.05);
-  --shadow-m: 0 4px 16px rgba(0, 0, 0, 0.10), 0 1px 4px rgba(0, 0, 0, 0.06);
+  --shadow-s:  0 1px 4px rgba(0, 0, 0, 0.07), 0 2px 8px rgba(0, 0, 0, 0.05);
+  --shadow-m:  0 4px 16px rgba(0, 0, 0, 0.10), 0 1px 4px rgba(0, 0, 0, 0.06);
+  --shadow-up: 0 -2px 12px rgba(0, 0, 0, 0.05);
+
+  /* Overlays semi-transparents pour boutons sur fond sombre */
+  --overlay-ghost:       rgba(255, 255, 255, 0.18);
+  --overlay-ghost-hover: rgba(255, 255, 255, 0.30);
 
   /* Z-index */
   --z-header:   30;
@@ -119,7 +61,6 @@
   --tv-emp-col: 200px;
   --gap:        1rem;
   --gap-small:  0.5rem;
-  --pad-h:      1.5rem;
 
   /* États — error */
   --color-error:        var(--color-danger);
@@ -177,10 +118,10 @@ html, body, #root {
 }
 
 body {
-  background: var(--bg-2);
+  background: var(--color-white);
   color: var(--text);
   font-family: 'Poppins', system-ui, sans-serif;
-  font-size: 13px;
+  font-size: var(--font-size-md);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow: hidden;
@@ -214,21 +155,21 @@ button { font-family: inherit; cursor: pointer; }
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1.5px dashed var(--color-purple-400);
+  border: 1px dashed var(--color-grey-500);
   border-radius: var(--radius-sm);
-  background: var(--bg);
-  color: var(--text-2);
+  background: var(--bg-subtle);
+  color: var(--text-primary);
   cursor: pointer;
   transition: border-color var(--t-fast),
               color var(--t-fast),
               background var(--t-fast);
   font-family: 'Poppins', sans-serif;
-  font-size: 13px;
+  font-size: var(--font-size-md);
   font-weight: 500;
 }
 
 .add-trigger:hover{
-  background: transparent;
+  background: var(--color-grey-200);
 }
 .add-trigger:active {
   border-color: var(--bg-4);
@@ -239,7 +180,7 @@ button { font-family: inherit; cursor: pointer; }
 /* Variante avec texte + icône */
 .add-trigger--labeled {
   gap: 6px;
-  padding: 8px 14px;
+  padding: var(--space-sm) var(--space-lg);
   min-height: 3rem;
 }
 

@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import Modal from '../design-system/components/Modal/Modal'
+import Modal from '../../../design-system/components/Modal/Modal'
+import Button from '../../../design-system/components/Button/Button'
 
 export const PASTEL_COLORS = [
   '#F5A7B8', '#A7C4F5', '#A8D5B5', '#C5B4E8',
@@ -46,8 +47,8 @@ export default function EmployeeModal({ employee, onSave, onCancel, onArchive, o
         <div className="modal-emp-form-title">Archiver {firstName} ?</div>
         <div className="archive-modal-body">Il n'apparaîtra plus dans le planning actif.</div>
         <div className="modal-actions">
-          <button className="btn-secondary modal-cancel" onClick={() => setConfirmMode(null)}>Retour</button>
-          <button className="modal-archive-confirm" onClick={onArchive}>Archiver</button>
+          <Button variant="default" style={{ flex: 1 }} onClick={() => setConfirmMode(null)}>Retour</Button>
+          <Button variant="danger" style={{ flex: 2 }} onClick={onArchive}>Archiver</Button>
         </div>
       </Modal>
     )
@@ -63,8 +64,8 @@ export default function EmployeeModal({ employee, onSave, onCancel, onArchive, o
           Tous ses shifts seront également supprimés. Cette action est irréversible.
         </div>
         <div className="modal-actions">
-          <button className="btn-secondary modal-cancel" onClick={() => setConfirmMode(null)}>Retour</button>
-          <button className="btn-danger modal-delete" onClick={onDelete}>Supprimer définitivement</button>
+          <Button variant="default" style={{ flex: 1 }} onClick={() => setConfirmMode(null)}>Retour</Button>
+          <Button variant="danger" style={{ flex: 2 }} onClick={onDelete}>Supprimer définitivement</Button>
         </div>
       </Modal>
     )
@@ -163,15 +164,15 @@ export default function EmployeeModal({ employee, onSave, onCancel, onArchive, o
 
         {/* Primary actions */}
         <div className="modal-actions">
-          <button className="btn-secondary modal-cancel" onClick={onCancel}>Annuler</button>
-          <button
-            className="btn-primary modal-confirm"
-            style={{ background: color }}
+          <Button variant="default" style={{ flex: 1 }} onClick={onCancel}>Annuler</Button>
+          <Button
+            variant="success"
+            style={{ flex: 2 }}
             onClick={handleSave}
             disabled={!name.trim()}
           >
             {isEdit ? 'Enregistrer' : 'Ajouter'}
-          </button>
+          </Button>
         </div>
 
         {/* Destructive actions — edit mode only */}

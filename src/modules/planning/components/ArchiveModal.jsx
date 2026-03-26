@@ -1,4 +1,5 @@
-import Modal from '../design-system/components/Modal/Modal'
+import Modal from '../../../design-system/components/Modal/Modal'
+import Button from '../../../design-system/components/Button/Button'
 
 export default function ArchiveModal({ employee, mode, onConfirm, onCancel, title: titleProp, body: bodyProp, confirmLabel: confirmLabelProp }) {
   const firstName = employee?.name?.split(' ')[0] ?? ''
@@ -20,11 +21,8 @@ export default function ArchiveModal({ employee, mode, onConfirm, onCancel, titl
       <div className="archive-modal-body">{body}</div>
 
       <div className="modal-actions">
-        <button className="btn-secondary modal-cancel" onClick={onCancel}>Annuler</button>
-        {isDelete || titleProp
-          ? <button className="btn-danger modal-delete" onClick={onConfirm}>{confirmLabel}</button>
-          : <button className="modal-archive-confirm" onClick={onConfirm}>{confirmLabel}</button>
-        }
+        <Button variant="default" style={{ flex: 1 }} onClick={onCancel}>Annuler</Button>
+        <Button variant="danger" style={{ flex: 2 }} onClick={onConfirm}>{confirmLabel}</Button>
       </div>
     </Modal>
   )

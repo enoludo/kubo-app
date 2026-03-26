@@ -1,6 +1,7 @@
 // ─── Modale nouveau brunch (samedi) ───────────────────────────────────────────
 import { useState } from 'react'
 import Modal from '../../design-system/components/Modal/Modal'
+import Button from '../../design-system/components/Button/Button'
 
 const BRUNCH_TIMES = ['10h30', '12h00', '13h30']
 
@@ -101,9 +102,9 @@ export default function BrunchModal({ onSave, onCancel, initialDate }) {
         </div>
 
         {/* Actions */}
-        <div className="modal-actions" style={{ marginTop: 20 }}>
-          <button className="btn-secondary modal-cancel" onClick={onCancel}>Annuler</button>
-          <button className="btn-primary" onClick={handleSave}>Enregistrer</button>
+        <div className="modal-actions" style={{ marginTop: 'var(--space-lg)' }}>
+          <Button variant="default" style={{ flex: 1 }} onClick={onCancel}>Annuler</Button>
+          <Button variant="success" style={{ flex: 2 }} onClick={handleSave}>Enregistrer</Button>
         </div>
 
     </Modal>

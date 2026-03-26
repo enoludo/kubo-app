@@ -40,7 +40,7 @@ function OrderPill({ channel, count }) {
 
 // ── Cellule jour ──────────────────────────────────────────────────────────────
 
-function OrderDayCell({ date, orders, isCurrentMonth, isToday, isPast, onAddOrder, onDayClick, onSaturdayClick }) {
+function OrderDayCell({ date, orders, isCurrentMonth, isToday, isPast, isOutsidePast, isOutsideFuture, onAddOrder, onDayClick, onSaturdayClick }) {
   const byChannel  = {}
   for (const o of orders) byChannel[o.channel] = (byChannel[o.channel] || 0) + 1
   const channels   = CHANNEL_ORDER.filter(c => byChannel[c])
@@ -63,26 +63,34 @@ function OrderDayCell({ date, orders, isCurrentMonth, isToday, isPast, onAddOrde
     <div
       className={[
         'order-day-cell',
-        !isCurrentMonth                              ? 'order-day-cell--outside'    : '',
-        isToday                                      ? 'order-day-cell--today'      : '',
-        hasOrders                                    ? 'order-day-cell--has-orders' : '',
-        isCurrentMonth && !hasOrders                 ? 'order-day-cell--empty'      : '',
-        isCurrentMonth                               ? 'order-day-cell--clickable'  : '',
-        isPast && isCurrentMonth                     ? 'order-day-cell--past'       : '',
+        isOutsidePast                                ? 'order-day-cell--outside-past'   : '',
+        isOutsideFuture                              ? 'order-day-cell--outside-future' : '',
+        !isCurrentMonth                              ? 'order-day-cell--outside'        : '',
+        isToday                                      ? 'order-day-cell--today'          : '',
+        hasOrders                                    ? 'order-day-cell--has-orders'     : '',
+        isCurrentMonth && !hasOrders                 ? 'order-day-cell--empty'          : '',
+        isCurrentMonth                               ? 'order-day-cell--clickable'      : '',
+        isPast && isCurrentMonth                     ? 'order-day-cell--past'           : '',
       ].filter(Boolean).join(' ')}
       onClick={handleClick}
       role={isCurrentMonth ? 'button' : undefined}
       tabIndex={isCurrentMonth ? 0 : undefined}
     >
-      <div className="order-day-num">{date.getDate()}</div>
+      {isToday
+        ? <div className="order-day-today-header">
+            <span className="order-day-today-label">Aujourd'hui</span>
+            <span className="order-day-num">{date.getDate()}</span>
+          </div>
+        : <div className="order-day-num">{date.getDate()}</div>
+      }
 
 <div className="order-day-content">
         {channels.map(c => (
           <OrderPill key={c} channel={c} count={byChannel[c]} />
         ))}
 
-        {/* Bouton + — cellules vides, non passées (samedi → SaturdayChoiceModal) */}
-        {!hasOrders && isCurrentMonth && !isPast && (
+        {/* Bouton + — cellules vides, non passées, pas aujourd'hui */}
+        {!hasOrders && isCurrentMonth && !isPast && !isToday && (
           <button
             className="order-day-add add-trigger add-trigger--icon"
             onClick={e => { e.stopPropagation(); isSaturday ? onSaturdayClick(date) : onAddOrder(date) }}
@@ -99,8 +107,9 @@ function OrderDayCell({ date, orders, isCurrentMonth, isToday, isPast, onAddOrde
 // ── Calendrier principal ──────────────────────────────────────────────────────
 
 export default function OrdersCalendar({ year, month, orders, onAddOrder, onDayClick, onSaturdayClick }) {
-  const weeks    = buildGrid(year, month)
-  const todayStr = dateToStr(new Date())
+  const weeks        = buildGrid(year, month)
+  const todayStr     = dateToStr(new Date())
+  const todayColIdx  = (new Date().getDay() + 6) % 7  // Mon=0 … Sun=6
 
   // Index date → commandes pour lookup O(1)
   const byDate = {}
@@ -114,8 +123,8 @@ export default function OrdersCalendar({ year, month, orders, onAddOrder, onDayC
 
       {/* En-tête jours */}
       <div className="orders-cal-header">
-        {DAYS_FR.map(d => (
-          <div key={d} className="orders-cal-day-name">{d}</div>
+        {DAYS_FR.map((d, i) => (
+          <div key={d} className={`orders-cal-day-name${i === todayColIdx ? ' orders-cal-day-name--today' : ''}`}>{d}</div>
         ))}
       </div>
 
@@ -124,10 +133,12 @@ export default function OrdersCalendar({ year, month, orders, onAddOrder, onDayC
         {weeks.map((week, wi) => (
           <div key={wi} className="orders-cal-week">
             {week.map(date => {
-              const ds             = dateToStr(date)
-              const dayOrders      = byDate[ds] ?? []
-              const isCurrentMonth = date.getMonth() === month
-              const isPast         = ds < todayStr
+              const ds              = dateToStr(date)
+              const dayOrders       = byDate[ds] ?? []
+              const isCurrentMonth  = date.getMonth() === month
+              const isPast          = ds < todayStr
+              const isOutsidePast   = !isCurrentMonth && date.getMonth() !== month && date < new Date(year, month, 1)
+              const isOutsideFuture = !isCurrentMonth && date >= new Date(year, month + 1, 1)
 
               return (
                 <OrderDayCell
@@ -137,6 +148,8 @@ export default function OrdersCalendar({ year, month, orders, onAddOrder, onDayC
                   isCurrentMonth={isCurrentMonth}
                   isToday={ds === todayStr}
                   isPast={isPast}
+                  isOutsidePast={isOutsidePast}
+                  isOutsideFuture={isOutsideFuture}
                   onAddOrder={onAddOrder}
                   onDayClick={onDayClick}
                   onSaturdayClick={onSaturdayClick}

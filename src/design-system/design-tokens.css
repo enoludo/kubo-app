@@ -72,7 +72,7 @@
 
   /* Texte */
   --text-primary:   var(--color-black);
-  --text-secondary: var(--color-text-muted);
+  --text-secondary: var(--color-grey-500);
 
   /* Bordures */
   --border-default: var(--color-grey-300);
@@ -107,15 +107,19 @@
   --space-md: 1rem;     /* 16px */
   --space-lg: 1.5rem;   /* 24px */
   --space-xl: 2rem;     /* 32px */
+  --space-2xl: 3rem;    /* 48px */
 
 
   /* ──────────────────────────────────────────────────────────────
      RADIUS
      ────────────────────────────────────────────────────────────── */
 
+  --radius-xs:   0.25rem;  /* 4px  — micro éléments */
   --radius-sm:   0.5rem;   /* 8px  — cards */
   --radius-md:   1rem;     /* 16px — modals */
   --radius-lg:   1.5rem;   /* 24px */
+  --radius-xl:   3rem;
+  --radius-pill: 2rem;
   --radius-full: 9999px;   /* badges, pills */
 
 
@@ -134,6 +138,11 @@
   --transition-fast: 0.12s ease;
   --transition-base: 0.15s ease;
   --transition-slow: 0.30s ease;
+
+  /* Alias courts — compatibilité composants */
+  --t-fast: var(--transition-fast);
+  --t-base: var(--transition-base);
+  --t-slow: var(--transition-slow);
 
 
   /* ──────────────────────────────────────────────────────────────

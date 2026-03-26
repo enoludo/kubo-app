@@ -94,6 +94,11 @@ export default function OrdersApp({ ordersCtx, productsCtx, showToast }) {
     })
   }
 
+  function handleOpenBrunch(date) {
+    setDayModal(null)
+    setBrunchModal({ date: dateToStr(date) })
+  }
+
   function handleOpenDetail(order) {
     setDayModal(null)
     setDetailOrder(order)
@@ -110,23 +115,23 @@ export default function OrdersApp({ ordersCtx, productsCtx, showToast }) {
     if (data.id) {
       ordersCtx.updateOrder(data.id, data)
       setEditOrder(null)
-      showToast?.('Commande modifiée ✓', '#66DA9B')
+      showToast?.('Commande modifiée ✓', 'var(--color-success)')
     } else {
       ordersCtx.addOrder(data)
       setNewOrderModal(null)
-      showToast?.('Commande ajoutée ✓', '#66DA9B')
+      showToast?.('Commande ajoutée ✓', 'var(--color-success)')
     }
   }
 
   function handleSaveBrunch(data) {
     ordersCtx.addOrder(data)
     setBrunchModal(null)
-    showToast?.('Brunch ajouté ✓', '#FFD866')
+    showToast?.('Brunch ajouté ✓', 'var(--color-yellow-300)')
   }
 
   function handleDelete(id) {
     ordersCtx.deleteOrder(id)
-    showToast?.('Commande supprimée', '#FF9594')
+    showToast?.('Commande supprimée', 'var(--color-danger)')
   }
 
   return (
@@ -163,6 +168,7 @@ export default function OrdersApp({ ordersCtx, productsCtx, showToast }) {
           date={dayModal.date}
           orders={dayModalOrders}
           onNewOrder={handleOpenNewOrder}
+          onNewBrunch={handleOpenBrunch}
           onEdit={handleEditOrder}
           onDelete={handleDelete}
           onOpenDetail={handleOpenDetail}

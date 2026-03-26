@@ -1,4 +1,4 @@
-import { MailIcon } from './Icons'
+import { MailIcon } from '../../../components/Icons'
 
 function fmtDur(h) {
   const totalMin = Math.round(Math.abs(h) * 60)
@@ -15,23 +15,22 @@ export default function EmployeeCard({ employee, weekHours, weekBalance, onClick
   let balanceText, balanceColor
   if (weekBalance === 0) {
     balanceText  = '✓ Semaine équilibrée'
-    balanceColor = '#4CAF50'
+    balanceColor = 'var(--color-success)'
   } else if (weekBalance > 0) {
     balanceText  = `+${fmtDur(weekBalance)} en trop cette semaine`
-    balanceColor = '#E05555'
+    balanceColor = 'var(--color-danger)'
   } else {
     balanceText  = `−${fmtDur(Math.abs(weekBalance))} pour être à jour`
-    balanceColor = '#F5A623'
+    balanceColor = 'var(--color-warning)'
   }
 
   return (
     <div
       className={`employee-card${employee.archived ? ' archived' : ''}`}
-      style={{ '--emp-color': employee.color }}
       onClick={onClick}
     >
       <div className="emp-profile">
-        <div className="emp-avatar" style={{ background: employee.color, color: '#333344' }}>
+        <div className="emp-avatar">
           {employee.initials}
         </div>
         <div className="emp-identity">

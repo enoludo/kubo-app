@@ -14,7 +14,7 @@ export default function Footer({ team, schedule, weekDates }) {
 
         return (
           <div key={emp.id} className="footer-emp">
-            <div className="footer-avatar" style={{ background: emp.color, color: '#333344' }}>
+            <div className="footer-avatar">
               {emp.initials}
             </div>
             <div className="footer-bar-area">
@@ -24,7 +24,7 @@ export default function Footer({ team, schedule, weekDates }) {
                   className="footer-fill"
                   style={{
                     width: `${pct}%`,
-                    background: over ? '#E05555' : emp.color,
+                    background: over ? 'var(--color-danger)' : 'var(--color-success)',
                   }}
                 />
               </div>

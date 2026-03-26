@@ -14,13 +14,13 @@ import { useState, useEffect, useRef } from 'react'
 import {
   loadGIS, initTokenClient, requestToken, requestTokenSilent,
   refreshTokenSilent, isTokenExpiringSoon, revokeToken,
-} from '../services/googleAuth'
+} from '../../../services/googleAuth'
 import {
   weekSheetName, mondayOf, weekDatesFromMonday, shiftsSig,
-} from '../services/googleSheets'
-import { dateToStr } from '../utils/date'
-import { getDataService, setDataService, clearDataService } from '../services/DataService'
-import { GoogleSheetsAdapter } from '../services/adapters/GoogleSheetsAdapter'
+} from '../../../services/googleSheets'
+import { dateToStr } from '../../../utils/date'
+import { getDataService, setDataService, clearDataService } from '../../../services/DataService'
+import { GoogleSheetsAdapter } from '../../../services/adapters/GoogleSheetsAdapter'
 
 const DEBOUNCE_MS          = 1_000
 const TOKEN_CHECK_MS       = 45 * 60 * 1_000  // vérification proactive toutes les 45min

@@ -10,32 +10,51 @@
 
   --planning-shift-work-color:   var(--color-blue-300);
   --planning-shift-leave-color:  var(--color-violet-300);
-  --planning-shift-sick-color:   var(--color-red-400);
+  --planning-shift-sick-color:   var(--color-red-300);
   --planning-shift-school-color: var(--color-yellow-300);
   --planning-shift-rest-color:   var(--color-green-300);
   --planning-shift-absent-color: var(--color-orange-300);
 
-  /* ── Shift types — fond de carte ────────────────────────────────────────── */
+  /* ── Shift types — fond de carte (non validé) ──────────────────────────── */
 
   --planning-shift-work-bg:   var(--color-blue-100);
   --planning-shift-leave-bg:  var(--color-violet-100);
-  --planning-shift-sick-bg:   var(--color-red-100);
+  --planning-shift-sick-bg:   var(--color-red-200);
   --planning-shift-school-bg: var(--color-yellow-100);
   --planning-shift-rest-bg:   var(--color-green-100);
   --planning-shift-absent-bg: var(--color-orange-100);
+
+  /* ── Shift types — fond du badge statut ────────────────────────────────── */
+
+  --planning-shift-work-badge-bg:   var(--color-blue-100);
+  --planning-shift-leave-badge-bg:  var(--color-violet-100);
+  --planning-shift-sick-badge-bg:   var(--color-red-200);
+  --planning-shift-school-badge-bg: var(--color-yellow-100);
+  --planning-shift-rest-badge-bg:   var(--color-green-100);
+  --planning-shift-absent-badge-bg: var(--color-orange-100);
+
+  /* ── Shift types — fond de carte (validé) ───────────────────────────────── */
+
+  --planning-shift-work-bg-validated:   var(--color-blue-200);
+  --planning-shift-leave-bg-validated:  var(--color-violet-200);
+  --planning-shift-sick-bg-validated:   var(--color-red-300);
+  --planning-shift-school-bg-validated: var(--color-yellow-200);
+  --planning-shift-rest-bg-validated:   var(--color-green-200);
+  --planning-shift-absent-bg-validated: var(--color-orange-200);
 
   /* ── Shift types — texte (sur fond clair) ───────────────────────────────── */
 
   --planning-shift-work-text:   var(--text);
   --planning-shift-leave-text:  var(--text);
-  --planning-shift-sick-text:   var(--color-red-800);
-  --planning-shift-school-text: var(--color-amber-500);
-  --planning-shift-rest-text:   var(--color-success-dark);
-  --planning-shift-absent-text: var(--color-amber-800);
+  --planning-shift-sick-text:   var(--text-primary);
+  --planning-shift-school-text: var(--text-primary);
+  --planning-shift-rest-text:   var(--text-primary);
+  --planning-shift-absent-text: var(--text-primary);
 
   /* ── Statut validé ──────────────────────────────────────────────────────── */
 
   --planning-shift-validated-color: var(--color-success);
+  --planning-shift-validated-color-bg: var(--color-success-bg);
 
   /* ── Jours fériés ───────────────────────────────────────────────────────── */
 

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { dateToStr, WEEKLY_CONTRACT } from '../hooks/useSchedule'
-import { PdfIcon, MailIcon } from './Icons'
+import { PdfIcon, MailIcon } from '../../../components/Icons'
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -123,12 +123,11 @@ export default function WeekPickerPanel({
         <div className="week-picker-header">
           <span className="week-picker-title">Choisir une semaine</span>
           <button
-            className="week-picker-today-btn"
+            className="btn--default"
             onClick={() => { onSelect(0); onClose() }}
           >
             Semaine en cours
           </button>
-          <button className="week-picker-close" onClick={onClose}>×</button>
         </div>
 
         {/* Weeks grid */}

@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { buildIndividualMailto } from '../utils/emailPlanning'
-import { dateToStr, fmtTime, mondayOf } from '../utils/date'
-import { MailIcon, CopyIcon } from './Icons'
-import Modal from '../design-system/components/Modal/Modal'
+import { dateToStr, fmtTime, mondayOf } from '../../../utils/date'
+import { MailIcon, CopyIcon } from '../../../components/Icons'
+import Modal from '../../../design-system/components/Modal/Modal'
+import Button from '../../../design-system/components/Button/Button'
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -81,16 +82,16 @@ export default function EmployeeProfileModal({
 
   // Solde cumulé
   const cumulBalance = schedule.getBalance(employee.id, contract, startBalance)
-  let cumulText, cumulColor
+  let cumulText, cumulStyle
   if (Math.abs(cumulBalance) < 0.05) {
     cumulText  = '✓ Solde cumulé équilibré'
-    cumulColor = '#4CAF50'
+    cumulStyle = { color: 'var(--color-success)', background: 'var(--color-success-bg)' }
   } else if (cumulBalance > 0) {
     cumulText  = `+${fmtDur(cumulBalance)} en avance (cumulé)`
-    cumulColor = '#E05555'
+    cumulStyle = { color: 'var(--color-danger)',  background: 'var(--color-danger-bg)' }
   } else {
     cumulText  = `−${fmtDur(Math.abs(cumulBalance))} à rattraper (cumulé)`
-    cumulColor = '#F5A623'
+    cumulStyle = { color: 'var(--color-warning)', background: 'var(--color-warning-bg)' }
   }
 
   // ── Données pour le panel Email ──────────────────────────────────────────────
@@ -154,7 +155,7 @@ export default function EmployeeProfileModal({
 
         {/* Header */}
         <div className="emp-profile-modal-header">
-          <div className="modal-avatar" style={{ background: employee.color, flexShrink: 0 }}>
+          <div className="modal-avatar" style={{ flexShrink: 0 }}>
             {employee.initials}
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
@@ -174,17 +175,17 @@ export default function EmployeeProfileModal({
         <div className="emp-profile-progress">
           <div className="emp-profile-progress-header">
             <span className="emp-profile-info-label">Semaine en cours</span>
-            <span style={{ fontWeight: 600, fontSize: 13 }}>
-              {fmtDur(wb.weekHours)}<span style={{ fontWeight: 400, fontSize: 11, color: '#9999aa', marginLeft: 2 }}>/{contract}h</span>
+            <span style={{ fontWeight: 600, fontSize: 'var(--font-size-md)' }}>
+              {fmtDur(wb.weekHours)}<span style={{ fontWeight: 400, fontSize: 'var(--font-size-sm)', color: 'var(--color-muted)', marginLeft: 2 }}>/{contract}h</span>
             </span>
           </div>
           <div className="emp-bar-track" style={{ height: 5, marginTop: 6 }}>
-            <div className="emp-bar-fill" style={{ width: `${weekPct}%`, background: weekOver ? '#E05555' : employee.color }} />
+            <div className="emp-bar-fill" style={{ width: `${weekPct}%`, background: weekOver ? 'var(--color-danger)' : 'var(--color-success)' }} />
           </div>
         </div>
 
         {/* Solde cumulé */}
-        <div className="emp-profile-cumul" style={{ color: cumulColor, background: cumulColor + '1a' }}>
+        <div className="emp-profile-cumul" style={cumulStyle}>
           {cumulText}
         </div>
 
@@ -194,7 +195,7 @@ export default function EmployeeProfileModal({
             <div className="modal-field-full">
               <label>Semaine à envoyer</label>
               {emailWeekKeys.length === 0 ? (
-                <div style={{ fontSize: 12, color: '#9999aa', padding: '6px 0' }}>Aucun shift enregistré</div>
+                <div style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-muted)', padding: '6px 0' }}>Aucun shift enregistré</div>
               ) : (
                 <select value={emailWeek} onChange={e => setEmailWeek(e.target.value)}>
                   {emailWeekKeys.map(wk => (
@@ -270,30 +271,30 @@ export default function EmployeeProfileModal({
         )}
 
         {/* ── Actions ── */}
-        <div className="modal-actions emp-profile-actions" style={{ marginTop: 20 }}>
+        <div className="modal-actions emp-profile-actions" style={{ marginTop: 'var(--space-lg)' }}>
 
           {activePanel === 'email' ? (
             <>
-              <button className="btn-secondary modal-cancel" onClick={() => setActivePanel(null)}>Annuler</button>
-              <button className="btn-primary modal-confirm" style={{ background: employee.color }} onClick={handleSend}>
+              <Button variant="default" style={{ flex: 1 }} onClick={() => setActivePanel(null)}>Annuler</Button>
+              <Button variant="success" style={{ flex: 2 }} onClick={handleSend}>
                 Envoyer ✉
-              </button>
+              </Button>
             </>
           ) : activePanel === 'copy' ? (
             <>
-              <button className="btn-secondary modal-cancel" onClick={() => setActivePanel(null)}>Annuler</button>
-              <button
-                className="btn-primary modal-confirm"
-                style={{ background: employee.color, opacity: previewShifts.length === 0 ? 0.4 : 1 }}
+              <Button variant="default" style={{ flex: 1 }} onClick={() => setActivePanel(null)}>Annuler</Button>
+              <Button
+                variant="success"
+                style={{ flex: 2 }}
                 disabled={previewShifts.length === 0}
                 onClick={handleConfirmCopy}
               >
                 <CopyIcon size={13} />
                 Confirmer la copie
-              </button>
+              </Button>
             </>
           ) : activePanel === 'paste' ? (
-            <button className="btn-secondary modal-cancel" style={{ flex: 1 }} onClick={() => setActivePanel(null)}>Annuler</button>
+            <Button variant="default" style={{ flex: 1 }} onClick={() => setActivePanel(null)}>Annuler</Button>
           ) : (
             <>
               {canPaste && (
@@ -305,14 +306,14 @@ export default function EmployeeProfileModal({
                 <CopyIcon size={13} />
                 Copier
               </button>
-              <button
-                className="btn-primary modal-confirm"
-                style={{background: employee.color,  opacity: employee.email ? 1 : 0.8,  flex: canPaste ? undefined : 1 }}
+              <Button
+                variant="success"
+                style={{ opacity: employee.email ? 1 : 0.8, flex: canPaste ? undefined : 1 }}
                 onClick={employee.email ? () => setActivePanel('email') : onEdit}
               >
                 <MailIcon size={13} style={{ marginRight: 6 }} />
                 {employee.email ? 'Envoyer' : "Ajouter un email"}
-              </button>
+              </Button>
             </>
           )}
         </div>

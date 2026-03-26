@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { ALLERGENS_EU } from './AllergenBadges'
 import Modal from '../../design-system/components/Modal/Modal'
+import Button from '../../design-system/components/Button/Button'
 
 // ── Constantes ────────────────────────────────────────────────────────────────
 
@@ -653,13 +654,12 @@ export default function ProductForm({ product, onSave, onClose, onDelete }) {
   const canSave = data.name.trim().length > 0
 
   const modal = (
-    <Modal onClose={onClose} align="bottom" className="product-form-modal">
+    <Modal onClose={onClose} className="product-form-modal">
         {/* En-tête */}
         <div className="product-form-header">
           <h2 className="product-form-title">
             {isEdit ? `Modifier — ${product.name}` : 'Nouveau produit'}
           </h2>
-          <button className="product-detail-close" onClick={onClose} aria-label="Fermer">✕</button>
         </div>
 
         {/* Corps scrollable */}
@@ -682,34 +682,30 @@ export default function ProductForm({ product, onSave, onClose, onDelete }) {
         {/* Pied */}
         <div className="product-form-footer">
           {isEdit && !product.webflowProductId && !confirmDel && (
-            <button
-              type="button"
-              className="btn-danger product-form-delete"
-              onClick={() => setConfirmDel(true)}
-            >
+            <Button variant="danger" className="product-form-delete" onClick={() => setConfirmDel(true)}>
               Supprimer
-            </button>
+            </Button>
           )}
           {isEdit && !product.webflowProductId && confirmDel && (
             <div className="product-form-confirm-del">
               <span>Supprimer définitivement ?</span>
-              <button type="button" className="btn-secondary" onClick={() => setConfirmDel(false)}>Annuler</button>
-              <button type="button" className="btn-danger" onClick={() => onDelete(product.id)}>Confirmer</button>
+              <Button variant="default" onClick={() => setConfirmDel(false)}>Annuler</Button>
+              <Button variant="danger" onClick={() => onDelete(product.id)}>Confirmer</Button>
             </div>
           )}
           {!confirmDel && (
             <>
-              <button type="button" className="btn-secondary product-form-cancel" onClick={onClose}>
+              <Button variant="default" className="product-form-cancel" onClick={onClose}>
                 Annuler
-              </button>
-              <button
-                type="button"
-                className="btn-primary product-form-save"
+              </Button>
+              <Button
+                variant="success"
+                className="product-form-save"
                 onClick={handleSave}
                 disabled={!canSave}
               >
                 {isEdit ? 'Enregistrer les modifications' : 'Créer le produit'}
-              </button>
+              </Button>
             </>
           )}
         </div>

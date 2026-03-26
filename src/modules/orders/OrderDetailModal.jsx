@@ -1,6 +1,7 @@
 // ─── Modale détail commande ────────────────────────────────────────────────────
 import { useState } from 'react'
 import Modal from '../../design-system/components/Modal/Modal'
+import Button from '../../design-system/components/Button/Button'
 
 const CHANNEL_LABEL = { web: 'Site web', boutique: 'Boutique', brunch: 'Brunch' }
 
@@ -31,10 +32,10 @@ export default function OrderDetailModal({ order, getProduct, onDelete, onClose 
           La commande de <strong>{order.customer.name}</strong> sera définitivement supprimée.
         </div>
         <div className="modal-actions">
-          <button className="btn-secondary modal-cancel" onClick={() => setConfirmDelete(false)}>Retour</button>
-          <button className="btn-danger modal-delete" onClick={() => { onDelete(order.id); onClose() }}>
+          <Button variant="default" style={{ flex: 1 }} onClick={() => setConfirmDelete(false)}>Retour</Button>
+          <Button variant="danger" style={{ flex: 2 }} onClick={() => { onDelete(order.id); onClose() }}>
             Supprimer
-          </button>
+          </Button>
         </div>
       </Modal>
     )
@@ -51,7 +52,6 @@ export default function OrderDetailModal({ order, getProduct, onDelete, onClose 
               <span className="order-pill-text">{CHANNEL_LABEL[order.channel]}</span>
             </span>
           </div>
-          <button className="order-detail-close" onClick={onClose} aria-label="Fermer">✕</button>
         </div>
 
         {/* ── Client ── */}

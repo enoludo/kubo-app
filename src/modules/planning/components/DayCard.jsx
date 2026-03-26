@@ -1,5 +1,4 @@
-import { fmtTime } from '../utils/date'
-import { getTypeColor } from '../utils/theme'
+import { fmtTime } from '../../../utils/date'
 
 function fmtDur(h) {
   const m  = Math.round(h * 60)
@@ -13,13 +12,6 @@ function fmtPause(v) {
   if (v < 1) return `${v * 60}min`
   if (v === 1) return '1h'
   return `1h${(v - 1) * 60}min`
-}
-
-function hexToRgba(hex, alpha) {
-  const r = parseInt(hex.slice(1, 3), 16)
-  const g = parseInt(hex.slice(3, 5), 16)
-  const b = parseInt(hex.slice(5, 7), 16)
-  return `rgba(${r},${g},${b},${alpha})`
 }
 
 function effectiveH(s) {
@@ -36,20 +28,22 @@ const STATUS = {
   absent: { label: 'Absent'    },
 }
 
-function typeBg(type, validated) {
-  const base = getTypeColor(type)
-  return base + (validated ? '1A' : '40')
-}
-
-export default function DayCard({ employee, shifts, onAdd, onEdit, onToggleValidated, defaultType }) {
+export default function DayCard({ shifts, onAdd, onEdit, onToggleValidated, defaultType }) {
   const mainShift = shifts.length > 0 ? shifts[0] : null
 
   if (!mainShift) {
     if (defaultType) {
       const st = STATUS[defaultType] || STATUS.work
       return (
-        <div className="day-card" style={{ background: typeBg(defaultType, false), '--card-border': getTypeColor(defaultType) + '99' }} onClick={onAdd}>
-          <span className="day-card-badge" style={{ background: getTypeColor(defaultType) + '44', color: '#333' }}>
+        <div
+          className="day-card"
+          style={{
+            background: `var(--planning-shift-${defaultType}-bg)`,
+            '--card-border': `var(--planning-shift-${defaultType}-color)`,
+          }}
+          onClick={onAdd}
+        >
+          <span className="day-card-badge" style={{ background: `var(--planning-shift-${defaultType}-badge-bg)`, color: 'var(--text)' }}>
             {st.label}
           </span>
           <div className="day-card-label">Journée entière</div>
@@ -57,7 +51,7 @@ export default function DayCard({ employee, shifts, onAdd, onEdit, onToggleValid
       )
     }
     return (
-      <div className="day-card day-card--empty add-trigger add-trigger--icon" style={{ '--card-border': '#7c6fcd99' }} onClick={onAdd}>
+      <div className="day-card day-card--empty add-trigger add-trigger--icon" style={{ '--card-border': 'var(--color-purple-400)' }} onClick={onAdd}>
         +
       </div>
     )
@@ -74,13 +68,16 @@ export default function DayCard({ employee, shifts, onAdd, onEdit, onToggleValid
   return (
     <div
       className={`day-card${isValidated ? ' day-card--validated' : ''}`}
-      style={{ background: typeBg(type, isValidated), '--card-border': getTypeColor(type) + '99' }}
+      style={{
+        background: isValidated ? `var(--planning-shift-${type}-bg-validated)` : `var(--planning-shift-${type}-bg)`,
+        '--card-border': `var(--planning-shift-${type}-color)`,
+      }}
       onClick={() => onEdit(mainShift.id)}
     >
       {/* Badge statut */}
       <span
         className="day-card-badge"
-        style={{ background: getTypeColor(type) + '44', color: '#333' }}
+        style={{ background: `var(--planning-shift-${type}-badge-bg)`, color: 'var(--text)' }}
       >
         {st.label}
       </span>

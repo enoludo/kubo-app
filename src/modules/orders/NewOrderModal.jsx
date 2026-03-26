@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { dateToStr } from '../../utils/date'
 import { useProducts } from '../../hooks/useProducts'
 import Modal from '../../design-system/components/Modal/Modal'
+import Button from '../../design-system/components/Button/Button'
 
 const PICKUP_SLOTS = (() => {
   const slots = []
@@ -402,15 +403,11 @@ export default function NewOrderModal({ onSave, onCancel, initialDate, initialCh
         </div>
 
         {/* Actions */}
-        <div className="modal-actions" style={{ marginTop: 20 }}>
-          <button className="btn-secondary modal-cancel" onClick={onCancel}>Annuler</button>
-          <button
-            className="btn-primary"
-            style={{ background: 'var(--planning-shift-rest-color)', color: 'var(--text)' }}
-            onClick={handleSave}
-          >
+        <div className="modal-actions" style={{ marginTop: 'var(--space-lg)' }}>
+          <Button variant="default" style={{ flex: 1 }} onClick={onCancel}>Annuler</Button>
+          <Button variant="success" style={{ flex: 2 }} onClick={handleSave}>
             {isEdit ? 'Enregistrer les modifications' : 'Enregistrer'}
-          </button>
+          </Button>
         </div>
 
     </Modal>

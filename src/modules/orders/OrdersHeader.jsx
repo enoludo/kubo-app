@@ -38,11 +38,13 @@ export default function OrdersHeader({
 
         {/* Gauche : badge commandes à venir */}
         <div className="header-nav-left">
-          {upcomingCount > 0 && (
+          {upcomingCount > 0 ? (
             <span className="orders-upcoming-badge">
               <span className="orders-upcoming-badge-count">{upcomingCount}</span>
               <span>commande{upcomingCount > 1 ? 's' : ''} à venir</span>
             </span>
+          ) : (
+            <span className="orders-upcoming-empty">Aucune commande à venir</span>
           )}
         </div>
 

@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect } from 'react'
-import { sessionSave, sessionLoad } from '../utils/session'
-import { dateToStr, mondayOf } from '../utils/date'
+import { sessionSave, sessionLoad } from '../../../utils/session'
+import { dateToStr, mondayOf } from '../../../utils/date'
 
-export { dateToStr, fmtH } from '../utils/date'
+export { dateToStr, fmtH } from '../../../utils/date'
 
 // Convention collective : max heures/jour
 export const MAX_HOURS_PER_DAY = 10
