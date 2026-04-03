@@ -58,8 +58,8 @@
 
   /* ── Jours fériés ───────────────────────────────────────────────────────── */
 
-  --planning-holiday-bg:   #FFF8E7;
-  --planning-holiday-cell: #FFFCF2;
-  --planning-holiday-text: #B8860B;
+  --planning-holiday-bg:   transparent;
+  --planning-holiday-cell: transparent;
+  --planning-holiday-text: var(--color-danger);
 
 }

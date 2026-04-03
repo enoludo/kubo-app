@@ -2,11 +2,6 @@ import { useState } from 'react'
 import Modal from '../../../design-system/components/Modal/Modal'
 import Button from '../../../design-system/components/Button/Button'
 
-export const PASTEL_COLORS = [
-  '#F5A7B8', '#A7C4F5', '#A8D5B5', '#C5B4E8',
-  '#F5CFA7', '#F5E6A7', '#A7E8E8', '#F5B8A7',
-]
-
 export function makeInitials(name) {
   return name.trim().split(/\s+/).map(w => w[0]?.toUpperCase() ?? '').join('').slice(0, 2) || '?'
 }
@@ -18,7 +13,6 @@ export default function EmployeeModal({ employee, onSave, onCancel, onArchive, o
   const [role,               setRole]               = useState(employee?.role     ?? '')
   const [email,              setEmail]              = useState(employee?.email    ?? '')
   const [contract,           setContract]           = useState(employee?.contract ?? 35)
-  const [color,              setColor]              = useState(employee?.color    ?? PASTEL_COLORS[0])
   const [balanceSign,        setBalanceSign]        = useState((employee?.startBalance ?? 0) >= 0 ? '+' : '-')
   const [balanceHours,       setBalanceHours]       = useState(Math.abs(employee?.startBalance ?? 0))
   const [confirmMode,        setConfirmMode]        = useState(null) // null | 'archive' | 'delete'
@@ -33,7 +27,6 @@ export default function EmployeeModal({ employee, onSave, onCancel, onArchive, o
       role:         role.trim(),
       email:        email.trim(),
       contract:     Math.max(1, Math.min(60, contract || 35)),
-      color,
       initials,
       startBalance,
     })
@@ -139,21 +132,9 @@ export default function EmployeeModal({ employee, onSave, onCancel, onArchive, o
           </div>
         </div>
 
-        <div className="modal-color-label">Couleur</div>
-        <div className="modal-color-grid">
-          {PASTEL_COLORS.map(c => (
-            <button
-              key={c}
-              className={`color-swatch${color === c ? ' selected' : ''}`}
-              style={{ background: c }}
-              onClick={() => setColor(c)}
-            />
-          ))}
-        </div>
-
         {/* Aperçu */}
         <div className="modal-emp-preview">
-          <div className="modal-avatar" style={{ background: color, flexShrink: 0 }}>
+          <div className="modal-avatar" style={{ flexShrink: 0 }}>
             {initials}
           </div>
           <div>

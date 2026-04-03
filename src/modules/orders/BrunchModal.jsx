@@ -1,7 +1,8 @@
 // ─── Modale nouveau brunch (samedi) ───────────────────────────────────────────
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Modal from '../../design-system/components/Modal/Modal'
 import Button from '../../design-system/components/Button/Button'
+import { fetchBrunchPrices } from '../../services/webflowAdapter'
 
 const BRUNCH_TIMES = ['10h30', '12h00', '13h30']
 
@@ -12,13 +13,25 @@ function fmtDateLabel(dateStr) {
   return s.charAt(0).toUpperCase() + s.slice(1)
 }
 
+function fmtPrice(p) {
+  return p.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })
+}
+
 export default function BrunchModal({ onSave, onCancel, initialDate }) {
-  const [name,      setName]      = useState('')
-  const [phone,     setPhone]     = useState('')
-  const [nbPersons, setNbPersons] = useState(2)
-  const [time,      setTime]      = useState('10h30')
-  const [paid,      setPaid]      = useState(false)
-  const [submitted, setSubmitted] = useState(false)
+  const [name,        setName]        = useState('')
+  const [phone,       setPhone]       = useState('')
+  const [nbPersons,   setNbPersons]   = useState(2)
+  const [time,        setTime]        = useState('10h30')
+  const [paid,        setPaid]        = useState(false)
+  const [submitted,   setSubmitted]   = useState(false)
+  const [brunchPrices, setBrunchPrices] = useState({})
+
+  useEffect(() => {
+    fetchBrunchPrices().then(setBrunchPrices).catch(() => {})
+  }, [])
+
+  const unitPrice  = brunchPrices[time] ?? null
+  const totalPrice = unitPrice != null ? unitPrice * Math.max(1, nbPersons) : 0
 
   const nameInvalid = submitted && !name.trim()
 
@@ -29,8 +42,8 @@ export default function BrunchModal({ onSave, onCancel, initialDate }) {
     onSave({
       channel:     'brunch',
       customer:    { name: name.trim(), phone: phone.trim() || null },
-      items:       [{ label: 'Brunch', size: null, qty: Math.max(1, nbPersons), unitPrice: null }],
-      totalPrice:  0,
+      items:       [{ label: 'Brunch', size: null, qty: Math.max(1, nbPersons), unitPrice }],
+      totalPrice,
       pickupDate:  initialDate,
       pickupTime:  time,
       paid,
@@ -88,6 +101,14 @@ export default function BrunchModal({ onSave, onCancel, initialDate }) {
               </select>
             </div>
           </div>
+
+          {/* Prix */}
+          {unitPrice != null && (
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 'var(--space-sm) var(--space-md)', background: 'var(--bg-subtle)', borderRadius: 'var(--radius-sm)', fontSize: 'var(--font-size-md)' }}>
+              <span style={{ color: 'var(--text-secondary)' }}>{fmtPrice(unitPrice)} / pers</span>
+              <span style={{ fontWeight: 'var(--font-weight-semibold)' }}>Total : {fmtPrice(totalPrice)}</span>
+            </div>
+          )}
 
           {/* Payé */}
           <label className="nom-checkbox-label">

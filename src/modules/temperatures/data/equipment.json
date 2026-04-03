@@ -1,0 +1,46 @@
+[
+  {
+    "id": "eq-joel",
+    "name": "Joël",
+    "type": "negatif",
+    "minTemp": -25,
+    "maxTemp": -15,
+    "colorIndex": 0,
+    "order": 1,
+    "active": true,
+    "createdAt": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "eq-bernard",
+    "name": "Bernard",
+    "type": "positif",
+    "minTemp": 0,
+    "maxTemp": 5,
+    "colorIndex": 1,
+    "order": 2,
+    "active": true,
+    "createdAt": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "eq-gustave",
+    "name": "Gustave",
+    "type": "positif",
+    "minTemp": 0,
+    "maxTemp": 5,
+    "colorIndex": 3,
+    "order": 3,
+    "active": true,
+    "createdAt": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "eq-yvette",
+    "name": "Yvette",
+    "type": "positif",
+    "minTemp": 3,
+    "maxTemp": 8,
+    "colorIndex": 4,
+    "order": 4,
+    "active": true,
+    "createdAt": "2026-01-01T00:00:00.000Z"
+  }
+]

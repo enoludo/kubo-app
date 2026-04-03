@@ -553,72 +553,7 @@
   overflow-x: visible;
 }
 
-/* Employee card */
-.employee-card {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-md);
-  padding: var(--space-md);
-  border-radius: var(--radius-sm);
-  background: var(--color-grey-100);
-  border: 1px solid transparent;
-  cursor: pointer;
-  transition: border-color var(--t-base);
-  user-select: none;
-}
-.employee-card:hover {
-  border-color: var(--color-grey-400);
-}
-.employee-card:active { cursor: default; }
-
-.emp-avatar {
-  width: var(--space-lg);
-  height: var(--space-lg);
-  border-radius: var(--radius-full);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'Poppins', sans-serif;
-  font-size: 9px;
-  font-weight: 700;
-  flex-shrink: 0;
-  letter-spacing: 0.02em;
-  background: var(--color-grey-400);
-  color: var(--color-white);
-}
-
-.emp-profile {
-  display: flex;
-  flex-direction: row;
-  align-items: top;
-  gap: var(--space-sm);
-}
-
-.emp-identity {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-}
-
-.emp-stats {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xs);
-  width: 100%;
-}
-
-.emp-hours-row {
-  display: flex;
-  align-items: center;
-}
-
-.emp-name-row {
-  display: flex;
-  align-items: center;
-  gap: var(--space-xs);
-}
+/* Entity card — styles dans EntityCard.css (design system) */
 
 .emp-email-icon {
   display: flex;
@@ -627,41 +562,6 @@
   flex-shrink: 0;
 }
 
-.emp-name {
-  font-family: 'Poppins', sans-serif;
-  display: block;
-  font-size: var(--font-size-lg);
-  font-weight: 600;
-  color: var(--text);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.emp-role {
-  font-family: 'Poppins', sans-serif;
-  display: block;
-  font-size: var(--font-size-sm);
-  color: var(--color-grey-500);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-
-.emp-bar-track {
-  display:none;
-  width: 100%;
-  height: 3px;
-  background: var(--bg-3);
-  border-radius: var(--radius-xs);
-  overflow: hidden;
-}
-.emp-bar-fill {
-  height: 100%;
-  border-radius: var(--radius-xs);
-  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
 
 /* ─── Sidebar filter & add button ─────────────────────────────── */
 .sidebar-filter {
@@ -718,7 +618,6 @@
 }
 
 /* ─── Employee card: menu button & dropdown ────────────────────── */
-.employee-card.archived { cursor: default; opacity: 0.8; }
 
 .emp-menu-btn {
   position: absolute;
@@ -870,29 +769,6 @@
   color: var(--text-2);
   margin-bottom: var(--space-lg);
   line-height: 1.5;
-}
-
-.emp-balance {
-  font-family: 'Poppins', sans-serif;
-  font-size: clamp(9px, 0.65vw, 11px);
-  font-weight: 600;
-  margin-top: var(--space-xs);
-  display: block;
-}
-
-.emp-hours {
-  font-family: 'Poppins', sans-serif;
-  font-size: clamp(10px, 0.75vw, 13px);
-  font-weight: 600;
-  flex-shrink: 0;
-  white-space: nowrap;
-}
-
-.emp-contract-sub {
-  font-size: 9px;
-  font-weight: 400;
-  color: var(--text-3);
-  margin-left: 1px;
 }
 
 /* ═══════════════════════════════════════════
@@ -1553,7 +1429,7 @@
   flex-direction: column;
 }
 
-.tv-emp-col .employee-card {
+.tv-emp-col .entity-card {
   height: 100%;
   overflow: visible;
 }
@@ -1584,7 +1460,7 @@
 }
 
 .tv-hdr-holiday-dot {
-  display: inline-block;
+  display: none;
   width: 5px;
   height: 5px;
   border-radius: var(--radius-full);
@@ -1693,7 +1569,7 @@
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  padding: var(--space-sm);
+  padding: var(--space-md);
   border: 1px solid transparent;
   transition: border-color var(--t-base);
 }
@@ -1719,7 +1595,6 @@
   font-size: clamp(9px, 0.65vw, 11px);
   font-weight: 600;
   letter-spacing: 0.02em;
-  margin-top: var(--space-sm);
   margin-bottom: var(--space-sm);
   align-self: flex-start;
 }
@@ -1824,8 +1699,8 @@
 
   .header { padding-top: var(--space-md); }
 
-  .employee-card { padding: var(--space-sm) var(--space-xl) var(--space-sm) var(--space-sm); gap: var(--space-sm); }
-  .emp-avatar    { width: 24px; height: 24px; font-size: 8px; }
+  .entity-card { padding: var(--space-sm) var(--space-xl) var(--space-sm) var(--space-sm); gap: var(--space-sm); }
+  .ec-avatar    { width: 24px; height: 24px; font-size: 8px; }
 
   .day-card { padding: var(--space-sm); }
 
@@ -1846,13 +1721,11 @@
 
   .header { padding-top: var(--space-lg); }
 
-  .employee-card { padding: var(--space-md); gap: var(--space-md); }
-  .emp-avatar    { width: var(--space-xl); height: var(--space-xl); font-size: var(--font-size-sm); }
+  .entity-card { padding: var(--space-md); gap: var(--space-md); }
+  /*.ec-avatar    { width: var(--space-xl); height: var(--space-xl); font-size: var(--font-size-sm); }*/
 
   .day-card        { padding: var(--space-md); }
   .day-card-badge  { padding: 0 var(--space-sm); margin-top: 0; margin-bottom: var(--space-md); }
-
-  .emp-bar-track { height: 4px; display:none;}
 
   .modal { width: 640px; }
   .week-picker-panel { width: min(960px, 96vw); }
@@ -1889,7 +1762,6 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: var(--space-md);
 }
 .emp-profile-info-label {
   font-family: 'Poppins', sans-serif;
@@ -1907,13 +1779,11 @@
 }
 
 .emp-profile-progress {
-  margin-bottom: var(--space-md);
 }
 .emp-profile-progress-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: var(--space-sm);
 }
 
 .emp-profile-cumul {

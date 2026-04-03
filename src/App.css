@@ -21,7 +21,7 @@
   border-right: 1px solid var(--color-grey-200);
   flex-direction: column;
   align-items: center;
-  padding: 0 var(--space-lg) 0 var(--space-lg);
+  padding: 0 var(--space-md) 0 var(--space-md);
   gap: 0;
   margin-top: var(--space-lg);
   z-index: var(--z-dropdown);
@@ -39,15 +39,40 @@
   user-select: none;
 }
 
-.nav-modules {
+.nav-top {
   display: flex;
-  justify-content: center;
   flex-direction: column;
   align-items: center;
-  gap: 2rem;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.nav-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
   flex: 1;
+  justify-content: center;
   width: 100%;
 }
+
+.nav-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+  width: 100%;
+  padding: var(--space-sm);
+  border-radius: var(--space-xl);
+  background-color: var(--color-grey-200);
+  flex-shrink: 0;
+}
+
+.nav-item.nav-item--group {
+  background-color: var(--color-white);
+}
+
 
 .nav-bottom {
   display: flex;
@@ -55,6 +80,7 @@
   align-items: center;
   gap: 1rem;
   width: 100%;
+  margin-top: auto;
 }
 
 .nav-item {
@@ -63,8 +89,8 @@
   height: 3rem;
   border-radius: var(--radius-full);
   border: none;
-  background: var(--bg-2);
-  color: var(--text-3); /* ⚠ ambiguïté : #737277 ≠ --text-3 (#9999aa), plus foncé — à vérifier visuellement */
+  background: var(--bg-3);
+  color: var(--text-primary); 
   display: flex;
   align-items: center;
   justify-content: center;
@@ -103,24 +129,25 @@
 }
 
 .nav-item:hover:not(:disabled) {
-  background: var(--bg-3);
-  color: var(--bg-4);
+  background: var(--color-grey-200);
 }
 
-.nav-item--active {
-  background: var(--bg-4);
-  color: var(--bg-2);
+.nav-item:active:not(:disabled) {
+  background: var(--color-black);
+  color: var(--color-white);
 }
 
-.nav-item--active:hover {
-  background: var(--bg-4);
-  color: var(--bg-2);
+.nav-item.nav-item--active,
+.nav-item.nav-item--active:hover {
+  background: var(--color-black);
+  color: var(--color-white);
   cursor: default;
 }
 
 .nav-item--disabled {
   opacity: 1;
   cursor: not-allowed;
+  pointer-events: none;
 }
 
 .nav-item--sm {

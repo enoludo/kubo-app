@@ -1,3 +1,4 @@
+import EntityCard from '../../../design-system/components/EntityCard/EntityCard'
 import { MailIcon } from '../../../components/Icons'
 
 function fmtDur(h) {
@@ -9,50 +10,29 @@ function fmtDur(h) {
 
 export default function EmployeeCard({ employee, weekHours, weekBalance, onClick }) {
   const contract = employee.contract ?? 35
-  const weekPct  = Math.min((weekHours / contract) * 100, 100)
-  const weekOver = weekHours > contract
 
   let balanceText, balanceColor
   if (weekBalance === 0) {
-    balanceText  = '✓ Semaine équilibrée'
+    balanceText  = 'à l\'équilibre'
     balanceColor = 'var(--color-success)'
   } else if (weekBalance > 0) {
-    balanceText  = `+${fmtDur(weekBalance)} en trop cette semaine`
+    balanceText  = `+${fmtDur(weekBalance)}`
     balanceColor = 'var(--color-danger)'
   } else {
-    balanceText  = `−${fmtDur(Math.abs(weekBalance))} pour être à jour`
+    balanceText  = `−${fmtDur(Math.abs(weekBalance))}`
     balanceColor = 'var(--color-warning)'
   }
 
   return (
-    <div
-      className={`employee-card${employee.archived ? ' archived' : ''}`}
+    <EntityCard
+      avatar={{ initials: employee.initials }}
+      title={employee.name}
+      subtitle={employee.role}
+      titleAddon={employee.email ? <MailIcon size={12} /> : null}
+      metric={{ primary: fmtDur(weekHours), suffix: `/${contract}h` }}
+      note={{ text: balanceText, color: balanceColor }}
+      archived={employee.archived}
       onClick={onClick}
-    >
-      <div className="emp-profile">
-        <div className="emp-avatar">
-          {employee.initials}
-        </div>
-        <div className="emp-identity">
-          <div className="emp-name-row">
-            <span className="emp-name">{employee.name}</span>
-            {employee.email && <span className="emp-email-icon"><MailIcon size={12} /></span>}
-          </div>
-          <span className="emp-role">{employee.role}</span>
-        </div>
-      </div>
-
-      <div className="emp-stats">
-        <div className="emp-hours-row">
-          <span className="emp-hours" >
-            {fmtDur(weekHours)}<span className="emp-contract-sub">/{contract}h</span>
-          </span>
-        </div>
-        <span className="emp-balance" style={{ color: balanceColor }}>{balanceText}</span>
-        <div className="emp-bar-track">
-          <div className="emp-bar-fill" style={{ width: `${weekPct}%`, background: balanceColor }} />
-        </div>
-      </div>
-    </div>
+    />
   )
 }

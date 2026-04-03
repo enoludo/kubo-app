@@ -304,9 +304,52 @@ function mapProduct(item) {
 
 // ── Export principal ──────────────────────────────────────────────────────────
 
+// "10:30" → "10h30"  /  "10h30" → "10h30"
+function normalizeTimeKey(str) {
+  return str.replace(':', 'h')
+}
+
+/**
+ * Récupère les prix par tranche horaire du produit "Brunch du Samedi".
+ * @returns {Promise<Record<string, number>>} Ex : { '10h30': 45, '12h00': 45, '13h30': 45 }
+ */
+export async function fetchBrunchPrices() {
+  try {
+    const url = `${API_BASE}/api/webflow-products?limit=100`
+    const res = await fetch(url)
+    if (!res.ok) return {}
+
+    const data  = await res.json()
+    const items = data.items ?? data.products ?? []
+
+    const brunchItem = items.find(item => {
+      const name = item.product?.fieldData?.name ?? item.product?.name ?? item.fieldData?.name ?? ''
+      return name.toLowerCase().includes('brunch du samedi')
+    })
+    if (!brunchItem) return {}
+
+    const prices = {}
+    for (const sku of brunchItem.skus ?? []) {
+      const sfd   = sku.fieldData ?? {}
+      const price = sfd.price?.value != null ? sfd.price.value / 100 : null
+      if (price == null) continue
+
+      const timeMatch = (sfd.name ?? '').match(/Horaire\s*:\s*(\d{1,2}:\d{2})/i)
+      if (!timeMatch) continue
+
+      const key = normalizeTimeKey(timeMatch[1])
+      if (!(key in prices)) prices[key] = price
+    }
+
+    return prices
+  } catch {
+    return {}
+  }
+}
+
 /**
  * Récupère les produits Webflow.
- * RÈGLE : exclut les produits dont le nom contient "Brunch du Samedi" (insensible à la casse).
+ * RÈGLE : exclut tout produit dont le nom contient "brunch" (insensible à la casse).
  * @returns {Promise<Array>} Produits mappés au format interne
  */
 export async function fetchProducts() {
@@ -329,9 +372,10 @@ export async function fetchProducts() {
   const mapped = items
     .filter(item => {
       const name = item.product?.fieldData?.name ?? item.product?.name ?? item.fieldData?.name ?? ''
-      return !name.toLowerCase().includes('brunch du samedi')
+      return !name.toLowerCase().includes('brunch')
     })
     .map(mapProduct)
+    .filter(p => !p.name.toLowerCase().includes('brunch'))
 
   console.log('[webflow] produits reçus:', mapped.length)
   return mapped

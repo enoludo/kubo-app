@@ -1,0 +1,721 @@
+/* ══════════════════════════════════════════════════════════════════════════════
+   CLEANING APP — styles spécifiques au module Nettoyage
+   Layout/grille génériques → design-system/ (ModuleLayout, WeekGrid, DayCard)
+   Toutes les valeurs viennent de design-tokens.css ou cleaning-tokens.css
+══════════════════════════════════════════════════════════════════════════════ */
+
+/* ── Cellule jour ────────────────────────────────────────────────────────── */
+
+.cln-day-cell {
+  flex: 1;
+  min-height: clamp(80px, 9vh, 140px);
+  border-radius: var(--radius-sm);
+  padding: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: border-color var(--transition-base);
+}
+
+.cln-day-cell:active {
+  border-color: var(--border-default);
+}
+
+.cln-day-cell-empty {
+  margin: auto;
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+/* ── Pills de tâches ─────────────────────────────────────────────────────── */
+
+.cln-task-pill {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  border-radius: var(--radius-md);
+  padding: var(--space-xs) var(--space-sm);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  overflow: hidden;
+}
+
+/* couleurs gérées en inline dans CleaningTaskPill */
+
+.cln-pill-icon {
+  flex-shrink: 0;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1;
+}
+
+.cln-pill-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   MODAL VALIDATION
+══════════════════════════════════════════════════════════════════════════════ */
+
+/* ── Header modal ────────────────────────────────────────────────────────── */
+
+.cln-modal-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+}
+
+.cln-modal-zone-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-full);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.cln-modal-date {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  margin-top: var(--space-sm);
+}
+
+.cln-modal-empty {
+  padding: var(--space-xl);
+  text-align: center;
+  color: var(--text-secondary);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-md);
+}
+
+/* ── Liste de tâches ─────────────────────────────────────────────────────── */
+
+.cln-task-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+/* ── Carte tâche ─────────────────────────────────────────────────────────── */
+
+.cln-task-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  border: solid 1px var(--color-grey-200) ;
+  border-radius: var(--radius-sm);
+  background: var(--bg-default);
+}
+
+
+.cln-task-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.cln-task-card-name {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+}
+
+.cln-task-card-duration {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ── Protocole ───────────────────────────────────────────────────────────── */
+
+.cln-task-protocol {
+  margin: 0;
+  padding-left: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.cln-task-protocol li {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-md);
+  color: var(--text-primary);
+  line-height: var(--line-height-normal);
+}
+
+/* ── Produit ─────────────────────────────────────────────────────────────── */
+
+.cln-task-product {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.cln-task-product-label {
+  font-weight: var(--font-weight-medium);
+  color: var(--text-primary);
+}
+
+/* ── Section validation ──────────────────────────────────────────────────── */
+
+.cln-validate-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding-top: var(--space-sm);
+}
+
+/* ── Statut validé ───────────────────────────────────────────────────────── */
+
+.cln-validate-done {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  padding-top: var(--space-sm);
+  border-top: 1px solid var(--border-default);
+}
+
+.cln-done-badge {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--cln-status-done);
+}
+
+.cln-done-by {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.cln-done-note {
+  flex-basis: 100%;
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.cln-unmark-btn {
+  margin-left: auto;
+  background: none;
+  border: none;
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-xs);
+  transition: background var(--transition-fast);
+}
+
+.cln-unmark-btn:active {
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   FORMULAIRE TÂCHE
+══════════════════════════════════════════════════════════════════════════════ */
+
+/* ── Protocole (steps) ───────────────────────────────────────────────────── */
+
+.cln-protocol-steps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.cln-step-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.cln-step-num {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-secondary);
+  min-width: var(--space-lg);
+  flex-shrink: 0;
+}
+
+.cln-step-input {
+  flex: 1;
+  height: var(--control-height-md);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--bg-subtle);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-md);
+  color: var(--text-primary);
+  padding: 0 var(--space-sm);
+  outline: none;
+}
+
+.cln-step-input:focus { background: var(--color-grey-200); }
+
+.cln-step-remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--space-xl);
+  min-height: var(--space-xl);
+  border: none;
+  border-radius: var(--radius-full);
+  background: none;
+  color: var(--text-secondary);
+  font-size: var(--font-size-md);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.cln-step-remove:active {
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+}
+
+.cln-step-add {
+  align-self: flex-start;
+  margin-top: var(--space-xs);
+}
+
+/* ── Durée stepper ───────────────────────────────────────────────────────── */
+
+.cln-duration-row {
+  display: flex;
+  align-items: center;
+}
+
+.cln-duration-value {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--space-2xl);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   MODAL TÂCHES PAR ZONE
+══════════════════════════════════════════════════════════════════════════════ */
+
+.cln-zone-modal-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+/* ── Profil zone (avatar + identité) — miroir exact de .ec-profile ── */
+
+.cln-zone-profile {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: var(--space-sm);
+}
+
+.cln-zone-avatar {
+  width: var(--space-2xl);
+  height: var(--space-2xl);
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  flex-shrink: 0;
+  letter-spacing: 0.02em;
+}
+
+.cln-zone-identity {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.cln-zone-title {
+  font-family: var(--font-family-base);
+  display: block;
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cln-zone-subtitle {
+  font-family: var(--font-family-base);
+  display: block;
+  font-size: var(--font-size-sm);
+  color: var(--color-grey-500);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Liste consultation ──────────────────────────────────────────────────── */
+
+.cln-zone-task-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-top: var(--space-md);
+}
+
+.cln-zone-task-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--bg-subtle);
+  border-radius: var(--radius-sm);
+  min-height: 44px;
+}
+
+.cln-zone-task-row--inactive {
+  opacity: 0.5;
+}
+
+.cln-zone-task-name {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-primary);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cln-zone-task-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex-shrink: 0;
+}
+
+.cln-freq-badge {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-secondary);
+  background: var(--bg-default);
+  border-radius: var(--radius-xs);
+  padding: 2px var(--space-sm);
+}
+
+.cln-zone-task-duration {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.cln-inactive-badge {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-muted);
+  background: var(--bg-default);
+  border-radius: var(--radius-xs);
+  padding: 2px var(--space-sm);
+}
+
+/* ── Liste édition ───────────────────────────────────────────────────────── */
+
+.cln-zone-edit-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-top: var(--space-md);
+}
+
+.cln-zone-edit-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.cln-zone-edit-confirm {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  flex-shrink: 0;
+}
+
+.cln-zone-confirm-label {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-sm);
+  color: var(--color-danger);
+  white-space: nowrap;
+}
+
+.cln-zone-confirm-yes,
+.cln-zone-confirm-no {
+  min-height: 32px;
+  padding: 0 var(--space-sm);
+  border: none;
+  border-radius: var(--radius-xs);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+}
+
+.cln-zone-confirm-yes {
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+}
+
+.cln-zone-confirm-no {
+  background: var(--bg-subtle);
+  color: var(--text-secondary);
+}
+
+.cln-zone-add-btn {
+  margin-top: var(--space-xs);
+}
+
+/* ── Confirmation suppression ────────────────────────────────────────────── */
+
+.cln-confirm-body {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-md);
+  color: var(--text-secondary);
+  padding: var(--space-md) 0;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   FORMULAIRE ZONE (CleaningZoneForm)
+══════════════════════════════════════════════════════════════════════════════ */
+
+/* ── Palette couleur ─────────────────────────────────────────────────────── */
+
+.czf-color-palette {
+  display: flex;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.czf-color-swatch {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  border: 3px solid transparent;
+  cursor: pointer;
+  transition: transform var(--transition-fast), border-color var(--transition-fast);
+}
+
+.czf-color-swatch--selected {
+  border-color: var(--color-black);
+  transform: scale(1.15);
+}
+
+/* ── Section tâches ──────────────────────────────────────────────────────── */
+
+.czf-tasks-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.czf-tasks-label {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.czf-tasks-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+/* ── Item tâche ──────────────────────────────────────────────────────────── */
+
+.czf-task-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  background: var(--bg-default);
+  border-radius: var(--radius-sm);
+  border: solid 1px var(--color-grey-200);
+}
+
+.czf-task-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.czf-task-num {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-secondary);
+}
+
+.czf-task-remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  min-height: 28px;
+  border: none;
+  border-radius: var(--radius-full);
+  background: none;
+  color: var(--text-secondary);
+  font-size: var(--font-size-lg);
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.czf-task-remove:active {
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+}
+
+/* ── Ligne bas tâche (durée + actif) ─────────────────────────────────────── */
+
+.czf-task-bottom {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-lg);
+}
+
+.czf-active-label {
+  padding-bottom: 6px;
+  white-space: nowrap;
+}
+
+.czf-add-task-btn {
+  align-self: flex-start;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   MODAL DÉTAIL ZONE (CleaningZoneDetailModal)
+══════════════════════════════════════════════════════════════════════════════ */
+
+
+/* ── Accordion ───────────────────────────────────────────────────────────── */
+
+.czd-accordion {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.czd-item {
+  border-radius: var(--radius-sm);
+  background: var(--bg-subtle);
+  overflow: hidden;
+}
+
+.czd-item--inactive {
+  opacity: 0.6;
+}
+
+.czd-item-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  min-height: 44px;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.czd-item-name {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-primary);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.czd-item-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex-shrink: 0;
+}
+
+.czd-chevron {
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+  flex-shrink: 0;
+  margin-left: var(--space-xs);
+}
+
+/* ── Corps expandable ────────────────────────────────────────────────────── */
+
+.czd-item-body-wrap {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 200ms ease;
+}
+
+.czd-item--open .czd-item-body-wrap {
+  grid-template-rows: 1fr;
+}
+
+.czd-item-body {
+  overflow: hidden;
+  padding: 0 var(--space-md);
+  transition: padding 200ms ease;
+}
+
+.czd-item--open .czd-item-body {
+  padding: 0 var(--space-md) var(--space-md);
+}
+
+.czd-detail-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  margin-top: var(--space-sm);
+}
+
+.czd-detail-label {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}

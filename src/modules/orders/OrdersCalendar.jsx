@@ -84,7 +84,7 @@ function OrderDayCell({ date, orders, isCurrentMonth, isToday, isPast, isOutside
         : <div className="order-day-num">{date.getDate()}</div>
       }
 
-<div className="order-day-content">
+      <div className="order-day-content">
         {channels.map(c => (
           <OrderPill key={c} channel={c} count={byChannel[c]} />
         ))}

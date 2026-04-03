@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react'
 import NavSidebar           from './components/NavSidebar'
 import OrdersApp            from './modules/orders/OrdersApp'
 import ProductsApp          from './modules/products/ProductsApp'
+import TemperaturesApp      from './modules/temperatures/TemperaturesApp'
+import CleaningApp          from './modules/cleaning/CleaningApp'
+import TraceabilityApp      from './modules/traceability/TraceabilityApp'
 import StartupModal         from './components/StartupModal'
 import PlanningApp          from './modules/planning/PlanningApp'
 import { useOrders }        from './hooks/useOrders'
@@ -83,7 +86,10 @@ export default function App() {
 
       {activeModule === 'orders'   && <OrdersApp   ordersCtx={ordersCtx} productsCtx={productsCtx} showToast={showToast} />}
       {activeModule === 'products' && <ProductsApp productsCtx={productsCtx} showToast={showToast} getToken={sync.getToken} />}
-      {activeModule === 'planning' && <PlanningApp showToast={showToast} onSyncChange={setSync} />}
+      {activeModule === 'planning'      && <PlanningApp      showToast={showToast} onSyncChange={setSync} />}
+      {activeModule === 'temperatures'  && <TemperaturesApp  showToast={showToast} />}
+      {activeModule === 'cleaning'      && <CleaningApp      showToast={showToast} />}
+      {activeModule === 'tracability'   && <TraceabilityApp  showToast={showToast} />}
 
       {toast && (
         <div className="toast" style={{ borderLeftColor: toast.color }}>{toast.msg}</div>

@@ -59,9 +59,11 @@ function OrderCard({ order, onEdit, onDelete, getProduct }) {
       {/* 1 : Badge canal + badge paiement */}
       <div className="odm-card-meta">
         <span className={`odm-badge odm-badge--${order.channel}`}>
-          {CHANNEL_LABEL[order.channel]}
+          {order.channel === 'brunch' && order.brunchSource === 'web'      ? 'Brunch web'
+           : order.channel === 'brunch' && order.brunchSource === 'boutique' ? 'Brunch boutique'
+           : CHANNEL_LABEL[order.channel]}
         </span>
-        {order.channel !== 'web' && (
+        {order.channel !== 'web' && !(order.channel === 'brunch' && order.brunchSource === 'web') && (
           <span className={`odm-badge ${order.paid ? 'odm-badge--paid' : 'odm-badge--unpaid'}`}>
             {order.paid ? 'Payé' : 'Non payé'}
           </span>
@@ -107,12 +109,14 @@ function OrderCard({ order, onEdit, onDelete, getProduct }) {
           const photoUrl = product?.photoUrl ?? null
           return (
             <div key={i} className="odm-item">
-              <div className="odm-item-photo">
-                {photoUrl
-                  ? <img src={photoUrl} alt={item.label} />
-                  : <span className="odm-item-photo-placeholder">🍰</span>
-                }
-              </div>
+              {order.channel !== 'brunch' && (
+                <div className="odm-item-photo">
+                  {photoUrl
+                    ? <img src={photoUrl} alt={item.label} />
+                    : <span className="odm-item-photo-placeholder">🍰</span>
+                  }
+                </div>
+              )}
               <div className="odm-item-content">
                 <div className="odm-item-top">
                   <span className="odm-item-name">{item.label}</span>

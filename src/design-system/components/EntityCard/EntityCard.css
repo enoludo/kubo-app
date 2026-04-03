@@ -1,0 +1,133 @@
+/* ══════════════════════════════════════════════════════════════════════════════
+   ENTITY CARD — composant générique partagé
+   Utilisé par : EmployeeCard (Planning), TempEquipmentCard (Températures)
+   et tout futur module nécessitant une carte d'entité.
+══════════════════════════════════════════════════════════════════════════════ */
+
+/* ── Conteneur ───────────────────────────────────────────────────────────── */
+
+.entity-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  border-radius: var(--radius-sm);
+  background: var(--color-grey-100);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: border-color var(--t-base);
+  user-select: none;
+}
+
+.entity-card:hover  { border-color: var(--color-grey-400); }
+.entity-card:active { cursor: default; }
+
+.entity-card--archived { cursor: default; opacity: 0.8; }
+
+/* ── Avatar ──────────────────────────────────────────────────────────────── */
+
+.ec-avatar {
+  width: var(--space-2xl);
+  height: var(--space-2xl);
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  flex-shrink: 0;
+  letter-spacing: 0.02em;
+  background: var(--color-grey-400);
+  color: var(--color-white);
+}
+
+/* ── Profil (avatar + identité) ──────────────────────────────────────────── */
+
+.ec-profile {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: var(--space-sm);
+}
+
+.ec-identity {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.ec-title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.ec-title {
+  font-family: var(--font-family-base);
+  display: block;
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ec-subtitle {
+  font-family: var(--font-family-base);
+  display: block;
+  font-size: var(--font-size-sm);
+  color: var(--color-grey-500);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Stats (métrique + note + barre) ─────────────────────────────────────── */
+
+.ec-stats {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-xs);
+  width: 100%;
+  margin-top: auto;
+}
+
+.ec-metric-row {
+  display: flex;
+  align-items: center;
+}
+
+.ec-metric {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.ec-metric-sub {
+  font-size: var(--font-size-sm);
+  font-weight: 400;
+  color: var(--color-grey-500);
+}
+
+.ec-note {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  white-space: nowrap;
+  text-align: right;
+}
+
+/* ── Responsive ≥ 1920px ─────────────────────────────────────────────────── */
+
+@media (min-width: 1920px) {
+  .entity-card { padding: var(--space-md); gap: var(--space-md); }
+  .ec-avatar    { width: var(--space-2xl); height: var(--space-2xl); font-size: var(--font-size-sm); }
+}

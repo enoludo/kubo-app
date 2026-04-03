@@ -179,9 +179,6 @@ export default function EmployeeProfileModal({
               {fmtDur(wb.weekHours)}<span style={{ fontWeight: 400, fontSize: 'var(--font-size-sm)', color: 'var(--color-muted)', marginLeft: 2 }}>/{contract}h</span>
             </span>
           </div>
-          <div className="emp-bar-track" style={{ height: 5, marginTop: 6 }}>
-            <div className="emp-bar-fill" style={{ width: `${weekPct}%`, background: weekOver ? 'var(--color-danger)' : 'var(--color-success)' }} />
-          </div>
         </div>
 
         {/* Solde cumulé */}

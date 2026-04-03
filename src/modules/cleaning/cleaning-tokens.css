@@ -1,0 +1,31 @@
+/* ══════════════════════════════════════════════════════════════════
+   CLEANING TOKENS — tokens spécifiques au module Nettoyage
+   Importe design-tokens.css en amont (via main.jsx)
+   ══════════════════════════════════════════════════════════════════ */
+
+:root {
+
+  /* ── Zones — couleur principale (bordure, avatar) ───────────────── */
+  --cln-zone-labo:        var(--color-blue-300);
+  --cln-zone-froid:       var(--color-violet-300);
+  --cln-zone-cuisson:     var(--color-orange-300);
+  --cln-zone-vente:       var(--color-green-300);
+  --cln-zone-sols:        var(--color-yellow-300);
+  --cln-zone-sanitaires:  var(--color-red-300);
+
+  /* ── Zones — fond de cellule ────────────────────────────────────── */
+  --cln-zone-labo-bg:         var(--color-blue-100);
+  --cln-zone-froid-bg:        var(--color-violet-100);
+  --cln-zone-cuisson-bg:      var(--color-orange-100);
+  --cln-zone-vente-bg:        var(--color-green-100);
+  --cln-zone-sols-bg:         var(--color-yellow-100);
+  --cln-zone-sanitaires-bg:   var(--color-red-100);
+
+  /* ── Statuts des tâches ─────────────────────────────────────────── */
+  --cln-status-pending:     var(--color-white);
+  --cln-status-done:        var(--color-success);
+  --cln-status-done-bg:     var(--color-success-bg);
+  --cln-status-late:        var(--color-danger);
+  --cln-status-late-bg:     var(--color-danger-bg);
+
+}

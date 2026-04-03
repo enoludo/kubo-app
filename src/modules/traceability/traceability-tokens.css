@@ -1,0 +1,62 @@
+/* ══════════════════════════════════════════════════════════════════════════════
+   TRAÇABILITÉ — tokens module
+   Préfixes : --tr-* (catégories, statuts, surfaces)
+══════════════════════════════════════════════════════════════════════════════ */
+
+:root {
+
+  /* ── Catégories fournisseurs ────────────────────────────────────────────────
+     Chaque catégorie dispose d'une teinte (bg = -100, pill = -200, badge = -300).
+     Liée à la COLOR_PALETTE du design system via les primitifs.                */
+
+  --tr-cat-flour-bg:    var(--color-yellow-100);
+  --tr-cat-flour-pill:  var(--color-yellow-200);
+  --tr-cat-flour-badge: var(--color-yellow-300);
+
+  --tr-cat-dairy-bg:    var(--color-blue-100);
+  --tr-cat-dairy-pill:  var(--color-blue-200);
+  --tr-cat-dairy-badge: var(--color-blue-300);
+
+  --tr-cat-eggs-bg:     var(--color-orange-100);
+  --tr-cat-eggs-pill:   var(--color-orange-200);
+  --tr-cat-eggs-badge:  var(--color-orange-300);
+
+  --tr-cat-fruits-bg:   var(--color-green-100);
+  --tr-cat-fruits-pill: var(--color-green-200);
+  --tr-cat-fruits-badge:var(--color-green-300);
+
+  --tr-cat-packaging-bg:    var(--color-violet-100);
+  --tr-cat-packaging-pill:  var(--color-violet-200);
+  --tr-cat-packaging-badge: var(--color-violet-300);
+
+  --tr-cat-cleaning-bg:    var(--color-red-100);
+  --tr-cat-cleaning-pill:  var(--color-red-200);
+  --tr-cat-cleaning-badge: var(--color-red-300);
+
+  --tr-cat-beverages-bg:    var(--color-blue-100);
+  --tr-cat-beverages-pill:  var(--color-blue-200);
+  --tr-cat-beverages-badge: var(--color-blue-300);
+
+  --tr-cat-other-bg:    var(--color-grey-100);
+  --tr-cat-other-pill:  var(--color-grey-200);
+  --tr-cat-other-badge: var(--color-grey-300);
+
+
+  /* ── Statuts de conformité ─────────────────────────────────────────────────
+     compliant     : réception conforme (verte)
+     non_compliant : anomalie constatée (rouge)
+     pending       : pas encore saisie / en attente (gris)                     */
+
+  --tr-status-compliant-bg:    var(--color-success-bg);
+  --tr-status-compliant-text:  #2E7D32;
+  --tr-status-compliant-dot:   var(--color-success);
+
+  --tr-status-non-compliant-bg:    var(--color-danger-bg);
+  --tr-status-non-compliant-text:  var(--color-danger);
+  --tr-status-non-compliant-dot:   var(--color-danger);
+
+  --tr-status-pending-bg:    var(--color-grey-200);
+  --tr-status-pending-text:  var(--text-secondary);
+  --tr-status-pending-dot:   var(--color-grey-400);
+
+}

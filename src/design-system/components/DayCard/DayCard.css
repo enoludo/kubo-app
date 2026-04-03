@@ -1,0 +1,88 @@
+/* ═══════════════════════════════════════════
+   DAY CARD — carte jour générique
+   Styles spécifiques au module restent dans le module.
+═══════════════════════════════════════════ */
+
+.day-card {
+  flex: 1;
+  min-height: clamp(80px, 9vh, 140px);
+  border-radius: var(--radius-sm);
+  background: var(--bg-subtle);
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-md);
+  border: 1px solid transparent;
+  transition: border-color var(--t-base);
+}
+.day-card:hover { border-color: var(--card-border, var(--color-grey-500)); }
+
+.day-card--empty {
+  border: 1px dashed var(--color-grey-500);
+}
+.day-card--empty:hover {
+  border: 1px dashed var(--color-grey-500);
+}
+
+/* ─── Badge statut ───────────────────────────────────────────────── */
+
+.day-card-badge {
+  display: inline-block;
+  mix-blend-mode: multiply;
+  border-radius: var(--radius-sm);
+  padding: var(--space-xs) var(--space-sm);
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(9px, 0.65vw, 11px);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  margin-bottom: var(--space-sm);
+  align-self: flex-start;
+}
+
+/* ─── Contenu ────────────────────────────────────────────────────── */
+
+.day-card-work {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  flex: 1;
+}
+
+.day-card-hours {
+  font-family: 'Poppins', sans-serif;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--text);
+}
+
+.day-card-pause {
+  font-family: 'Poppins', sans-serif;
+  font-size: var(--font-size-sm);
+  color: var(--text);
+}
+
+.day-card-eff {
+  font-family: 'Poppins', sans-serif;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-regular);
+  color: var(--text-primary);
+}
+
+.day-card-label {
+  display: none;
+  font-family: 'Poppins', sans-serif;
+  font-size: var(--font-size-sm);
+  color: var(--text-3);
+  margin-top: var(--space-xs);
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Grand écran ────────────────────────────────────────────────── */
+
+

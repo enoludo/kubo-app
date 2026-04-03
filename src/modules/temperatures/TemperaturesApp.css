@@ -1,0 +1,428 @@
+/* ══════════════════════════════════════════════════════════════════════════════
+   TEMPERATURES APP — styles spécifiques au module uniquement
+   Layout/grille/cards génériques → design-system/ (ModuleLayout, WeekGrid, DayCard)
+══════════════════════════════════════════════════════════════════════════════ */
+
+/* ── Cellule calendrier ──────────────────────────────────────────────────── */
+
+/* Badge état dans la cellule jour */
+.temp-day-badge {
+  display: inline-block;
+  border-radius: var(--radius-sm);
+  padding: var(--space-xs) var(--space-sm);
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(9px, 0.65vw, 11px);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  margin-top: var(--space-sm);
+  margin-bottom: var(--space-sm);
+  align-self: flex-start;
+}
+.temp-day-badge--alert   { display: none ; background: var(--color-danger-bg);  color: var(--color-danger); }
+.temp-day-badge--missing { background: var(--color-warning-bg); color: var(--color-warning); }
+
+/* Séparateur Matin / Soir dans .day-card-work */
+.temp-cell-sep {
+  border-top: 1px solid var(--color-grey-200);
+  margin: var(--space-xs) 0;
+}
+
+/* Message état vide du calendrier */
+.temp-empty {
+  padding: var(--space-xl);
+  text-align: center;
+  color: var(--text-secondary);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-md);
+}
+
+/* ── Cellules vides passées / futures ───────────────────────────────────── */
+
+.tdc-past-empty {
+  cursor: pointer;
+}
+
+.tdc-future-empty {
+  pointer-events: none;
+  cursor: default;
+}
+
+.tdc-no-reading {
+  margin: auto;
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+/* ── Day cell reading rows ───────────────────────────────────────────────── */
+
+
+.tdc-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-xs);
+  border-radius: var(--radius-md);
+  padding: 0 var(--space-sm);
+}
+
+.tdc-time {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.tdc-temp {
+  font-family: var(--font-family-base);
+    font-size: var(--font-size-sm);
+    min-height: var(--control-height-sm);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+}
+
+.tdc-temp--alert { color: var(--color-danger); }
+
+.tdc-comment {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   TEMP MODAL — saisie des relevés
+══════════════════════════════════════════════════════════════════════════════ */
+
+/* ── Header équipement ───────────────────────────────────────────────────── */
+
+.tm-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.tm-avatar {
+  width: var(--control-height-md);
+  height: var(--control-height-md);
+  border-radius: var(--radius-full);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 18px;
+}
+
+.tm-equip-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.tm-equip-name {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+}
+
+.tm-equip-meta {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+
+/* ── Date titre ──────────────────────────────────────────────────────────── */
+
+.tm-date {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  text-transform: capitalize;
+}
+
+/* ── Bannière alerte ─────────────────────────────────────────────────────── */
+
+.tm-alert-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+/* ── Sections saisie ─────────────────────────────────────────────────────── */
+
+.tm-sections {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+/* Matin + Soir côte à côte */
+.tm-main-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+}
+
+.tm-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.tm-section-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.tm-section-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+
+.tm-section-dot--morning { background: var(--color-warning); }
+.tm-section-dot--evening { background: var(--color-grey-400); }
+
+.tm-section-required {
+  color: var(--color-danger);
+  font-size: var(--font-size-xs);
+  margin-left: 1px;
+}
+
+/* ── Ligne saisie heure + température ────────────────────────────────────── */
+
+.tm-slot-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.tm-input {
+  height: var(--space-2xl);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--bg-subtle);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-primary);
+  outline: none;
+  transition: background var(--t-fast);
+}
+.tm-input:focus { background: var(--color-grey-200); }
+
+.tm-input--time {
+  padding: 0 var(--space-md);
+  width: 110px;
+}
+
+.tm-temp-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.tm-temp-stepper--alert .qty-btn,
+.tm-temp-stepper--alert .qty-value {
+  color: var(--color-danger);
+  background: var(--color-danger-bg);
+}
+
+/* Valeur affichée : plus large pour accueillir ex. "−18.5°C" */
+.tm-stepper-value {
+  display: inline-flex;
+  height: var(--control-height-md);
+  align-items: center;
+  justify-content: center;
+  min-width: 72px;
+}
+
+.tm-alert-tag {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-danger);
+  white-space: nowrap;
+}
+
+.tm-remove-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+  min-width: var(--control-height-sm);
+  min-height: var(--control-height-sm);
+  border: none;
+  border-radius: var(--radius-full);
+  background: var(--color-white);
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background var(--t-fast), color var(--t-fast);
+}
+.tm-remove-btn:active {
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+}
+
+.tm-add-extra {
+  align-self: flex-start;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   TEMP EQUIPMENT MODAL — formulaire création / édition
+══════════════════════════════════════════════════════════════════════════════ */
+
+
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   TEMP MODAL — liste des relevés + formulaire ajout
+══════════════════════════════════════════════════════════════════════════════ */
+
+/* ── Liste relevés ───────────────────────────────────────────────────────── */
+
+.tm-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.tm-list-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  border-radius: var(--radius-sm);
+}
+
+.tm-list-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  min-width: 0;
+}
+
+.tm-list-line {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.tm-list-time {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-md);
+  color: var(--text-primary);
+  min-width: 44px;
+  flex-shrink: 0;
+}
+
+.tm-list-temp {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  min-width: 52px;
+  flex-shrink: 0;
+}
+
+.tm-list-temp--alert { color: var(--color-danger); }
+
+.tm-list-comment {
+  display: block;
+  width: 100%;
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-md);
+  color: var(--color-text-muted);
+  white-space: normal;
+  word-break: break-word;
+  margin-top: var(--space-xs);
+}
+
+/* ── Formulaire ajout ────────────────────────────────────────────────────── */
+
+.tm-add-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+/* Ligne 1 : Heure + °C côte à côte */
+.tm-add-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-sm);
+}
+
+/* Ligne 2 : Commentaire pleine largeur */
+.tm-input--comment-full {
+  width: 100%;
+  height: var(--space-2xl);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--bg-subtle);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-primary);
+  padding: 0 var(--space-md);
+  outline: none;
+  box-sizing: border-box;
+  transition: background var(--t-fast);
+}
+.tm-input--comment-full:focus { background: var(--color-grey-200); }
+
+/* Input time pleine largeur dans la grille */
+.tm-input--full {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ── Auteur ──────────────────────────────────────────────────────────────── */
+
+.tm-author-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.tm-author-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+
+.tm-list-author {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+  white-space: nowrap;
+}

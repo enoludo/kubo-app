@@ -49,7 +49,14 @@
 }
 
 .modal--xl {
-  max-width: 860px;
+  width: 80vw;
+  max-width: calc(100vw - var(--space-lg));
+}
+
+.modal--xl.modal--inner-scroll {
+  height: calc(100dvh - var(--space-2xl));
+  max-height: calc(100dvh - var(--space-2xl));
+  overflow: hidden;
 }
 
 /* ── Scroll interne ───────────────────────────────────────────────────────── */

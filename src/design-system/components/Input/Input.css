@@ -27,3 +27,8 @@
   min-height: 3rem;
   box-sizing: border-box;
 }
+
+select.field-input {
+  padding-right: var(--space-xl);
+  background-position: right var(--space-md) center;
+}
