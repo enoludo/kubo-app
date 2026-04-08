@@ -8,7 +8,8 @@
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(npx tsc:*)",
-      "Bash(grep -n \"var\\(--type-\\\\|var\\(--order-\\\\|#[0-9A-Fa-f]\\\\{3,6\\\\}\" /Users/ludovicenault/kubo-planning/src/modules/orders/OrdersApp.css)"
+      "Bash(grep -n \"var\\(--type-\\\\|var\\(--order-\\\\|#[0-9A-Fa-f]\\\\{3,6\\\\}\" /Users/ludovicenault/kubo-planning/src/modules/orders/OrdersApp.css)",
+      "Bash(ls /Users/ludovicenault/kubo-planning/.env*)"
     ]
   }
 }

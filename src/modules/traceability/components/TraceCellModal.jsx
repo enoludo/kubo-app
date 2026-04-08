@@ -1,30 +1,27 @@
-// ─── Modal — réceptions d'un fournisseur pour un jour ─────────────────────────
+// ─── Modal — produits livrés d'un fournisseur pour un jour ────────────────────
 import Modal  from '../../../design-system/components/Modal/Modal'
 import Button from '../../../design-system/components/Button/Button'
-import { getCategoryById, getCategoryTokens } from '../../../data/categories'
+import { getSupplierColors } from '../utils/traceabilityColors'
 
 const STATUS_META = {
   compliant:     { label: 'Conforme',     color: 'var(--tr-status-compliant-text)',     bg: 'var(--tr-status-compliant-bg)'     },
   non_compliant: { label: 'Non conforme', color: 'var(--tr-status-non-compliant-text)', bg: 'var(--tr-status-non-compliant-bg)' },
-  pending:       { label: 'En attente',   color: 'var(--tr-status-pending-text)',       bg: 'var(--tr-status-pending-bg)'       },
 }
 
 function fmtDate(dateStr) {
   const [y, m, d] = dateStr.split('-')
-  const date = new Date(Number(y), Number(m) - 1, Number(d))
-  return date.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })
-}
-
-function fmtDateShort(dateStr) {
-  const [y, m, d] = dateStr.split('-')
   return new Date(Number(y), Number(m) - 1, Number(d))
-    .toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })
+    .toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })
 }
 
-export default function TraceCellModal({ supplier, dateStr, receptions, onAddReception, onEditReception, onClose }) {
-  const tokens   = getCategoryTokens(supplier.category)
-  const catLabel = getCategoryById(supplier.category)?.label ?? supplier.category
+function fmtDlc(dlc) {
+  if (!dlc) return null
+  const [y, m, d] = dlc.split('-')
+  return `${d}/${m}/${y}`
+}
 
+export default function TraceCellModal({ supplier, dateStr, deliveries, onAddDelivery, onEditDelivery, onClose }) {
+  const colors   = getSupplierColors(supplier)
   const initials = supplier.name
     .split(' ')
     .map(w => w[0]?.toUpperCase() ?? '')
@@ -32,52 +29,59 @@ export default function TraceCellModal({ supplier, dateStr, receptions, onAddRec
     .join('')
 
   return (
-    <Modal onClose={onClose} size="sm" scrollBody>
+    <Modal onClose={onClose} scrollBody>
 
       {/* ── Header ── */}
       <div className="tr-modal-header">
         <div className="tr-zone-profile">
-          <div className="tr-zone-avatar" style={{ backgroundColor: tokens.badge }}>
+          <div className="tr-zone-avatar" style={{ backgroundColor: colors.badgeColor }}>
             {initials}
           </div>
           <div className="tr-zone-identity">
             <span className="tr-zone-title">{supplier.name}</span>
-            <span className="tr-zone-subtitle">{catLabel}</span>
+            {supplier.contact && (
+              <span className="tr-zone-subtitle">{supplier.contact}</span>
+            )}
           </div>
         </div>
-        <div className="tr-modal-date">{fmtDate(dateStr)}</div>
+        <button
+          className="add-trigger add-trigger--labeled tr-modal-add-rec-btn"
+          onClick={onAddDelivery}
+        >
+          + Produit livré
+        </button>
       </div>
 
-      {/* ── Liste réceptions ── */}
-      {receptions.length === 0 ? (
-        <p className="tr-modal-empty">Aucune réception saisie pour ce jour.</p>
+      <div className="tr-modal-date">{fmtDate(dateStr)}</div>
+
+      {/* ── Liste produits ── */}
+      {deliveries.length === 0 ? (
+        <p className="tr-modal-empty">Aucun produit livré ce jour.</p>
       ) : (
         <div className="tr-rec-list">
-          {receptions.map(rec => {
-            const meta         = STATUS_META[rec.conformity] ?? STATUS_META.pending
-            const productCount = rec.products?.length ?? 0
+          {deliveries.map(d => {
+            const meta = STATUS_META[d.conformity] ?? STATUS_META.compliant
             return (
-              <div key={rec.id} className="tr-rec-row">
+              <div key={d.id} className="tr-rec-row" style={{ backgroundColor: colors.bgColor }}>
                 <div className="tr-rec-status-col">
-                  <span
-                    className="tr-rec-status-pill"
-                    style={{ backgroundColor: meta.bg, color: meta.color }}
-                  >
+                  <span className="tr-rec-status-pill"
+                    style={{ backgroundColor: meta.bg, color: meta.color }}>
                     {meta.label}
                   </span>
                 </div>
                 <div className="tr-rec-info">
-                  <span className="tr-rec-product-count">
-                    {productCount === 0 ? 'Aucun produit' : `${productCount} produit${productCount > 1 ? 's' : ''}`}
+                  <span className="tr-rec-product-count">{d.productName}</span>
+                  <span className="tr-rec-meta">
+                    {[d.weight, d.dlc ? `DLC ${fmtDlc(d.dlc)}` : null].filter(Boolean).join(' · ')}
                   </span>
-                  {rec.notes && (
-                    <span className="tr-rec-note">{rec.notes}</span>
+                  {d.nonConformityNote && (
+                    <span className="tr-rec-note">{d.nonConformityNote}</span>
                   )}
                 </div>
                 <button
                   className="tr-rec-edit-btn"
-                  onClick={() => onEditReception(rec)}
-                  aria-label="Modifier cette réception"
+                  onClick={() => onEditDelivery(d)}
+                  aria-label="Modifier ce produit livré"
                 >
                   Modifier
                 </button>
@@ -87,15 +91,6 @@ export default function TraceCellModal({ supplier, dateStr, receptions, onAddRec
         </div>
       )}
 
-      {/* ── Actions ── */}
-      <div className="modal-actions">
-        <Button variant="default" onClick={onAddReception}>
-          + Réception
-        </Button>
-        <Button variant="default" onClick={onClose}>
-          Fermer
-        </Button>
-      </div>
 
     </Modal>
   )

@@ -25,8 +25,11 @@
   --orders-payment-paid-bg:      var(--color-green-100);
   --orders-payment-paid-text:    var(--text-primary);
 
-  --orders-payment-unpaid-bg:    var(--color-grey-300);
+  --orders-payment-unpaid-bg:    var(--color-danger-bg);
   --orders-payment-unpaid-text:  var(--text-primary);
+
+  --orders-payment-partial-bg:   var(--color-warning-bg);
+  --orders-payment-partial-text: var(--text-primary);
 
   /* ── Calendrier — jour courant ──────────────────────────────────────────── */
 

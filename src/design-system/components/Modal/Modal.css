@@ -49,7 +49,10 @@
 }
 
 .modal--xl {
-  width: 80vw;
+  width: calc(100vw - 9rem);
+  height: calc(100vh - 3rem);
+  margin-left: auto;
+  margin-right: 1.5rem;
   max-width: calc(100vw - var(--space-lg));
 }
 

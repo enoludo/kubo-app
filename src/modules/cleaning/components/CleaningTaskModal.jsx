@@ -2,6 +2,8 @@
 import { useState } from 'react'
 import Modal  from '../../../design-system/components/Modal/Modal'
 import Button from '../../../design-system/components/Button/Button'
+import Toggle from '../../../design-system/components/Toggle/Toggle'
+import '../../../design-system/components/Toggle/Toggle.css'
 import teamData from '../../planning/data/team.json'
 
 const activeTeam = teamData.filter(e => !e.archived)
@@ -25,7 +27,7 @@ function TaskCard({ task, record, onMarkDone, onUnmark }) {
   const [authorId, setAuthorId] = useState('')
   const [note,     setNote]     = useState('')
 
-  const isDone = task.status === 'done'
+  const isDone = !!record
   const isLate = task.status === 'late'
 
   function handleMarkDone() {
@@ -60,23 +62,9 @@ function TaskCard({ task, record, onMarkDone, onUnmark }) {
       )}
 
       {/* ── Validation ── */}
-      {isDone ? (
-        <div className="cln-validate-done">
-          <span className="cln-done-badge">✓ Fait</span>
-          {record?.authorId && teamById[record.authorId] && (
-            <span className="cln-done-by">
-              par {teamById[record.authorId].name}
-              {record.completedAt && ` à ${fmtTime(record.completedAt)}`}
-            </span>
-          )}
-          {record?.note && (
-            <span className="cln-done-note">{record.note}</span>
-          )}
-          <button className="cln-unmark-btn" onClick={onUnmark}>
-            Annuler
-          </button>
-        </div>
-      ) : (
+      
+      {/* ── Champs validation (état "À faire" seulement) ── */}
+      {!isDone && (
         <div className="cln-validate-section">
           <select
             className="field-input"
@@ -84,7 +72,7 @@ function TaskCard({ task, record, onMarkDone, onUnmark }) {
             onChange={e => setAuthorId(e.target.value)}
             aria-label="Validé par"
           >
-            <option value="">— Validé par —</option>
+            <option value="">Fait par</option>
             {activeTeam.map(e => (
               <option key={e.id} value={e.id}>{e.name}</option>
             ))}
@@ -96,9 +84,28 @@ function TaskCard({ task, record, onMarkDone, onUnmark }) {
             value={note}
             onChange={e => setNote(e.target.value)}
           />
-          <Button variant="success" onClick={handleMarkDone}>
-            Marquer comme fait
-          </Button>
+        </div>
+      )}
+      {/* ── Toggle statut ── */}
+      <Toggle
+        checked={isDone}
+        onChange={val => val ? handleMarkDone() : onUnmark()}
+        label={isDone ? 'Fait' : 'À faire'}
+      />
+
+
+      {/* ── Info validation (état "Fait") ── */}
+      {isDone && (record?.authorId || record?.note) && (
+        <div className="cln-validate-done">
+          {record.authorId && teamById[record.authorId] && (
+            <span className="cln-done-by">
+              par {teamById[record.authorId].name}
+              {record.completedAt && ` à ${fmtTime(record.completedAt)}`}
+            </span>
+          )}
+          {record?.note && (
+            <span className="cln-done-note">{record.note}</span>
+          )}
         </div>
       )}
 

@@ -144,8 +144,8 @@ button { font-family: inherit; cursor: pointer; }
 /* Texte méta — sous-titre, rôle, info secondaire */
 .text-meta {
   font-family: 'Poppins', sans-serif;
-  font-size: 11px;
-  color: var(--text-3);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
 }
 
 /* ─────────────────────────────────────────────────────────────────────────── */

@@ -2,17 +2,18 @@
 import { useState } from 'react'
 import Modal  from '../../../design-system/components/Modal/Modal'
 import Button from '../../../design-system/components/Button/Button'
-import { CATEGORIES, getCategoryTokens } from '../../../data/categories'
+import { SUPPLIER_COLOR_PALETTE, getSupplierColors } from '../utils/traceabilityColors'
 
 export default function TraceSupplierForm({ supplier, onSave, onDelete, onClose }) {
   const isEdit = !!supplier
 
-  const [name,     setName]     = useState(supplier?.name     ?? '')
-  const [category, setCategory] = useState(supplier?.category ?? CATEGORIES[0].id)
-  const [contact,  setContact]  = useState(supplier?.contact  ?? '')
+  const [name,         setName]         = useState(supplier?.name         ?? '')
+  const [contactName,  setContactName]  = useState(supplier?.contactName  ?? '')
+  const [contact,      setContact]      = useState(supplier?.contact      ?? '')
+  const [colorIndex,   setColorIndex]   = useState(supplier?.colorIndex   ?? 0)
   const [confirmDelete, setConfirmDelete] = useState(false)
 
-  const tokens   = getCategoryTokens(category)
+  const colors   = getSupplierColors({ colorIndex })
   const initials = name
     .split(' ')
     .map(w => w[0]?.toUpperCase() ?? '')
@@ -23,9 +24,10 @@ export default function TraceSupplierForm({ supplier, onSave, onDelete, onClose 
   function handleSave() {
     if (!name.trim()) return
     onSave({
-      name:     name.trim(),
-      category,
-      contact:  contact.trim() || null,
+      name:        name.trim(),
+      contactName: contactName.trim() || null,
+      contact:     contact.trim() || null,
+      colorIndex,
     })
   }
 
@@ -34,7 +36,7 @@ export default function TraceSupplierForm({ supplier, onSave, onDelete, onClose 
 
       {/* ── Header ── */}
       <div className="tr-zone-profile">
-        <div className="tr-zone-avatar" style={{ backgroundColor: tokens.badge }}>
+        <div className="tr-zone-avatar" style={{ backgroundColor: colors.badgeColor }}>
           {initials}
         </div>
         <div className="tr-zone-identity">
@@ -62,16 +64,17 @@ export default function TraceSupplierForm({ supplier, onSave, onDelete, onClose 
         </div>
 
         <div className="modal-field-full">
-          <label>Catégorie *</label>
-          <select value={category} onChange={e => setCategory(e.target.value)}>
-            {CATEGORIES.map(cat => (
-              <option key={cat.id} value={cat.id}>{cat.label}</option>
-            ))}
-          </select>
+          <label>Nom du contact <span className="tr-form-optional">(optionnel)</span></label>
+          <input
+            type="text"
+            value={contactName}
+            onChange={e => setContactName(e.target.value)}
+            placeholder="Prénom Nom"
+          />
         </div>
 
         <div className="modal-field-full">
-          <label>Contact <span className="tr-form-optional">(optionnel)</span></label>
+          <label>Téléphone <span className="tr-form-optional">(optionnel)</span></label>
           <input
             type="text"
             value={contact}
@@ -80,6 +83,23 @@ export default function TraceSupplierForm({ supplier, onSave, onDelete, onClose 
           />
         </div>
 
+      </div>
+
+      {/* ── Palette couleur ── */}
+      <div className="tr-form-section">
+        <label className="tr-form-label">Couleur</label>
+        <div className="tr-color-palette">
+          {SUPPLIER_COLOR_PALETTE.map((c, i) => (
+            <button
+              key={c.key}
+              type="button"
+              className={`tr-color-swatch${colorIndex === i ? ' tr-color-swatch--selected' : ''}`}
+              style={{ backgroundColor: c.badgeColor }}
+              onClick={() => setColorIndex(i)}
+              aria-label={`Couleur ${c.key}`}
+            />
+          ))}
+        </div>
       </div>
 
       {/* ── Actions ── */}

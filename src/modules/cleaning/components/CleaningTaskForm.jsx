@@ -1,7 +1,9 @@
 // ─── Formulaire création / édition d'une tâche de nettoyage ──────────────────
 import { useState } from 'react'
 import Modal  from '../../../design-system/components/Modal/Modal'
-import Button from '../../../design-system/components/Button/Button'
+import Button  from '../../../design-system/components/Button/Button'
+import Toggle  from '../../../design-system/components/Toggle/Toggle'
+import '../../../design-system/components/Toggle/Toggle.css'
 import { resolveZone, INITIAL_ZONES } from '../utils/cleaningZones.jsx'
 
 // CleaningTaskForm attend une prop optionnelle `zones` (tableau raw depuis useCleaning).
@@ -229,14 +231,11 @@ export default function CleaningTaskForm({ task, zones: zonesProp, onSave, onDel
         </div>
 
         {/* Actif */}
-        <label className="nom-checkbox-label">
-          <input
-            type="checkbox"
-            checked={active}
-            onChange={e => setActive(e.target.checked)}
-          />
-          Tâche active
-        </label>
+        <Toggle
+          checked={active}
+          onChange={setActive}
+          label="Tâche active"
+        />
 
       </div>
 

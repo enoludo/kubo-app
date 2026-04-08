@@ -342,7 +342,7 @@
   justify-content: center;
   font-family: var(--font-family-base);
   font-size: var(--font-size-xs);
-  font-weight: 700;
+  font-weight: var(--font-weight-semibold);
   flex-shrink: 0;
   letter-spacing: 0.02em;
 }
@@ -392,7 +392,7 @@
   padding: var(--space-sm) var(--space-md);
   background: var(--bg-subtle);
   border-radius: var(--radius-sm);
-  min-height: 44px;
+  min-height: var(--control-height-md);
 }
 
 .cln-zone-task-row--inactive {
@@ -649,7 +649,7 @@
   align-items: center;
   gap: var(--space-sm);
   padding: var(--space-sm) var(--space-md);
-  min-height: 44px;
+  min-height: var(--control-height-md);
   background: none;
   border: none;
   text-align: left;
@@ -718,4 +718,42 @@
   color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.04em;
+}
+
+/* ── Switch statut tâche ─────────────────────────────────────────────────── */
+
+.cln-status-switch {
+  display: flex;
+  padding: var(--space-sm);
+  background-color: var(--bg-subtle);
+  border: 0px solid var(--color-grey-300);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  gap: var(--space-sm);
+}
+
+.cln-switch-btn {
+  flex: 1;
+  min-height: var(--control-height-md);
+  background: var(--color-white);
+  border: none;
+  background-color: var(--bg-default);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-md);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.cln-switch-btn--todo.cln-switch-btn--active {
+  background: var(--bg-default);
+  border: solid 1px var(--color-danger);
+  color: var(--color-danger);
+  font-weight: var(--font-weight-semibold);
+}
+
+.cln-switch-btn--done.cln-switch-btn--active {
+  background: var(--color-success);
+  color: var(--text-primary);
+  font-weight: var(--font-weight-semibold);
 }

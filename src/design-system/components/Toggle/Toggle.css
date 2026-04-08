@@ -1,0 +1,48 @@
+.ds-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-md);
+  color: var(--text-primary);
+  min-height: 44px;
+}
+
+.ds-toggle-track {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  background: var(--color-grey-300);
+  border-radius: var(--radius-full);
+  transition: background var(--transition-base);
+  flex-shrink: 0;
+}
+
+.ds-toggle--on .ds-toggle-track {
+  background: var(--color-success);
+}
+
+.ds-toggle-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background: var(--color-white);
+  border-radius: var(--radius-full);
+  transition: transform var(--transition-base);
+  box-shadow: var(--shadow-sm);
+}
+
+.ds-toggle--on .ds-toggle-thumb {
+  transform: translateX(20px);
+}
+
+.ds-toggle:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

@@ -35,7 +35,7 @@
   background: var(--color-success);
   color: var(--bg);
   font-size: 14px;
-  font-weight: 700;
+  font-weight: var(--font-weight-semibold);
   flex-shrink: 0;
   line-height: 1;
 }
@@ -299,7 +299,7 @@
 
 .som-btn {
   width: 100%;
-  min-height: 44px;
+  min-height: var(--control-height-md);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -401,8 +401,8 @@
   border: none;
   border-radius: var(--radius-sm);
   padding: 0 10px;
-  height: 44px;
-  min-height: 44px;
+  height: var(--control-height-md);
+  min-height: var(--control-height-md);
   width: 100%;
   outline: none;
   cursor: pointer;
@@ -415,7 +415,7 @@
   font-family: 'Poppins', sans-serif;
   font-size: 14px;
   min-height: 3rem;
-  font-weight: 700;
+  font-weight: var(--font-weight-semibold);
   color: var(--text);
   text-align: right;
   padding: var(--space-xs) var(--space-xs);
@@ -436,8 +436,8 @@
   border: none;
   border-radius: var(--radius-sm);
   padding: 0 10px;
-  height: 44px;
-  min-height: 44px;
+  height: var(--control-height-md);
+  min-height: var(--control-height-md);
   width: 100%;
   outline: none;
   min-width: 0;
@@ -460,8 +460,8 @@
   border: none;
   border-radius: var(--radius-sm);
   padding: 0 10px;
-  height: 44px;
-  min-height: 44px;
+  height: var(--control-height-md);
+  min-height: var(--control-height-md);
   flex: 2;
   min-width: 0;
   outline: none;
@@ -482,8 +482,8 @@
   border: none;
   border-radius: var(--radius-sm);
   padding: 0 var(--space-lg) 0 var(--space-sm);
-  height: 44px;
-  min-height: 44px;
+  height: var(--control-height-md);
+  min-height: var(--control-height-md);
   width: 100%;
   outline: none;
   text-align: right;
@@ -516,9 +516,9 @@
 
 /* Bouton × de suppression de ligne */
 .nom-row-remove {
-  width: 44px;
-  height: 44px;
-  min-width: 44px;
+  width: var(--control-height-md);
+  height: var(--control-height-md);
+  min-width: var(--control-height-md);
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -565,8 +565,8 @@
 .qty-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
 .qty-value {
-  min-width: 40px;
-  height: 44px;
+  min-width: var(--control-height-md);
+  height: var(--control-height-md);
   text-align: center;
   font-family: 'Poppins', sans-serif;
   font-size: var(--font-size-md);
@@ -666,7 +666,7 @@
 .order-detail-name {
   font-family: 'Poppins', sans-serif;
   font-size: 20px;
-  font-weight: 700;
+  font-weight: var(--font-weight-semibold);
   color: var(--text);
   line-height: 1.2;
 }
@@ -816,7 +816,7 @@
 }
 .order-detail-total span:last-child {
   font-size: var(--font-size-xl);
-  font-weight: 700;
+  font-weight: var(--font-weight-semibold);
   color: var(--text);
 }
 
@@ -834,7 +834,7 @@
 .order-detail-note-label {
   font-family: 'Poppins', sans-serif;
   font-size: 9px;
-  font-weight: 700;
+  font-weight: var(--font-weight-semibold);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--accent);
@@ -851,7 +851,7 @@
 /* Bouton avancement statut — même style que .modal-confirm */
 .order-detail-advance-btn {
   width: 100%;
-  height: 44px;
+  height: var(--control-height-md);
   border-radius: var(--radius-sm);
   border: none;
   background: var(--bg-4);
@@ -1011,11 +1011,12 @@
   padding: var(--space-xs) var(--space-sm);
   border-radius: var(--radius-md);
 }
-.odm-badge--boutique { background: var(--orders-channel-boutique-bg); color: var(--orders-channel-boutique-text); }
-.odm-badge--web      { background: var(--orders-channel-web-bg);      color: var(--orders-channel-web-text); }
-.odm-badge--brunch   { background: var(--orders-channel-brunch-bg);   color: var(--orders-channel-brunch-text); }
+.odm-badge--boutique { background: var(--orders-channel-boutique-bg);  color: var(--orders-channel-boutique-text); }
+.odm-badge--web      { background: var(--orders-channel-web-bg);       color: var(--orders-channel-web-text); }
+.odm-badge--brunch   { background: var(--orders-channel-brunch-bg);    color: var(--orders-channel-brunch-text); }
 .odm-badge--paid     { background: var(--orders-payment-paid-bg);      color: var(--orders-payment-paid-text); }
-.odm-badge--unpaid   { background: var(--orders-payment-unpaid-bg); color: var(--orders-payment-unpaid-text); }
+.odm-badge--unpaid   { background: var(--orders-payment-unpaid-bg);    color: var(--orders-payment-unpaid-text); }
+.odm-badge--partial  { background: var(--orders-payment-partial-bg);   color: var(--orders-payment-partial-text);  }
 
 /* Ligne 2 : Produits en liste */
 .odm-card-products {
@@ -1038,7 +1039,7 @@
 }
 
 .odm-item-photo {
-  width: auto;
+  width: 4rem;
   height: 3rem;
   mix-blend-mode: multiply;
   border-radius: var(--radius-sm);
@@ -1118,8 +1119,8 @@
 
 .odm-card-note-label {
   font-family: 'Poppins', sans-serif;
-  font-size: 9px;
-  font-weight: 700;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
   text-transform: uppercase;
   letter-spacing: 0.07em;
   color: var(--accent);
@@ -1252,7 +1253,7 @@
 
 .nom-product-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(10vw, 1fr));
   gap: var(--space-sm);
   align-content: start;
   overflow-y: auto;
@@ -1372,7 +1373,7 @@
 .nom-size-btn {
   display: block;
   width: 100%;
-  min-height: 44px;
+  min-height: var(--control-height-md);
   padding: var(--space-xs) var(--space-sm);
   border: 0px solid var(--color-grey-300);
   border-radius: var(--radius-sm);
@@ -1465,7 +1466,7 @@
 
 .nom-free-cancel {
   flex: 1;
-  min-height: 44px;
+  min-height: var(--control-height-md);
   border: none;
   border-radius: var(--radius-xs);
   background: var(--bg-default);
@@ -1477,7 +1478,7 @@
 
 .nom-free-add {
   flex: 2;
-  min-height: 44px;
+  min-height: var(--control-height-md);
   border: none;
   border-radius: var(--radius-xs);
   background: var(--color-black);
@@ -1500,7 +1501,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: var(--bg-subtle);
+  background: var(--bg-default);
   border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
 }
 
@@ -1510,7 +1511,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-sm);
-  padding: var(--space-lg) var(--space-lg) var(--space-md);
+  padding: var(--space-lg);
   flex-shrink: 0;
 }
 
@@ -1541,8 +1542,8 @@
 .nom-client-section {
   display: flex;
   flex-direction: column;
-  gap: var(--space-sm);
-  padding: 0 var(--space-lg) var(--space-md);
+  gap: var(--space-md);
+  padding: 0 var(--space-lg) var(--space-lg);
   flex-shrink: 0;
   border-bottom: 1px solid var(--border-default);
 }
@@ -1554,23 +1555,24 @@
 }
 
 .nom-field-label {
-  font-family: var(--font-family-base);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  color: var(--text-secondary);
+  font-family: 'Poppins', sans-serif;
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-3);
 }
 
 .nom-field-input {
   height: var(--control-height-md);
   border: none;
   border-radius: var(--radius-sm);
-  background: var(--bg-default);
+  background: var(--bg-subtle);
   font-family: var(--font-family-base);
   font-size: var(--font-size-md);
   color: var(--text-primary);
   padding: 0 var(--space-md);
   outline: none;
-  width: 100%;
   box-sizing: border-box;
 }
 
@@ -1615,9 +1617,10 @@
   justify-content: space-between;
   gap: var(--space-sm);
   min-height: var(--control-height-md);
-  padding: var(--space-xs) var(--space-sm);
+  padding: var(--space-md);
   border-radius: var(--radius-sm);
-  background: var(--bg-default);
+  border: solid 1px var(--color-grey-200);
+  background: var(--color-white);
 }
 
 .nom-cart-row-info {
@@ -1685,6 +1688,8 @@
 }
 
 .nom-cart-row-price {
+  width: 3.5rem;
+  text-align: right;
   font-family: var(--font-family-base);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
@@ -1718,8 +1723,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--space-md) var(--space-lg);
-  border-top: 1px solid var(--border-default);
+  padding: var(--space-xs) var(--space-lg) ;
+  border-top: 0px solid var(--border-default);
   flex-shrink: 0;
 }
 
@@ -1770,8 +1775,8 @@
 .nom-order-details {
   display: flex;
   flex-direction: column;
-  gap: var(--space-sm);
-  padding: var(--space-sm) var(--space-lg) var(--space-md);
+  gap: var(--space-md);
+  padding: var(--space-lg) var(--space-lg) var(--space-lg);
   border-top: 1px solid var(--border-default);
   flex-shrink: 0;
 }
@@ -1782,27 +1787,63 @@
   gap: var(--space-sm);
 }
 
-.nom-paid-toggle {
-  min-height: 44px;
-  padding: 0 var(--space-md);
-  border: none;
+/* ── Sélecteur paiement 3 états ── */
+
+.nom-payment-selector {
+  display: flex;
+  border: 1px solid var(--color-grey-300);
   border-radius: var(--radius-sm);
-  font-family: var(--font-family-base);
-  font-size: var(--font-size-md);
-  font-weight: var(--font-weight-semibold);
-  cursor: pointer;
-  transition: opacity var(--transition-fast);
-  width: 100%;
+  overflow: hidden;
 }
 
-.nom-paid-toggle--paid {
+.nom-payment-btn {
+  flex: 1;
+  min-height: var(--control-height-md);
+  background: var(--color-white);
+  border: none;
+  border-right: 1px solid var(--color-grey-300);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.nom-payment-btn:last-child {
+  border-right: none;
+}
+
+.nom-payment-btn--paid.nom-payment-btn--active {
   background: var(--color-success-bg);
   color: var(--color-success);
+  font-weight: var(--font-weight-semibold);
 }
 
-.nom-paid-toggle--unpaid {
-  background: var(--color-grey-200);
-  color: var(--text-secondary);
+.nom-payment-btn--unpaid.nom-payment-btn--active {
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+  font-weight: var(--font-weight-semibold);
+}
+
+.nom-payment-btn--partial.nom-payment-btn--active {
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* ── Paiement partiel ── */
+
+.nom-partial-payment {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.nom-remaining {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-sm);
+  color: var(--color-warning);
+  margin-top: var(--space-xs);
 }
 
 /* ── Actions ─────────────────────────────────────────────────────────────── */

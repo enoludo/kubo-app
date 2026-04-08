@@ -2,85 +2,61 @@ PROJECT CONTEXT
 
 This project is an internal business platform for a bakery / pastry shop.
 
-The goal is to progressively build multiple connected applications that share the same data and infrastructure.
+The goal is to progressively build multiple connected modules that share the same data and infrastructure.
 
-The first module currently being developed is the employee scheduling system.
+Active modules:
+- planning (employee scheduling)
+- cleaning (zone hygiene tracking)
+- temperatures (equipment temperature logs)
+- orders (boutique, web, brunch)
+- products (catalog + recipes)
+- traceability (supplier deliveries, conformity, photos)
 
-Future modules will include:
-- hygiene tracking
-- product management
-- recipe management
-- product cost calculation
-- order management
-- supplier management
-
-The scheduling module must be built as the first module of a modular system, not as an isolated application.
+All modules share the same design system and will eventually connect to a central backend.
 
 
 CORE ARCHITECTURE PRINCIPLES
 
-The system must follow these architectural principles:
-
 1. Modular architecture
-Each business feature must be implemented as a module.
-
-Example modules:
-- scheduling
-- hygiene
-- products
-- recipes
-- orders
+Each business feature is implemented as an independent module under src/modules/.
 
 2. Shared core data
-Some data entities must be shared across modules.
+Entities shared across modules (team_members, roles, products, suppliers)
+must exist in one place only.
 
-Example shared entities:
-- team_members
-- roles
-- products
-- ingredients
-- suppliers
-
-These must exist in one place only.
-
-3. Central database
-All modules must connect to the same database.
-
-The database must support future modules.
+3. Central database (target)
+All modules will connect to the same database.
+Current state: local state (localStorage) — transitioning to API.
 
 4. Unique identifiers
-All entities must use UUID identifiers.
+All entities use UUID identifiers.
 
 5. Separation of concerns
-The codebase must separate:
-
 - data models
 - business logic
 - API layer
 - UI components
 
 6. Future scalability
-The system should remain maintainable as more modules are added.
+The system must remain maintainable as more modules are added.
 
 
 DEVELOPMENT PRIORITIES
 
-The current priority is to continue developing the scheduling module.
+Priority: traceability module, then stabilize existing modules.
 
-However all design decisions must respect the modular architecture and shared data model.
+All design decisions must respect the modular architecture and shared data model.
 
 
 INSTRUCTIONS FOR THE AI
 
 Before implementing new features:
+1. Verify the feature respects the architecture
+2. Avoid tightly coupling modules
+3. Reuse shared entities when possible
+4. Keep code modular and maintainable
 
-1. verify that the feature respects the architecture
-2. avoid tightly coupling modules
-3. reuse shared entities when possible
-4. keep the code modular and maintainable
-
-When making structural changes:
-explain the reasoning before implementing.
+When making structural changes: explain the reasoning before implementing.
 
 
 PROJECT OWNER CONTEXT

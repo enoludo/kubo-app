@@ -107,7 +107,7 @@
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  padding: 0 var(--space-lg);
+  padding: 0 var(--space-lg) var(--space-lg);
 }
 
 /* ── Grille ──────────────────────────────────────────────────────────────── */
@@ -338,7 +338,6 @@
 /* .product-detail-modal → surcharge .modal : overflow caché, hauteur max */
 .product-detail-modal {
   overflow: hidden;
-  max-height: 90vh;
 }
 
 /* ── En-tête modal ────────────────────────────────────────────────────────── */
@@ -391,7 +390,7 @@
 .product-detail-header-name {
   font-family: 'Poppins', sans-serif;
   font-size: 20px;
-  font-weight: 700;
+  font-weight: var(--font-weight-semibold);
   color: var(--text);
   line-height: 1.2;
 }
@@ -466,7 +465,7 @@
   padding: 10px 16px;
   cursor: pointer;
   white-space: nowrap;
-  min-height: 44px;
+  min-height: var(--control-height-md);
   transition: color var(--t-fast), border-color var(--t-fast);
 }
 .product-detail-tab--active {
@@ -494,7 +493,7 @@
 }
 
 .product-detail-delete-btn {
-  height: 44px;
+  height: var(--control-height-md);
   padding: 0 20px;
 }
 
@@ -659,7 +658,7 @@
   color: var(--bg);
   font-family: 'Poppins', sans-serif;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: var(--font-weight-semibold);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -755,14 +754,14 @@
 }
 
 .size-table-price {
-  font-weight: 700;
+  font-weight: var(--font-weight-semibold);
   color: var(--text) !important;
 }
 
 .size-table-margin {
   font-family: 'Poppins', sans-serif;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: var(--font-weight-semibold);
   padding: var(--space-xs) var(--space-sm);
   border-radius: var(--radius-pill);
 }
@@ -870,7 +869,7 @@
 .product-form-title {
   font-family: 'Poppins', sans-serif;
   font-size: 16px;
-  font-weight: 700;
+  font-weight: var(--font-weight-semibold);
   color: var(--text);
 }
 
@@ -894,7 +893,7 @@
 .pf-section-title {
   font-family: 'Poppins', sans-serif;
   font-size: var(--font-size-md);
-  font-weight: 700;
+  font-weight: var(--font-weight-semibold);
   color: var(--text);
   margin-bottom: var(--space-xs);
 }
@@ -922,7 +921,7 @@
 }
 
 .pf-input {
-  min-height: 44px;
+  min-height: var(--control-height-md);
 }
 
 .pf-textarea {
@@ -952,7 +951,7 @@
   border: none;
   cursor: pointer;
   padding: var(--space-sm) 0;
-  min-height: 44px;
+  min-height: var(--control-height-md);
 }
 
 .pf-toggle-track {
@@ -998,7 +997,7 @@
 }
 
 .pf-size-preset {
-  height: 44px;
+  height: var(--control-height-md);
   padding: 0 var(--space-md);
   border-radius: var(--radius-sm);
   border: 1.5px dashed var(--color-violet-300);
@@ -1070,7 +1069,7 @@
 
 .pf-ing-name { }
 .pf-ing-qty  { }
-.pf-ing-unit { min-height: 44px; cursor: pointer; }
+.pf-ing-unit { min-height: var(--control-height-md); cursor: pointer; }
 
 /* ── Bouton d'ajout générique ─────────────────────────────────────────────── */
 
@@ -1103,7 +1102,7 @@
   color: var(--bg);
   font-family: 'Poppins', sans-serif;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: var(--font-weight-semibold);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1244,7 +1243,7 @@
   font-size: 12px;
   font-weight: 500;
   padding: var(--space-sm) var(--space-md);
-  min-height: 44px;
+  min-height: var(--control-height-md);
   border-radius: var(--radius-sm);
   border: 1.5px solid var(--bg-3);
   background: var(--bg-2);
@@ -1395,4 +1394,4 @@
 }
 .product-form-confirm-del span { flex: 1; }
 .product-form-confirm-del .btn-secondary,
-.product-form-confirm-del .btn-danger { flex-shrink: 0; min-height: 44px; }
+.product-form-confirm-del .btn-danger { flex-shrink: 0; min-height: var(--control-height-md); }

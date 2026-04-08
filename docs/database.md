@@ -30,22 +30,42 @@ shifts:
   - created_at
   - updated_at
 
-## Hygiene Module
+## Cleaning Module
 
-hygiene_checks:
+cleaning_zones:
   - id (UUID, PK)
-  - employee_id → team_members.id
+  - label
+  - icon
+  - token (color)
+  - tasks (embedded array)
+
+cleaning_records:
+  - id (UUID, PK)
+  - task_id → cleaning_tasks.id
   - date
-  - type_check
-  - result
-  - notes
-
-cleaning_tasks:
-  - id (UUID, PK)
-  - description
-  - assigned_to → team_members.id
-  - frequency
+  - author_id → team_members.id
   - completed_at
+  - note
+
+## Temperatures Module
+
+equipment:
+  - id (UUID, PK)
+  - name
+  - type
+  - color_index
+  - target_min
+  - target_max
+  - active
+
+temperature_readings:
+  - id (UUID, PK)
+  - equipment_id → equipment.id
+  - date
+  - time
+  - temperature
+  - author_id → team_members.id
+  - comment
 
 ## Products Module
 
@@ -72,9 +92,14 @@ recipes:
 
 orders:
   - id (UUID, PK)
+  - channel (boutique | web | brunch)
   - customer_name
   - date
+  - pickup_date
+  - pickup_time
   - status
+  - paid
+  - notes
 
 order_items:
   - id (UUID, PK)
@@ -82,10 +107,27 @@ order_items:
   - product_id → products.id
   - quantity
 
-## Suppliers Module
+## Traceability Module
 
 suppliers:
   - id (UUID, PK)
   - name
-  - contact_info
-  - products_supplied
+  - contact_name
+  - contact (phone / email)
+  - color_index
+  - active
+
+delivered_products:
+  - id (UUID, PK)
+  - supplier_id → suppliers.id
+  - date
+  - product_name
+  - qty
+  - weight
+  - lot
+  - dlc
+  - temperature
+  - conformity (compliant | non_compliant)
+  - non_conformity_note
+  - photo_url
+  - created_at

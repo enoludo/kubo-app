@@ -1,14 +1,14 @@
 // ─── Grille semaine fournisseurs × jours ─────────────────────────────────────
 // Réutilise .wg-layout / .wg-header / .wg-body / .wg-row / .wg-day-cell
 
-import { dateToStr }       from '../../../utils/date'
-import { getCategoryTokens } from '../../../data/categories'
-import TraceDayCell        from './TraceDayCell'
+import { dateToStr }         from '../../../utils/date'
+import { getSupplierColors } from '../utils/traceabilityColors'
+import TraceDayCell          from './TraceDayCell'
 
 const DAY_NAMES = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
 const DAY_FLEX  = [0.5, 1, 1, 1, 1, 1, 0.5]
 
-function SupplierCard({ supplier, categoryLabel, bgColor, onClick }) {
+function SupplierCard({ supplier, colors, onClick }) {
   const initials = supplier.name
     .split(' ')
     .map(w => w[0]?.toUpperCase() ?? '')
@@ -17,13 +17,24 @@ function SupplierCard({ supplier, categoryLabel, bgColor, onClick }) {
 
   return (
     <div className="tr-supplier-card" onClick={onClick}>
-      <div className="tr-supplier-avatar" style={{ backgroundColor: bgColor }}>
-        {initials}
-      </div>
       <div className="tr-supplier-identity">
+        <div className="tr-supplier-avatar" style={{ backgroundColor: colors.badgeColor }}>
+          {initials}
+        </div>
         <span className="tr-supplier-name">{supplier.name}</span>
-        <span className="tr-supplier-category">{categoryLabel}</span>
       </div>
+      {(supplier.contactName || supplier.contact) && (
+        <div className="tr-supplier-contact">
+          {supplier.contactName && (
+            <span>{supplier.contactName}</span>
+          )}
+          {supplier.contact && (
+            <a href={`tel:${supplier.contact}`} onClick={e => e.stopPropagation()}>
+              {supplier.contact}
+            </a>
+          )}
+        </div>
+      )}
     </div>
   )
 }
@@ -31,8 +42,7 @@ function SupplierCard({ supplier, categoryLabel, bgColor, onClick }) {
 export default function TraceCalendar({
   weekDates,
   suppliers,
-  categories,
-  getReceptionsForDay,
+  getDeliveriesForDay,
   onCellClick,
   onSupplierClick,
   onAddSupplier,
@@ -73,9 +83,7 @@ export default function TraceCalendar({
       {/* ── Corps scrollable ── */}
       <div className={`wg-body ${suppliers.length <= 5 ? 'wg-body--stretch' : 'wg-body--scroll'}`}>
         {suppliers.map(supplier => {
-          const tokens  = getCategoryTokens(supplier.category)
-          const catObj  = categories.find(c => c.id === supplier.category)
-          const catLabel = catObj?.label ?? supplier.category
+          const colors = getSupplierColors(supplier)
 
           return (
             <div key={supplier.id} className="wg-row">
@@ -84,17 +92,16 @@ export default function TraceCalendar({
               <div className="wg-entity-col">
                 <SupplierCard
                   supplier={supplier}
-                  categoryLabel={catLabel}
-                  bgColor={tokens.badge}
+                  colors={colors}
                   onClick={() => onSupplierClick(supplier)}
                 />
               </div>
 
               {/* Cellules jours */}
               {weekDates.map((date, i) => {
-                const ds         = dateToStr(date)
-                const dayRecs    = getReceptionsForDay(supplier.id, ds)
-                const isWeekend  = i === 0 || i === 6
+                const ds          = dateToStr(date)
+                const dayDeliveries = getDeliveriesForDay(supplier.id, ds)
+                const isWeekend   = i === 0 || i === 6
 
                 return (
                   <div
@@ -103,12 +110,13 @@ export default function TraceCalendar({
                     style={{ flex: DAY_FLEX[i] }}
                   >
                     <TraceDayCell
-                      receptions={dayRecs}
-                      bgColor={tokens.bg}
+                      deliveries={dayDeliveries}
+                      bgColor={colors.bgColor}
+                      pillColor={colors.pillColor}
                       dateStr={ds}
                       todayStr={todayStr}
                       isWeekend={isWeekend}
-                      onClick={() => onCellClick(supplier, ds, dayRecs)}
+                      onClick={() => onCellClick(supplier, ds, dayDeliveries)}
                     />
                   </div>
                 )

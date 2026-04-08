@@ -8,7 +8,7 @@ composants UI simples, workflows épurés.
 L'app est principalement utilisée sur tablette et mobile.
 Concevoir pour le tactile en priorité :
 - Aucun élément visible uniquement au hover
-- Zones de tap minimum 44x44px
+- Zones de tap minimum var(--control-height-md) x var(--control-height-md)
 - Interactions déclenchées par tap/clic uniquement
 - Pas de drag & drop complexe sur mobile
 - Menus déroulants plutôt que hover menus

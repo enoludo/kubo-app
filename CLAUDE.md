@@ -1,140 +1,72 @@
-# Kubo Pâtisserie — Internal Platform
+# Kubo Pâtisserie — App interne
 
-## Skills disponibles dans .claude/skills/
+## Stack
+- React + Vite, CSS custom properties, Poppins
+- État local (transitoire → API centralisée à venir)
+- Tablette iPad en production
 
-Consulte le skill approprié avant chaque tâche :
-- Design UI/UX → `.claude/skills/ux-designer.md`
-- Design System → `.claude/skills/design-system.md`
-  À lire OBLIGATOIREMENT avant toute modification
-  de styles, tokens, composants ou création de UI
-- Composants React → `.claude/skills/frontend-engineer.md`
-- Intégration Google Sheets → `.claude/skills/integration-engineer.md`
-- Architecture → `.claude/skills/software-architect.md`
-- Base de données → `.claude/skills/database-architect.md`
-- Backend/API → `.claude/skills/backend-engineer.md`
-- DevOps → `.claude/skills/devops.md`
-- Pertinence métier → `.claude/skills/bakery-operations.md`
+## Règles absolues design system
+- 3 niveaux de tokens : primitifs → sémantiques → module
+- Préfixes : `--color-*` / `--bg-*` / `--[module]-*`
+- Zéro valeur hardcodée (hex, px) dans les composants
+- Zéro logique métier dans les composants génériques
+- Chaque module a ses propres tokens (`[module]-tokens.css`)
+- Lire `.claude/skills/design-system.md` avant toute modif de styles
 
-Lis le ou les skills pertinents avant chaque nouvelle tâche.
-Lis aussi `.claude/skills/README.md` pour les conventions générales du projet.
+## Modules actifs
+| Module        | Dossier                      |
+|---------------|------------------------------|
+| Planning      | `src/modules/planning/`      |
+| Commandes     | `src/modules/orders/`        |
+| Produits      | `src/modules/products/`      |
+| Nettoyage     | `src/modules/cleaning/`      |
+| Températures  | `src/modules/temperatures/`  |
+| Traçabilité   | `src/modules/traceability/`  |
 
----
+## Skills — quand les lire
+| Skill                              | Contexte                                      |
+|------------------------------------|-----------------------------------------------|
+| `design-system.md`                 | Styles, tokens, composants, toute UI          |
+| `ux-designer.md`                   | Nouveaux écrans, flows, interactions          |
+| `frontend-engineer.md`             | Composants React                              |
+| `integration-engineer.md`          | Google Sheets / Drive / Webflow               |
+| `software-architect.md`            | Structure, nouveaux modules                   |
+| `database-architect.md`            | Schéma de données                             |
+| `backend-engineer.md`              | API, services                                 |
+| `bakery-operations.md`             | Pertinence métier, logique boulangerie        |
+| `devops.md`                        | CI/CD, variables d'environnement, déploiement |
 
-## Project Overview
+Lire aussi `.claude/skills/README.md` pour les conventions générales.
 
-This project is an internal business platform for a bakery.
+## Docs de référence
+| Fichier                    | Quand le lire                                 |
+|----------------------------|-----------------------------------------------|
+| `/docs/vision.md`          | Architecture globale, décisions structurelles |
+| `/docs/master-prompt.md`   | Règles de développement générales             |
+| `/docs/database.md`        | Modèle de données                             |
+| `/docs/features.md`        | État des modules actifs                       |
+| `/docs/orders-context.md`  | Module Commandes (obligatoire avant toute tâche commandes) |
 
-The current focus is the scheduling module, but it is NOT a standalone app.
+**En cas de conflit entre une instruction et `/docs` → suivre `/docs`.**
 
-The system will progressively include:
-- scheduling
-- hygiene tracking
-- orders management
-- products & recipes
-- cost calculation
-- suppliers
+## Intégrations actives
+- **Google Auth** — `src/services/googleAuth.js` — OAuth2 GIS, scope `spreadsheets` + `drive.file`
+- **Google Sheets** — `src/services/googleSheets.js` — sync bidirectionnelle
+- **Google Drive** — `src/services/googleDrive.js` — upload photos étiquettes traçabilité
+- **Webflow** — import commandes web via API Vercel Serverless
 
-All modules must share the same data and architecture.
-
----
-
-## Source of Truth
-
-All architecture and rules are defined in:
-
-- /docs/vision.md
-- /docs/master-prompt.md
-- /docs/database.md
-- /docs/features.md
-
-### Documentation obligatoire à lire
-
-Avant toute tâche sur un module spécifique, lire le fichier de contexte correspondant :
-
-- **Module Commandes** → `/docs/orders-context.md`
-  (canaux, règles métier, schéma de données, intégration Webflow, formulaires)
-
-You must always follow these documents.
-
-If any instruction conflicts with them:
-→ follow /docs
-
----
-
-## Architecture Principles
-
-- Modular system (not standalone apps)
-- Shared database (single source of truth)
-- Reusable entities (team_members, roles, etc.)
-- No data duplication
-- Clear separation:
-  - data models
-  - business logic
-  - API
-  - UI
-
----
-
-## Current Tech Context
-
-The current implementation uses:
-- React + Vite
-- local state (temporary)
-
-However:
-⚠️ This is transitional
-
-The architecture must evolve toward:
-- shared backend / API
-- centralized data
-- scalable structure
-
-Do NOT lock the system into frontend-only logic.
-
----
-
-## UI / Design
-
-- Clean, professional, artisan aesthetic
-- Inspired by tools like Skello / ComboHR
-- Prioritize clarity and speed of use
-- Optimize for non-technical users (bakery staff)
-
-Design is important, but must not break architecture.
-
----
-
-## Development Rules
-
-- Keep components modular and reusable
-- Avoid tight coupling
-- Always think about future modules
-- Prefer simple and maintainable solutions
-- Validate architecture before implementing
-
----
-
-## Demo Data
-
-Données de démonstration — modifier uniquement ici :
-- Shifts : `src/data/demoShifts.js` (tableau + UUIDs fixes des employés)
+## Données de démo
+- Shifts : `src/data/demoShifts.js`
 - Équipe : `src/data/team.json`
+- Ne jamais mettre de données dans les hooks ou composants
 
-Ne pas mettre de données dans les hooks ou composants.
+## Règles tablette
+- Tap target minimum : var(--control-height-md)
+- Zéro interaction hover-only
+- Toutes les actions fonctionnent au tap
 
----
-
-## Usage tactile
-
-L'app est utilisée principalement sur tablette.
-Aucune fonctionnalité ne doit dépendre du hover.
-Toutes les interactions doivent fonctionner au tap.
-
----
-
-## Current Priority
-
-Focus on improving the scheduling module,
-while ensuring it fits into the global system.
-
-If unsure, ask before implementing.
+## Règles CSS
+- Toujours utiliser les tokens, jamais de valeurs brutes
+- Rayon : cards `--radius-sm`, modals `--radius-md`, pills `--radius-full`
+- Modifications ciblées — ne pas régénérer ce qui fonctionne
+- Isoler les styles par module, pas de fuite entre modules

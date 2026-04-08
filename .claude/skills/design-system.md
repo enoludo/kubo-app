@@ -8,7 +8,7 @@ The system must support multiple independent modules:
 - planning
 - orders
 - products
-- hygiene
+- cleaning
 - temperatures
 - traceability
 
@@ -148,7 +148,7 @@ Examples:
 - Cards: --radius-sm (8px)
 - Modals: --radius-md (16px)
 - Badges/pills: --radius-full
-- All interactions: minimum 44px tap target
+- All interactions: minimum var(--control-height-md) tap target
 - No hover-only interactions (tablet)
 - Always use design tokens, never hardcode values
 

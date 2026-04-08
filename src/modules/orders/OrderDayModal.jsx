@@ -39,7 +39,7 @@ function isWebflowOrder(order) {
 
 function OrderCard({ order, onEdit, onDelete, getProduct }) {
   const [confirmDelete, setConfirmDelete] = useState(false)
-  const canEdit   = !order.paid && !isWebflowOrder(order)
+  const canEdit   = order.paymentStatus !== 'paid' && !isWebflowOrder(order)
   const canDelete = !isWebflowOrder(order)
 
   return (
@@ -63,11 +63,22 @@ function OrderCard({ order, onEdit, onDelete, getProduct }) {
            : order.channel === 'brunch' && order.brunchSource === 'boutique' ? 'Brunch boutique'
            : CHANNEL_LABEL[order.channel]}
         </span>
-        {order.channel !== 'web' && !(order.channel === 'brunch' && order.brunchSource === 'web') && (
-          <span className={`odm-badge ${order.paid ? 'odm-badge--paid' : 'odm-badge--unpaid'}`}>
-            {order.paid ? 'Payé' : 'Non payé'}
-          </span>
-        )}
+        {order.channel !== 'web' && !(order.channel === 'brunch' && order.brunchSource === 'web') && (() => {
+          const status = order.paymentStatus ?? (order.paid ? 'paid' : 'unpaid')
+          if (status === 'partial') {
+            const remaining = Math.max(0, (order.totalPrice ?? 0) - (order.paidAmount ?? 0))
+            return (
+              <span className="odm-badge odm-badge--partial">
+                Reste : {remaining.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}
+              </span>
+            )
+          }
+          return (
+            <span className={`odm-badge odm-badge--${status}`}>
+              {status === 'paid' ? 'Payé' : 'Non payé'}
+            </span>
+          )
+        })()}
       </div>
 
       {/* 2+3 : Nom client | Prix total */}

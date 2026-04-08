@@ -1,8 +1,10 @@
 // ─── Formulaire produit — création et édition ────────────────────────────────
 import { useState } from 'react'
 import { ALLERGENS_EU } from './AllergenBadges'
-import Modal from '../../design-system/components/Modal/Modal'
-import Button from '../../design-system/components/Button/Button'
+import Modal  from '../../design-system/components/Modal/Modal'
+import Button  from '../../design-system/components/Button/Button'
+import Toggle  from '../../design-system/components/Toggle/Toggle'
+import '../../design-system/components/Toggle/Toggle.css'
 
 // ── Constantes ────────────────────────────────────────────────────────────────
 
@@ -65,23 +67,6 @@ function Field({ label, children, hint }) {
       {children}
       {hint && <span className="pf-hint">{hint}</span>}
     </div>
-  )
-}
-
-function Toggle({ label, checked, onChange }) {
-  return (
-    <button
-      type="button"
-      className={`pf-toggle${checked ? ' pf-toggle--on' : ''}`}
-      onClick={() => onChange(!checked)}
-      role="switch"
-      aria-checked={checked}
-    >
-      <span className="pf-toggle-track">
-        <span className="pf-toggle-thumb" />
-      </span>
-      <span className="pf-toggle-label">{label}</span>
-    </button>
   )
 }
 

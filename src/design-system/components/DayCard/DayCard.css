@@ -26,6 +26,10 @@
   border: 1px dashed var(--color-grey-500);
 }
 
+.day-card--today {
+  border: 1px dashed var(--color-grey-500) !important;
+}
+
 /* ─── Badge statut ───────────────────────────────────────────────── */
 
 .day-card-badge {

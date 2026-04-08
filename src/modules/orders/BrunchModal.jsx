@@ -22,7 +22,8 @@ export default function BrunchModal({ onSave, onCancel, initialDate }) {
   const [phone,       setPhone]       = useState('')
   const [nbPersons,   setNbPersons]   = useState(2)
   const [time,        setTime]        = useState('10h30')
-  const [paid,        setPaid]        = useState(false)
+  const [paymentStatus, setPaymentStatus] = useState('unpaid')
+  const [paidAmount,    setPaidAmount]    = useState('')
   const [submitted,   setSubmitted]   = useState(false)
   const [brunchPrices, setBrunchPrices] = useState({})
 
@@ -44,10 +45,11 @@ export default function BrunchModal({ onSave, onCancel, initialDate }) {
       customer:    { name: name.trim(), phone: phone.trim() || null },
       items:       [{ label: 'Brunch', size: null, qty: Math.max(1, nbPersons), unitPrice }],
       totalPrice,
-      pickupDate:  initialDate,
-      pickupTime:  time,
-      paid,
-      note:        null,
+      pickupDate:   initialDate,
+      pickupTime:   time,
+      paymentStatus,
+      paidAmount:   paymentStatus === 'partial' ? (parseFloat(String(paidAmount).replace(',', '.')) || 0) : null,
+      note:         null,
     })
   }
 
@@ -110,15 +112,41 @@ export default function BrunchModal({ onSave, onCancel, initialDate }) {
             </div>
           )}
 
-          {/* Payé */}
-          <label className="nom-checkbox-label">
-            <input
-              type="checkbox"
-              checked={paid}
-              onChange={e => setPaid(e.target.checked)}
-            />
-            Brunch payé
-          </label>
+          {/* Paiement */}
+          <div className="nom-payment-selector">
+            {[
+              { value: 'paid',    label: 'Payé' },
+              { value: 'unpaid',  label: 'Non payé' },
+              { value: 'partial', label: 'Partiel' },
+            ].map(opt => (
+              <button
+                key={opt.value}
+                type="button"
+                className={`nom-payment-btn nom-payment-btn--${opt.value}${paymentStatus === opt.value ? ' nom-payment-btn--active' : ''}`}
+                onClick={() => setPaymentStatus(opt.value)}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+
+          {paymentStatus === 'partial' && (
+            <div className="nom-partial-payment">
+              <label className="field-label">Somme payée (€)</label>
+              <input
+                type="number"
+                className="field-input"
+                placeholder="0.00"
+                min="0"
+                step="0.01"
+                value={paidAmount}
+                onChange={e => setPaidAmount(e.target.value)}
+              />
+              <div className="nom-remaining">
+                Reste à payer : <strong>{Math.max(0, totalPrice - (parseFloat(String(paidAmount).replace(',', '.')) || 0)).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}</strong>
+              </div>
+            </div>
+          )}
 
         </div>
 

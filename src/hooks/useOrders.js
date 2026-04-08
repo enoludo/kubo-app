@@ -53,6 +53,14 @@ function sessionSave(orders) {
   } catch {}
 }
 
+// Migration paid: boolean → paymentStatus: string
+function migratePaymentStatus(orders) {
+  return orders.map(o => {
+    if (o.paymentStatus) return o
+    return { ...o, paymentStatus: o.paid ? 'paid' : 'unpaid' }
+  })
+}
+
 // Migration depuis l'ancien format (kubo_orders en sessionStorage)
 function migrateOldStorage() {
   try {
@@ -77,7 +85,7 @@ function migrateOldStorage() {
 export function useOrders({ onToast } = {}) {
   const [orders,        setOrders]        = useState(() => {
     migrateOldStorage()
-    return [...localLoad(), ...sessionLoad()]
+    return migratePaymentStatus([...localLoad(), ...sessionLoad()])
   })
   const [webflowStatus, setWebflowStatus] = useState('idle')
   const [webflowError,  setWebflowError]  = useState(null)

@@ -35,8 +35,8 @@
   align-items: center;
   justify-content: center;
   font-family: var(--font-family-base);
-  font-size: var(--font-size-xs);
-  font-weight: 700;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
   flex-shrink: 0;
   letter-spacing: 0.02em;
   background: var(--color-grey-400);
@@ -53,6 +53,8 @@
 }
 
 .ec-identity {
+  margin-top: auto;
+  margin-bottom: auto;
   flex: 1;
   min-width: 0;
   display: flex;

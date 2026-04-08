@@ -260,8 +260,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 44px;
-  min-height: 44px;
+  min-width: var(--control-height-md);
+  min-height: var(--control-height-md);
   background: none;
   border: none;
   cursor: pointer;
@@ -335,7 +335,7 @@
   font-size: var(--font-size-sm);
   font-weight: 600;
   padding: var(--space-xs) var(--space-sm);
-  min-height: 44px;
+  min-height: var(--control-height-md);
   border-radius: var(--radius-sm);
   border: 1px solid var(--border-m);
   background: var(--bg-2);
@@ -674,7 +674,7 @@
 .modal-emp-form-title {
   font-family: 'Poppins', sans-serif;
   font-size: 15px;
-  font-weight: 700;
+  font-weight: var(--font-weight-semibold);
   color: var(--text);
 }
 
@@ -714,6 +714,7 @@
 
 .modal-field-full input,
 .modal-field-balance-row input {
+  width: 100%;
   font-family: 'Poppins', sans-serif;
   font-size: var(--font-size-md);
   font-weight: 500;
@@ -802,7 +803,7 @@
   justify-content: center;
   font-family: 'Poppins', sans-serif;
   font-size: 9px;
-  font-weight: 700;
+  font-weight: var(--font-weight-semibold);
   flex-shrink: 0;
   background: var(--color-grey-400);
   color: var(--color-white);
@@ -834,7 +835,7 @@
 .footer-hours {
   font-family: 'Poppins', sans-serif;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: var(--font-weight-semibold);
   color: var(--text);
   white-space: nowrap;
   flex-shrink: 0;
@@ -859,14 +860,14 @@
 }
 
 .modal-avatar {
-  width: 42px;
-  height: 42px;
+  width: var(--control-height-md);
+  height: var(--control-height-md);
   border-radius: var(--radius-full);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: var(--font-size-sm);
-  font-weight: 700;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
   flex-shrink: 0;
   background: var(--color-grey-400);
   color: var(--color-white);
@@ -880,13 +881,13 @@
 
 .modal-emp-role {
   /* extends .text-meta — ajoute uniquement margin-top */
-  margin-top: var(--space-xs);
+  margin-top: 0;
 }
 
 .modal-date {
   font-size: var(--font-size-xl);
   color: var(--text-primary);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-semibold);
   text-transform: capitalize;
 }
 
@@ -962,7 +963,7 @@
   border-color: var(--accent);
   background: var(--color-grey-200);
   color: var(--accent);
-  font-weight: 700;
+  font-weight: var(--font-weight-semibold);
 }
 
 .preview-type-note {
@@ -990,13 +991,12 @@
 }
 
 .modal-pause label {
-  font-family: 'Poppins', sans-serif;
-  font-size: var(--font-size-sm);
-  font-weight: 600;
-  color: var(--text-3);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  white-space: nowrap;
+    font-family: 'Poppins', sans-serif;
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-3);
 }
 
 .modal-preview {
@@ -1223,7 +1223,7 @@
 .week-picker-title {
   font-family: 'Poppins', sans-serif;
   font-size: 15px;
-  font-weight: 700;
+  font-weight: var(--font-weight-semibold);
   color: var(--text);
   flex: 1;
 }
@@ -1242,7 +1242,7 @@
 .week-picker-month-label {
   font-family: 'Poppins', sans-serif;
   font-size: var(--font-size-sm);
-  font-weight: 700;
+  font-weight: var(--font-weight-semibold);
   color: var(--text-2);
   text-transform: uppercase;
   letter-spacing: 0.07em;
@@ -1713,11 +1713,7 @@
 
 /* ── Grand écran : ≥ 1920px ── */
 @media (min-width: 1920px) {
-  :root {
-    --tv-emp-col: 240px;
-    --gap:        16px;
-    --header-h:   142px;
-  }
+  
 
   .header { padding-top: var(--space-lg); }
 
@@ -1727,7 +1723,7 @@
   .day-card        { padding: var(--space-md); }
   .day-card-badge  { padding: 0 var(--space-sm); margin-top: 0; margin-bottom: var(--space-md); }
 
-  .modal { width: 640px; }
+  
   .week-picker-panel { width: min(960px, 96vw); }
 }
 
@@ -1975,7 +1971,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-sm);
-  min-height: 44px;
+  min-height: var(--control-height-md);
   padding: 0 var(--space-md);
   border-radius: var(--radius-sm);
   border: 1px solid var(--border-m);
@@ -1990,7 +1986,7 @@
 .emp-btn-copy:hover { background: var(--bg-3); color: var(--text); }
 .emp-btn-paste {
   flex: 0 0 100%;
-  min-height: 44px;
+  min-height: var(--control-height-md);
   padding: 0 var(--space-md);
   border-radius: var(--radius-sm);
   border: none;

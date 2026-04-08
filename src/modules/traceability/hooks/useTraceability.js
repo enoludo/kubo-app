@@ -1,11 +1,10 @@
 // ─── Hook — état et logique du module Traçabilité ─────────────────────────────
 import { useState, useEffect, useRef } from 'react'
-import { DEMO_SUPPLIERS }              from '../../../data/traceabilityDemo'
-import { DEMO_RECEPTIONS }             from '../../../data/traceabilityDemo'
+import { DEMO_SUPPLIERS, DEMO_PRODUCTS } from '../../../data/traceabilityDemo'
 
-const SUPPLIERS_KEY  = 'kubo_tr_suppliers'
-const RECEPTIONS_KEY = 'kubo_tr_receptions'
-const DEBOUNCE_MS    = 500
+const SUPPLIERS_KEY = 'kubo_tr_suppliers'
+const PRODUCTS_KEY  = 'kubo_tr_products'
+const DEBOUNCE_MS   = 500
 
 // ── Persistance locale ────────────────────────────────────────────────────────
 
@@ -23,13 +22,12 @@ function save(key, data) {
 // ── Hook ──────────────────────────────────────────────────────────────────────
 
 export function useTraceability() {
-  const [suppliers,  setSuppliers]  = useState(() => load(SUPPLIERS_KEY,  DEMO_SUPPLIERS))
-  const [receptions, setReceptions] = useState(() => load(RECEPTIONS_KEY, DEMO_RECEPTIONS))
+  const [suppliers, setSuppliers] = useState(() => load(SUPPLIERS_KEY, DEMO_SUPPLIERS))
+  const [deliveries, setDeliveries] = useState(() => load(PRODUCTS_KEY, DEMO_PRODUCTS))
 
   const timerS = useRef(null)
-  const timerR = useRef(null)
+  const timerD = useRef(null)
 
-  // Persistance avec debounce
   useEffect(() => {
     clearTimeout(timerS.current)
     timerS.current = setTimeout(() => save(SUPPLIERS_KEY, suppliers), DEBOUNCE_MS)
@@ -37,27 +35,15 @@ export function useTraceability() {
   }, [suppliers])
 
   useEffect(() => {
-    clearTimeout(timerR.current)
-    timerR.current = setTimeout(() => save(RECEPTIONS_KEY, receptions), DEBOUNCE_MS)
-    return () => clearTimeout(timerR.current)
-  }, [receptions])
+    clearTimeout(timerD.current)
+    timerD.current = setTimeout(() => save(PRODUCTS_KEY, deliveries), DEBOUNCE_MS)
+    return () => clearTimeout(timerD.current)
+  }, [deliveries])
 
   // ── Helpers ─────────────────────────────────────────────────────────────────
 
-  /** Réceptions pour un fournisseur donné sur une date */
-  function getReceptionsForDay(supplierId, dateStr) {
-    return receptions.filter(r => r.supplierId === supplierId && r.date === dateStr)
-  }
-
-  /** Réceptions pour un fournisseur sur la semaine */
-  function getReceptionsForWeek(supplierId, weekDates) {
-    const dateStrs = new Set(weekDates.map(d => {
-      const y = d.getFullYear()
-      const m = String(d.getMonth() + 1).padStart(2, '0')
-      const dd = String(d.getDate()).padStart(2, '0')
-      return `${y}-${m}-${dd}`
-    }))
-    return receptions.filter(r => r.supplierId === supplierId && dateStrs.has(r.date))
+  function getDeliveriesForDay(supplierId, dateStr) {
+    return deliveries.filter(d => d.supplierId === supplierId && d.date === dateStr)
   }
 
   // ── CRUD fournisseurs ────────────────────────────────────────────────────────
@@ -74,36 +60,35 @@ export function useTraceability() {
 
   function deleteSupplier(id) {
     setSuppliers(prev => prev.filter(s => s.id !== id))
-    setReceptions(prev => prev.filter(r => r.supplierId !== id))
+    setDeliveries(prev => prev.filter(d => d.supplierId !== id))
   }
 
-  // ── CRUD réceptions ──────────────────────────────────────────────────────────
+  // ── CRUD produits livrés ─────────────────────────────────────────────────────
 
-  function addReception(data) {
-    const newRec = { ...data, id: `rec-${Date.now()}` }
-    setReceptions(prev => [...prev, newRec])
-    return newRec
+  function addDelivery(data) {
+    const newDelivery = { ...data, id: `dp-${Date.now()}` }
+    setDeliveries(prev => [...prev, newDelivery])
+    return newDelivery
   }
 
-  function updateReception(id, data) {
-    setReceptions(prev => prev.map(r => r.id === id ? { ...r, ...data } : r))
+  function updateDelivery(id, data) {
+    setDeliveries(prev => prev.map(d => d.id === id ? { ...d, ...data } : d))
   }
 
-  function deleteReception(id) {
-    setReceptions(prev => prev.filter(r => r.id !== id))
+  function deleteDelivery(id) {
+    setDeliveries(prev => prev.filter(d => d.id !== id))
   }
 
   return {
-    suppliers:             suppliers.filter(s => s.active),
-    allSuppliers:          suppliers,
-    receptions,
-    getReceptionsForDay,
-    getReceptionsForWeek,
+    suppliers:          suppliers.filter(s => s.active),
+    allSuppliers:       suppliers,
+    deliveries,
+    getDeliveriesForDay,
     addSupplier,
     updateSupplier,
     deleteSupplier,
-    addReception,
-    updateReception,
-    deleteReception,
+    addDelivery,
+    updateDelivery,
+    deleteDelivery,
   }
 }

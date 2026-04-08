@@ -15,11 +15,11 @@ export default function TempDayCell({ equipment, date, readings, onClick }) {
   const cellDate = new Date(date); cellDate.setHours(0, 0, 0, 0)
   const isPast   = cellDate < today
   const isFuture = cellDate > today
+  const isToday  = !isPast && !isFuture
   const bg       = isEmpty ? undefined : palette.c100
 
   if (isEmpty) {
     if (isFuture) {
-      // Futur sans relevé — non cliquable, pas de bordure pointillée
       return (
         <div
           className="day-card tdc-future-empty"
@@ -29,7 +29,6 @@ export default function TempDayCell({ equipment, date, readings, onClick }) {
     }
 
     if (isPast) {
-      // Passé sans relevé — cliquable, "Aucun relevé"
       return (
         <div
           className="day-card tdc-past-empty"
@@ -43,10 +42,10 @@ export default function TempDayCell({ equipment, date, readings, onClick }) {
       )
     }
 
-    // Aujourd'hui sans relevé — comportement original
+    // Aujourd'hui sans relevé
     return (
       <div
-        className="day-card day-card--empty add-trigger add-trigger--icon"
+        className="day-card day-card--empty day-card--today add-trigger add-trigger--icon"
         style={{ '--card-border': palette.c300 }}
         onClick={onClick}
         role="button"
@@ -63,7 +62,7 @@ export default function TempDayCell({ equipment, date, readings, onClick }) {
 
   return (
     <div
-      className="day-card"
+      className={`day-card${isToday ? ' day-card--today' : ''}`}
       style={{ background: bg, '--card-border': palette.c300 }}
       onClick={onClick}
       role="button"

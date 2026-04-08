@@ -200,7 +200,7 @@ export default function TempModal({ equipment, date, readings: initialReadings, 
 
       {/* ── Formulaire ajout ── */}
       <div className="tm-add-section">
-        <div className="tm-section-label">Ajouter un relevé</div>
+        <div className="tm-section-label">Nouveau relevé</div>
         <div className="tm-add-grid">
           <input
             type="time"

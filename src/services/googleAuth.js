@@ -45,7 +45,7 @@ export function initTokenClient(clientId, onSuccess, onError) {
 
   _tokenClient = window.google.accounts.oauth2.initTokenClient({
     client_id:      clientId,
-    scope:          'https://www.googleapis.com/auth/spreadsheets',
+    scope:          'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file',
     callback:       (r) => {
       const queue = _pendingQueue.splice(0)
       if (r.error) { queue.forEach(({ onError: e }) => e(r.error)); return }

@@ -61,7 +61,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-md);
+  gap: var(--space-sm);
   width: 100%;
   padding: var(--space-sm);
   border-radius: var(--space-xl);
@@ -200,7 +200,7 @@
 
 .startup-title {
   font-size: var(--font-size-xl);
-  font-weight: 700;
+  font-weight: var(--font-weight-semibold);
   color: var(--text);
 }
 
@@ -236,7 +236,7 @@
   justify-content: center;
   font-family: 'Poppins', sans-serif;
   font-size: 17px;
-  font-weight: 700;
+  font-weight: var(--font-weight-semibold);
   color: var(--bg);
   flex-shrink: 0;
 }
@@ -326,14 +326,14 @@
   font-size: var(--font-size-md);
   color: var(--text-3);
   cursor: pointer;
-  min-height: 44px;
+  min-height: var(--control-height-md);
   padding: 0;
   text-decoration: underline;
   text-underline-offset: 2px;
 }
 
 .startup-continue {
-  min-height: 44px;
+  min-height: var(--control-height-md);
   padding: 0 var(--space-lg);
   border-radius: var(--radius-sm);
   border: none;

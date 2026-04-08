@@ -62,10 +62,13 @@ export default function NewOrderModal({ onSave, onCancel, initialDate, initialCh
   const [totalOverride, setTotalOverride] = useState(
     initialOrder?.totalPrice ? String(initialOrder.totalPrice) : ''
   )
-  const [pickupDate, setPickupDate] = useState(initialOrder?.pickupDate ?? initialDate ?? today)
-  const [pickupTime, setPickupTime] = useState(initialOrder?.pickupTime ?? '')
-  const [paid,       setPaid]       = useState(initialOrder?.paid ?? false)
-  const [submitted,  setSubmitted]  = useState(false)
+  const [pickupDate,     setPickupDate]     = useState(initialOrder?.pickupDate ?? initialDate ?? today)
+  const [pickupTime,     setPickupTime]     = useState(initialOrder?.pickupTime ?? '')
+  const [paymentStatus,  setPaymentStatus]  = useState(
+    initialOrder?.paymentStatus ?? (initialOrder?.paid ? 'paid' : 'unpaid')
+  )
+  const [paidAmount,     setPaidAmount]     = useState(initialOrder?.paidAmount ?? '')
+  const [submitted,      setSubmitted]      = useState(false)
 
   // ── Total auto-calculé ────────────────────────────────────────────────────
   const computedTotal = cart.reduce((sum, item) => {
@@ -124,7 +127,8 @@ export default function NewOrderModal({ onSave, onCancel, initialDate, initialCh
       totalPrice: finalTotal,
       pickupDate,
       pickupTime: pickupTime || null,
-      paid,
+      paymentStatus,
+      paidAmount: paymentStatus === 'partial' ? (parseFloat(String(paidAmount).replace(',', '.')) || 0) : null,
       note: null,
     })
   }
@@ -277,13 +281,40 @@ export default function NewOrderModal({ onSave, onCancel, initialDate, initialCh
               </div>
             </div>
 
-            <button
-              type="button"
-              className={`nom-paid-toggle${paid ? ' nom-paid-toggle--paid' : ' nom-paid-toggle--unpaid'}`}
-              onClick={() => setPaid(v => !v)}
-            >
-              {paid ? 'Payée' : 'Non payée'}
-            </button>
+            <div className="nom-payment-selector">
+              {[
+                { value: 'paid',    label: 'Payé' },
+                { value: 'unpaid',  label: 'Non payé' },
+                { value: 'partial', label: 'Partiel' },
+              ].map(opt => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  className={`nom-payment-btn nom-payment-btn--${opt.value}${paymentStatus === opt.value ? ' nom-payment-btn--active' : ''}`}
+                  onClick={() => setPaymentStatus(opt.value)}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+
+            {paymentStatus === 'partial' && (
+              <div className="nom-partial-payment">
+                <label className="field-label">Somme payée (€)</label>
+                <input
+                  type="number"
+                  className="field-input"
+                  placeholder="0.00"
+                  min="0"
+                  step="0.01"
+                  value={paidAmount}
+                  onChange={e => setPaidAmount(e.target.value)}
+                />
+                <div className="nom-remaining">
+                  Reste à payer : <strong>{Math.max(0, finalTotal - (parseFloat(String(paidAmount).replace(',', '.')) || 0)).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}</strong>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* ── Actions ── */}

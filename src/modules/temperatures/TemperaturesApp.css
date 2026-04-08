@@ -133,7 +133,7 @@
 .tm-equip-meta {
   font-family: var(--font-family-base);
   font-size: var(--font-size-sm);
-  color: var(--color-text-muted);
+  color: var(--text-secondary);
 }
 
 
@@ -192,7 +192,7 @@
   font-weight: var(--font-weight-semibold);
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--color-text-muted);
+  color: var(--text-primary);
 }
 
 .tm-section-dot {
@@ -337,7 +337,7 @@
   font-family: var(--font-family-base);
   font-size: var(--font-size-md);
   color: var(--text-primary);
-  min-width: 44px;
+  min-width: var(--control-height-md);
   flex-shrink: 0;
 }
 
@@ -368,6 +368,9 @@
 .tm-add-section {
   display: flex;
   flex-direction: column;
+  border: solid 1px var(--color-grey-200);
+  border-radius: var(--radius-sm);
+  padding: var(--space-md);
   gap: var(--space-sm);
 }
 
