@@ -946,226 +946,6 @@
   margin: 0;
 }
 
-/* ── Carte commande ───────────────────────────────────────────────────────── */
-
-/* Carte commande */
-.odm-card {
-  border-radius: var(--radius-sm);
-  background: var(--bg-2);
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-/* Ligne 1 : Nom | Montant */
-.odm-card-row1 {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--space-sm);
-}
-
-/* Bloc contact indépendant (téléphone + email) */
-.odm-card-contact-block {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xs);
-}
-
-.odm-card-name {
-  font-family: 'Poppins', sans-serif;
-  font-size: var(--font-size-md);
-  font-weight: 600;
-  color: var(--text);
-  line-height: 1.2;
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.odm-card-total-amount {
-  font-family: 'Poppins', sans-serif;
-  font-size: var(--font-size-md);
-  font-weight: 600;
-  color: var(--text);
-  flex-shrink: 0;
-}
-
-/* Ligne 0 : badges canal + paiement */
-.odm-card-meta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-sm);
-  margin-bottom: var(--space-xs);
-}
-
-/* Badges canal / paiement */
-.odm-badge {
-  font-family: 'Poppins', sans-serif;
-  font-size: var(--font-size-xs);
-  font-weight: 600;
-  padding: var(--space-xs) var(--space-sm);
-  border-radius: var(--radius-md);
-}
-.odm-badge--boutique { background: var(--orders-channel-boutique-bg);  color: var(--orders-channel-boutique-text); }
-.odm-badge--web      { background: var(--orders-channel-web-bg);       color: var(--orders-channel-web-text); }
-.odm-badge--brunch   { background: var(--orders-channel-brunch-bg);    color: var(--orders-channel-brunch-text); }
-.odm-badge--paid     { background: var(--orders-payment-paid-bg);      color: var(--orders-payment-paid-text); }
-.odm-badge--unpaid   { background: var(--orders-payment-unpaid-bg);    color: var(--orders-payment-unpaid-text); }
-.odm-badge--partial  { background: var(--orders-payment-partial-bg);   color: var(--orders-payment-partial-text);  }
-
-/* Ligne 2 : Produits en liste */
-.odm-card-products {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  border-top: solid 1px var(--bg-3);
-  border-bottom: solid 1px var(--bg-3);
-  padding: 1rem 0;
-  font-family: 'Poppins', sans-serif;
-  font-size: 12px;
-  color: var(--text);
-  line-height: 1.4;
-}
-
-.odm-item {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-}
-
-.odm-item-photo {
-  width: 4rem;
-  height: 3rem;
-  mix-blend-mode: multiply;
-  border-radius: var(--radius-sm);
-  overflow: hidden;
-  flex-shrink: 0;
-  background: var(--bg-2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.odm-item-photo img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.odm-item-photo-placeholder {
-  font-size: var(--font-size-xl);
-}
-
-.odm-item-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.odm-item-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.odm-item-name {
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.odm-item-qty {
-  font-weight: 600;
-  color: var(--text-2);
-  margin-left: var(--space-sm);
-  flex-shrink: 0;
-}
-
-.odm-item-size {
-  font-size: 12px;
-  color: var(--text-3);
-  margin-top: var(--space-xs);
-}
-
-/* Ligne 3 : Heure de retrait */
-.odm-card-time {
-  font-family: 'Poppins', sans-serif;
-  font-weight: 500;
-  font-size: 12px;
-  color: var(--text);
-  margin-top: auto;
-}
-
-/* Contact (téléphone + email) — directement sous le nom */
-.odm-card-contact {
-  display: block;
-  font-size: var(--font-size-sm);
-}
-
-/* Note — fond var(--bg) pour contraste sur fond var(--bg-2) de la carte */
-.odm-card-note {
-  display: flex;
-  gap: var(--space-sm);
-  background: var(--bg);
-  border-radius: var(--radius-sm);
-  padding: var(--space-sm);
-}
-
-.odm-card-note-label {
-  font-family: 'Poppins', sans-serif;
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  color: var(--accent);
-  flex-shrink: 0;
-  padding-top: var(--space-xs);
-}
-
-.odm-card-note-text {
-  font-family: 'Poppins', sans-serif;
-  font-size: 12px;
-  color: var(--text-2);
-  font-style: italic;
-  line-height: 1.4;
-}
-
-
-/* Footer actions (modifier + supprimer) */
-.odm-card-actions {
-  display: flex;
-  gap: var(--space-sm);
-  margin-top: var(--space-xs);
-}
-.odm-card-edit   { flex: 1; gap: 6px; background-color: var(--color-grey-200) }
-.odm-card-edit:hover   { background-color: var(--color-grey-400) }
-.odm-card-delete { flex: 1; gap: 6px; }
-.odm-card-delete:hover  { background: var(--btn-danger-bg-hover); }
-.odm-card-delete:active { background: var(--btn-danger-bg-active); }
-
-/* État confirmation suppression */
-.odm-card--confirm {
-  border: 1px solid var(--color-error-border);
-}
-
-.odm-confirm-text {
-  font-family: 'Poppins', sans-serif;
-  font-size: var(--font-size-md);
-  color: var(--text);
-  margin: 0 0 var(--space-md);
-  line-height: 1.4;
-}
-
-.odm-confirm-actions {
-  display: flex;
-  gap: var(--space-sm);
-}
 
 /* Toggle Payé/Non payé dans NewOrderModal récap */
 .odm-paid-toggle {
@@ -1790,23 +1570,25 @@
 /* ── Sélecteur paiement 3 états ── */
 
 .nom-payment-selector {
-  display: flex;
-  border: 1px solid var(--color-grey-300);
-  border-radius: var(--radius-sm);
-  overflow: hidden;
+    display: flex;
+    overflow: hidden;
+    flex-direction: row;
+    gap: var(--space-sm);
 }
 
 .nom-payment-btn {
-  flex: 1;
-  min-height: var(--control-height-md);
-  background: var(--color-white);
-  border: none;
-  border-right: 1px solid var(--color-grey-300);
-  font-family: var(--font-family-base);
-  font-size: var(--font-size-sm);
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: background var(--transition-fast), color var(--transition-fast);
+    flex: 1;
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-full);
+    border: 1px solid var(--border-default);
+    background: var(--bg-subtle);
+    color: var(--text-secondary);
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    cursor: pointer;
+    min-height: var(--control-height-sm);
+    transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
 }
 
 .nom-payment-btn:last-child {
@@ -1815,19 +1597,22 @@
 
 .nom-payment-btn--paid.nom-payment-btn--active {
   background: var(--color-success-bg);
-  color: var(--color-success);
+  color: var(--text-primary);
+  border: solid 1px var(--color-success-bg);
   font-weight: var(--font-weight-semibold);
 }
 
 .nom-payment-btn--unpaid.nom-payment-btn--active {
   background: var(--color-danger-bg);
-  color: var(--color-danger);
+  color: var(--text-primary);
+  border: solid 1px var(--color-danger-bg);
   font-weight: var(--font-weight-semibold);
 }
 
 .nom-payment-btn--partial.nom-payment-btn--active {
   background: var(--color-warning-bg);
-  color: var(--color-warning);
+  color: var(--text-primary);
+  border: solid 1px var(--color-warning-bg);
   font-weight: var(--font-weight-semibold);
 }
 

@@ -5,27 +5,19 @@ import EmployeeModal        from './components/EmployeeModal'
 import EmployeeProfileModal from './components/EmployeeProfileModal'
 import WeekPickerPanel      from './components/WeekPickerPanel'
 import TableView            from './components/TableView'
-import { useSchedule }      from './hooks/useSchedule'
 import { useGoogleSync }    from './hooks/useGoogleSync'
 import { useWeek }          from './hooks/useWeek'
-import { useTeam }          from './hooks/useTeam'
 import { useShiftActions }  from './hooks/useShiftActions'
 import { useTemplates }     from './hooks/useTemplates'
 import { useExports }       from './hooks/useExports'
-import { sessionHasData }   from '../../utils/session'
 import { mondayOf, dateToStr } from '../../utils/date'
-import initialTeam from './data/team.json'
 import './planning-tokens.css'
 import './PlanningApp.css'
 
-export default function PlanningApp({ showToast, onSyncChange }) {
-  const schedule = useSchedule()
-  const week     = useWeek()
+export default function PlanningApp({ showToast, onSyncChange, schedule, teamCtx, dataSource, setDataSource }) {
+  const week = useWeek()
 
-  const [dataSource,         setDataSource]        = useState(() => sessionHasData() ? 'session' : 'demo')
   const [copiedEmployeePlan, setCopiedEmployeePlan] = useState(null)
-
-  const teamCtx = useTeam({ initialTeam, schedule, setDataSource, showToast })
 
   const sync = useGoogleSync({
     shifts:            schedule.shifts,

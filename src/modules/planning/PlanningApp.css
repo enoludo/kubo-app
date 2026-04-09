@@ -13,7 +13,7 @@
 
 .app-body {
   flex: 1;
-  display: flex;
+  display: grid;
   min-height: 0;
 }
 

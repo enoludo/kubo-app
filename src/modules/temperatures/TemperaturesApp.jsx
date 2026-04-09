@@ -1,6 +1,5 @@
 import { useState, useRef }  from 'react'
 import { useWeek }           from '../../hooks/useWeek'
-import { useTemperatures }   from './hooks/useTemperatures'
 import { useTemperaturesGoogleSync } from './hooks/useTemperaturesGoogleSync'
 import { generateTempPdf }   from './utils/exportTempPdf'
 import TempCalendar          from './components/TempCalendar'
@@ -52,9 +51,8 @@ function MenuIcon() {
   )
 }
 
-export default function TemperaturesApp({ showToast }) {
-  const week    = useWeek()
-  const tempCtx = useTemperatures()
+export default function TemperaturesApp({ showToast, tempCtx }) {
+  const week = useWeek()
   const menuBtnRef = useRef(null)
 
   const [equipModal, setEquipModal] = useState(null)

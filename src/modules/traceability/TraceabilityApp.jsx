@@ -1,7 +1,6 @@
 // ─── Module Traçabilité — Shell principal ─────────────────────────────────────
 import { useState, useRef, useMemo } from 'react'
 import { useWeek }               from '../../hooks/useWeek'
-import { useTraceability }       from './hooks/useTraceability'
 import { useDrivePhotos }        from './hooks/useDrivePhotos'
 import TraceCalendar             from './components/TraceCalendar'
 import TraceListView             from './components/TraceListView'
@@ -66,9 +65,8 @@ const VIEWS = [
   )},
 ]
 
-export default function TraceabilityApp({ showToast }) {
+export default function TraceabilityApp({ showToast, trCtx }) {
   const week        = useWeek()
-  const trCtx       = useTraceability()
   const { photos: drivePhotos, sync: syncDrivePhotos } = useDrivePhotos()
   const photoInputRef  = useRef(null)
   const [photoUploading, setPhotoUploading] = useState(false)

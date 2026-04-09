@@ -57,6 +57,7 @@
 }
 
 .header-nav-center {
+    height: var(--control-height-md);
   border-radius: var(--radius-pill);
   background-color: var(--color-grey-100);
   display: flex;

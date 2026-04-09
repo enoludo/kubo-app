@@ -104,7 +104,7 @@ function IconProfile() {
 
 // ── Structure des groupes ──────────────────────────────────────────────────────
 
-const DASHBOARD = { id: 'dashboard', label: 'Dashboard', icon: IconDashboard, available: false }
+const DASHBOARD = { id: 'dashboard', label: 'Dashboard', icon: IconDashboard, available: true }
 
 const GROUP_METIER = [
   { id: 'planning',  label: 'Planning',  icon: IconPlanning, available: true },

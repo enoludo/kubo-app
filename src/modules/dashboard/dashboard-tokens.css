@@ -1,0 +1,58 @@
+/* ══════════════════════════════════════════════════════════════════════════════
+   DASHBOARD — Module tokens
+   Utilise les primitifs de /design-system/design-tokens.css
+══════════════════════════════════════════════════════════════════════════════ */
+
+:root {
+
+  /* ── Layout ─────────────────────────────────────────────────────────────── */
+
+  --dash-col-left-ratio:  2fr;
+  --dash-col-right-ratio: 1fr;
+  --dash-gap:             var(--space-sm);
+  --dash-padding:         var(--space-lg);
+
+  /* ── Cards ──────────────────────────────────────────────────────────────── */
+
+  --dash-card-bg:      var(--bg-default);
+  --dash-card-radius:  var(--radius-md);
+  --dash-card-shadow:  var(--shadow-sm);
+  --dash-card-padding: var(--space-md);
+
+  /* ── Bloc header ────────────────────────────────────────────────────────── */
+
+  --dash-block-header-gap:        var(--space-sm);
+  --dash-block-icon-color:        var(--text-secondary);
+  --dash-block-title-size:        var(--font-size-lg);
+  --dash-block-title-weight:      var(--font-weight-semibold);
+
+  /* ── Planning — types de shift ──────────────────────────────────────────── */
+
+  --dash-shift-work-bg:    var(--color-blue-100);
+  --dash-shift-work-text:  var(--color-blue-300);
+  --dash-shift-school-bg:  var(--color-yellow-100);
+  --dash-shift-school-text:var(--color-yellow-300);
+  --dash-shift-rest-bg:    var(--color-green-100);
+  --dash-shift-rest-text:  var(--color-green-300);
+  --dash-shift-leave-bg:   var(--color-violet-100);
+  --dash-shift-leave-text: var(--color-violet-300);
+  --dash-shift-sick-bg:    var(--color-red-100);
+  --dash-shift-sick-text:  var(--color-red-300);
+
+  /* ── Planning — solde heures ────────────────────────────────────────────── */
+
+  --dash-balance-positive: var(--color-blue-300);
+  --dash-balance-neutral:  var(--color-success);
+  --dash-balance-negative: var(--color-warning);
+
+  /* ── Planning — indicateur heure actuelle ───────────────────────────────── */
+
+  --dash-now-line-color: var(--color-blue-300);
+  --dash-now-line-width: 2px;
+
+  /* ── Commandes — date labels ─────────────────────────────────────────────── */
+
+  --dash-orders-today-color:  var(--color-danger);
+  --dash-orders-date-color:   var(--text-primary);
+
+}

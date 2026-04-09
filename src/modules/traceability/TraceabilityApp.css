@@ -756,6 +756,7 @@
 
 .tr-conformity-btn--active {
   border-color: transparent;
+  color: var(--text-primary);
 }
 
 /* ── Température ── */

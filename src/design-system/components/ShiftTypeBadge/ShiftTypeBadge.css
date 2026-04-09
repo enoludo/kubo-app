@@ -1,0 +1,26 @@
+/* ══════════════════════════════════════════════════════════════════════════════
+   ShiftTypeBadge — Badge générique de type de shift
+   Utilise uniquement les tokens primitifs (pas de logique planning)
+══════════════════════════════════════════════════════════════════════════════ */
+
+.shift-type-badge {
+  position:     relative;
+  mix-blend-mode: multiply;
+  margin-right: auto;
+  z-index:      1;
+  display:      inline-flex;
+  align-items:  center;
+  padding:      var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+  font-family:  var(--font-family-base);
+  font-size:    var(--font-size-sm);
+  font-weight:  var(--font-weight-medium);
+  color:        var(--text-primary);
+  white-space:  nowrap;
+}
+
+.shift-type-badge--rest    { background: var(--color-green-200); }
+.shift-type-badge--school  { background: var(--color-yellow-200); }
+.shift-type-badge--sick    { background: var(--color-red-200); }
+.shift-type-badge--absent  { background: var(--color-orange-200); }
+.shift-type-badge--leave   { background: var(--color-violet-200); }

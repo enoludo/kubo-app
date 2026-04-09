@@ -5,19 +5,28 @@ import ProductsApp          from './modules/products/ProductsApp'
 import TemperaturesApp      from './modules/temperatures/TemperaturesApp'
 import CleaningApp          from './modules/cleaning/CleaningApp'
 import TraceabilityApp      from './modules/traceability/TraceabilityApp'
+import DashboardApp         from './modules/dashboard/DashboardApp'
 import StartupModal         from './components/StartupModal'
 import PlanningApp          from './modules/planning/PlanningApp'
 import { useOrders }        from './hooks/useOrders'
 import { useProducts }      from './hooks/useProducts'
+import { useSchedule }      from './modules/planning/hooks/useSchedule'
+import { useTeam }          from './modules/planning/hooks/useTeam'
+import { useCleaning }      from './modules/cleaning/hooks/useCleaning'
+import { useTemperatures }  from './modules/temperatures/hooks/useTemperatures'
+import { useTraceability }  from './modules/traceability/hooks/useTraceability'
+import { sessionHasData }   from './utils/session'
+import initialTeam          from './modules/planning/data/team.json'
 import './App.css'
 
 const INITIAL_SYNC = { status: 'disconnected', errMsg: null, loading: false, connect: null, retry: null, getToken: null }
 
 export default function App() {
-  const [activeModule,     setActiveModule]   = useState('planning')
+  const [activeModule,     setActiveModule]   = useState('dashboard')
   const [startupDismissed, setStartupDismissed] = useState(false)
   const [toast,            setToast]          = useState(null)
   const [sync,             setSync]           = useState(INITIAL_SYNC)
+  const [dataSource,       setDataSource]     = useState(() => sessionHasData() ? 'session' : 'demo')
 
   function showToast(msg, color) {
     setToast({ msg, color })
@@ -26,6 +35,11 @@ export default function App() {
 
   const ordersCtx   = useOrders({ onToast: showToast })
   const productsCtx = useProducts({ onToast: showToast })
+  const schedule    = useSchedule()
+  const teamCtx     = useTeam({ initialTeam, schedule, setDataSource, showToast })
+  const cleanCtx    = useCleaning()
+  const tempCtx     = useTemperatures()
+  const trCtx       = useTraceability()
 
   // Auto-dismiss startup modal quand les deux services sont connectés
   useEffect(() => {
@@ -84,12 +98,13 @@ export default function App() {
         ]}
       />
 
-      {activeModule === 'orders'   && <OrdersApp   ordersCtx={ordersCtx} productsCtx={productsCtx} showToast={showToast} />}
-      {activeModule === 'products' && <ProductsApp productsCtx={productsCtx} showToast={showToast} getToken={sync.getToken} />}
-      {activeModule === 'planning'      && <PlanningApp      showToast={showToast} onSyncChange={setSync} />}
-      {activeModule === 'temperatures'  && <TemperaturesApp  showToast={showToast} />}
-      {activeModule === 'cleaning'      && <CleaningApp      showToast={showToast} />}
-      {activeModule === 'tracability'   && <TraceabilityApp  showToast={showToast} />}
+      {activeModule === 'dashboard'     && <DashboardApp     schedule={schedule} teamCtx={teamCtx} cleanCtx={cleanCtx} tempCtx={tempCtx} trCtx={trCtx} ordersCtx={ordersCtx} productsCtx={productsCtx} onNavigate={setActiveModule} />}
+      {activeModule === 'orders'        && <OrdersApp        ordersCtx={ordersCtx} productsCtx={productsCtx} showToast={showToast} />}
+      {activeModule === 'products'      && <ProductsApp      productsCtx={productsCtx} showToast={showToast} getToken={sync.getToken} />}
+      {activeModule === 'planning'      && <PlanningApp      showToast={showToast} onSyncChange={setSync} schedule={schedule} teamCtx={teamCtx} dataSource={dataSource} setDataSource={setDataSource} />}
+      {activeModule === 'temperatures'  && <TemperaturesApp  showToast={showToast} tempCtx={tempCtx} />}
+      {activeModule === 'cleaning'      && <CleaningApp      showToast={showToast} cleanCtx={cleanCtx} />}
+      {activeModule === 'tracability'   && <TraceabilityApp  showToast={showToast} trCtx={trCtx} />}
 
       {toast && (
         <div className="toast" style={{ borderLeftColor: toast.color }}>{toast.msg}</div>

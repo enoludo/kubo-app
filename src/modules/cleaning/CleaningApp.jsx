@@ -1,7 +1,6 @@
 // ─── Module Nettoyage — Shell principal ───────────────────────────────────────
 import { useState, useRef }   from 'react'
 import { useWeek }            from '../../hooks/useWeek'
-import { useCleaning }        from './hooks/useCleaning'
 import CleaningCalendar       from './components/CleaningCalendar'
 import CleaningTaskModal       from './components/CleaningTaskModal'
 import CleaningZoneDetailModal from './components/CleaningZoneDetailModal'
@@ -40,9 +39,8 @@ function MenuIcon() {
   )
 }
 
-export default function CleaningApp({ showToast }) {
-  const week       = useWeek()
-  const cleanCtx   = useCleaning()
+export default function CleaningApp({ showToast, cleanCtx }) {
+  const week = useWeek()
   const menuBtnRef = useRef(null)
 
   const [menuOpen,       setMenuOpen]       = useState(false)
