@@ -1,8 +1,13 @@
 // ─── Hook — état et logique du module Nettoyage ───────────────────────────────
 import { useState, useEffect, useRef } from 'react'
-import { DEMO_CLEANING_TASKS }         from '../../../data/cleaningTasks'
-import { INITIAL_ZONES }               from '../utils/cleaningZones.jsx'
 import { dateToStr }                   from '../../../utils/date'
+import {
+  fetchZones,    upsertZone,    upsertZones,   deleteZone    as deleteZoneSupabase,
+  fetchTasks,    upsertTask,    upsertTasks,   deleteTask    as deleteTaskSupabase,
+                                               deleteTasksByZone,
+  fetchRecords,  upsertRecord,  deleteRecord  as deleteRecordSupabase,
+                                               deleteRecordsByTask,
+} from '../../../services/cleaningService'
 
 const TASKS_KEY   = 'kubo_cleaning_tasks'
 const RECORDS_KEY = 'kubo_cleaning_records'
@@ -14,8 +19,8 @@ const DEBOUNCE_MS = 500
 function loadTasks() {
   try {
     const raw = localStorage.getItem(TASKS_KEY)
-    return raw ? JSON.parse(raw) : DEMO_CLEANING_TASKS
-  } catch { return DEMO_CLEANING_TASKS }
+    return raw ? JSON.parse(raw) : []
+  } catch { return [] }
 }
 
 function loadRecords() {
@@ -36,8 +41,8 @@ function saveRecords(records) {
 function loadZones() {
   try {
     const raw = localStorage.getItem(ZONES_KEY)
-    return raw ? JSON.parse(raw) : INITIAL_ZONES
-  } catch { return INITIAL_ZONES }
+    return raw ? JSON.parse(raw) : []
+  } catch { return [] }
 }
 
 function saveZones(zones) {
@@ -126,6 +131,38 @@ export function useCleaning() {
     debounceZonesRef.current = setTimeout(() => saveZones(zones), DEBOUNCE_MS)
   }, [zones])
 
+  // ── Chargement Supabase au montage ────────────────────────────────────────
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const supabaseZones = await fetchZones()
+        if (supabaseZones.length > 0) {
+          setZones(supabaseZones)
+          console.log('[supabase] zones chargées:', supabaseZones.length)
+        }
+      } catch (err) { console.error('[supabase] fetchZones:', err.message) }
+
+      try {
+        const supabaseTasks = await fetchTasks()
+        if (supabaseTasks.length > 0) {
+          setTasks(supabaseTasks)
+          console.log('[supabase] tâches chargées:', supabaseTasks.length)
+        }
+      } catch (err) { console.error('[supabase] fetchTasks:', err.message) }
+
+      try {
+        const supabaseRecords = await fetchRecords()
+        if (supabaseRecords.length > 0) {
+          setRecords(supabaseRecords)
+          console.log('[supabase] records chargés:', supabaseRecords.length)
+        }
+      } catch (err) { console.error('[supabase] fetchRecords:', err.message) }
+    }
+
+    load()
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
   // ── Requêtes ──────────────────────────────────────────────────────────────
 
   /** Tâches actives planifiées pour une date, avec leur statut calculé. */
@@ -174,30 +211,33 @@ export function useCleaning() {
 
   /** Marque une tâche comme faite pour une date. */
   function markDone(taskId, dateStr, authorId = null, note = null) {
-    setRecords(prev => {
-      const other = prev.filter(r => !(r.taskId === taskId && r.scheduledDate === dateStr))
-      return [...other, {
-        id:            crypto.randomUUID(),
-        taskId,
-        scheduledDate: dateStr,
-        completedAt:   new Date().toISOString(),
-        authorId,
-        status:        'done',
-        note,
-        createdAt:     new Date().toISOString(),
-      }]
-    })
+    const record = {
+      id:            crypto.randomUUID(),
+      taskId,
+      scheduledDate: dateStr,
+      completedAt:   new Date().toISOString(),
+      authorId,
+      status:        'done',
+      note,
+      createdAt:     new Date().toISOString(),
+    }
+    setRecords(prev => [
+      ...prev.filter(r => !(r.taskId === taskId && r.scheduledDate === dateStr)),
+      record,
+    ])
+    upsertRecord(record).catch(err => console.error('[supabase] markDone:', err.message))
   }
 
   /** Annule la validation d'une tâche pour une date. */
   function unmarkDone(taskId, dateStr) {
     setRecords(prev => prev.filter(r => !(r.taskId === taskId && r.scheduledDate === dateStr)))
+    deleteRecordSupabase(taskId, dateStr).catch(err => console.error('[supabase] unmarkDone:', err.message))
   }
 
   // ── Mutations tâches ──────────────────────────────────────────────────────
 
   function addTask(data) {
-    setTasks(prev => [...prev, {
+    const task = {
       id:           crypto.randomUUID(),
       name:         data.name,
       zone:         data.zone,
@@ -208,51 +248,70 @@ export function useCleaning() {
       duration_min: Number(data.duration_min) || 15,
       active:       true,
       createdAt:    new Date().toISOString(),
-    }])
+    }
+    setTasks(prev => [...prev, task])
+    upsertTask(task).catch(err => console.error('[supabase] addTask:', err.message))
   }
 
   function updateTask(id, updates) {
-    setTasks(prev => prev.map(t => t.id === id ? { ...t, ...updates } : t))
+    let updated
+    setTasks(prev => prev.map(t => {
+      if (t.id !== id) return t
+      updated = { ...t, ...updates }
+      return updated
+    }))
+    if (updated) upsertTask(updated).catch(err => console.error('[supabase] updateTask:', err.message))
   }
 
   function deleteTask(id) {
     setTasks(prev => prev.filter(t => t.id !== id))
     setRecords(prev => prev.filter(r => r.taskId !== id))
+    deleteTaskSupabase(id).catch(err => console.error('[supabase] deleteTask:', err.message))
+    deleteRecordsByTask(id).catch(err => console.error('[supabase] deleteRecordsByTask:', err.message))
   }
 
   // ── Mutations zones ───────────────────────────────────────────────────────
 
   function addZone(data, tasksData = []) {
     const id = crypto.randomUUID()
-    setZones(prev => [...prev, {
+    const zone = {
       id,
       name:      data.name.trim(),
       color:     data.color ?? 'blue',
       createdAt: new Date().toISOString(),
-    }])
+    }
+    setZones(prev => [...prev, zone])
+    upsertZone(zone).catch(err => console.error('[supabase] addZone:', err.message))
     tasksData.forEach(t => addTask({ ...t, zone: id }))
   }
 
   function updateZone(id, updates, tasksData = null) {
-    setZones(prev => prev.map(z => z.id === id ? { ...z, ...updates } : z))
+    let updatedZone
+    setZones(prev => prev.map(z => {
+      if (z.id !== id) return z
+      updatedZone = { ...z, ...updates }
+      return updatedZone
+    }))
+    if (updatedZone) upsertZone(updatedZone).catch(err => console.error('[supabase] updateZone:', err.message))
+
     if (tasksData !== null) {
       // Supprime les tâches existantes de la zone, recrée
-      setTasks(prev => {
-        const kept = prev.filter(t => t.zone !== id)
-        const next = tasksData.map(t => ({
-          id:           t.id ?? crypto.randomUUID(),
-          name:         t.name,
-          zone:         id,
-          frequency:    t.frequency,
-          dayOfWeek:    t.dayOfWeek ?? null,
-          protocol:     t.protocol  ?? [],
-          product:      t.product   ?? null,
-          duration_min: Number(t.duration_min) || 15,
-          active:       t.active ?? true,
-          createdAt:    t.createdAt ?? new Date().toISOString(),
-        }))
-        return [...kept, ...next]
-      })
+      const newTasks = tasksData.map(t => ({
+        id:           t.id ?? crypto.randomUUID(),
+        name:         t.name,
+        zone:         id,
+        frequency:    t.frequency,
+        dayOfWeek:    t.dayOfWeek ?? null,
+        protocol:     t.protocol  ?? [],
+        product:      t.product   ?? null,
+        duration_min: Number(t.duration_min) || 15,
+        active:       t.active ?? true,
+        createdAt:    t.createdAt ?? new Date().toISOString(),
+      }))
+      setTasks(prev => [...prev.filter(t => t.zone !== id), ...newTasks])
+      deleteTasksByZone(id)
+        .then(() => upsertTasks(newTasks))
+        .catch(err => console.error('[supabase] updateZone tasks:', err.message))
     }
   }
 
@@ -263,6 +322,8 @@ export function useCleaning() {
       const task = tasks.find(t => t.id === r.taskId)
       return task ? task.zone !== id : true
     }))
+    // CASCADE ON DELETE handles tasks + records in Supabase
+    deleteZoneSupabase(id).catch(err => console.error('[supabase] deleteZone:', err.message))
   }
 
   return {

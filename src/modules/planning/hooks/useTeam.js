@@ -1,5 +1,10 @@
 import { useState, useEffect, useRef } from 'react'
 import { sessionSave, sessionLoad, sessionHasData, sessionClear } from '../../../utils/session'
+import {
+  fetchEmployees,
+  upsertEmployee,
+  deleteEmployee,
+} from '../../../services/planningService'
 
 export function useTeam({ initialTeam, schedule, setDataSource, showToast }) {
   const [team,         setTeam]         = useState(() => sessionLoad('team') ?? initialTeam)
@@ -21,45 +26,77 @@ export function useTeam({ initialTeam, schedule, setDataSource, showToast }) {
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Chargement Supabase au montage
+  // - Si Supabase a des données → charge et remplace l'état local
+  // - Si Supabase est vide → seed avec l'équipe locale (nécessaire avant tout upsert de shifts)
+  useEffect(() => {
+    fetchEmployees()
+      .then(async employees => {
+        if (employees.length > 0) {
+          setTeam(employees)
+        } else {
+          const toSeed = sessionLoad('team') ?? initialTeam
+          await Promise.all(toSeed.map(emp => upsertEmployee(emp)))
+          console.log('[supabase] équipe seedée:', toSeed.length, 'employés')
+        }
+      })
+      .catch(err => console.error('[supabase] fetchEmployees:', err.message))
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
   function handleReset() {
     sessionClear()
     schedule.resetShifts()
     setTeam(initialTeam)
     setDataSource('demo')
+    // Note : resetShifts ne touche pas Supabase intentionnellement
   }
 
   function handleSaveEmployee(data) {
     if (empModal.employee) {
-      setTeam(prev => prev.map(e =>
-        e.id === empModal.employee.id
-          ? { ...e, name: data.name, role: data.role, email: data.email,
-              contract: data.contract, color: data.color, initials: data.initials,
-              startBalance: data.startBalance ?? 0 }
-          : e
-      ))
+      const updated = {
+        ...empModal.employee,
+        name:         data.name,
+        role:         data.role,
+        email:        data.email,
+        contract:     data.contract,
+        color:        data.color,
+        initials:     data.initials,
+        startBalance: data.startBalance ?? 0,
+      }
+      setTeam(prev => prev.map(e => e.id === empModal.employee.id ? updated : e))
+      upsertEmployee(updated).catch(err => console.error('[supabase] upsertEmployee:', err.message))
     } else {
-      const newId = crypto.randomUUID()
-      setTeam(prev => [...prev, {
-        id: newId, name: data.name, role: data.role, email: data.email,
-        contract: data.contract ?? 35, color: data.color, initials: data.initials,
-        archived: false, startBalance: data.startBalance ?? 0,
-      }])
+      const newEmp = {
+        id:           crypto.randomUUID(),
+        name:         data.name,
+        role:         data.role,
+        email:        data.email,
+        contract:     data.contract ?? 35,
+        color:        data.color,
+        initials:     data.initials,
+        archived:     false,
+        startBalance: data.startBalance ?? 0,
+      }
+      setTeam(prev => [...prev, newEmp])
+      upsertEmployee(newEmp).catch(err => console.error('[supabase] upsertEmployee:', err.message))
     }
     setEmpModal(null)
   }
 
   function handleArchiveEmployee() {
     if (!empModal?.employee) return
-    setTeam(prev => prev.map(e =>
-      e.id === empModal.employee.id ? { ...e, archived: true } : e
-    ))
+    const updated = { ...empModal.employee, archived: true }
+    setTeam(prev => prev.map(e => e.id === empModal.employee.id ? updated : e))
+    upsertEmployee(updated).catch(err => console.error('[supabase] archiveEmployee:', err.message))
     setEmpModal(null)
   }
 
   function handleDeleteEmployee() {
     if (!empModal?.employee) return
-    schedule.removeEmployeeShifts(empModal.employee.id)
-    setTeam(prev => prev.filter(e => e.id !== empModal.employee.id))
+    const id = empModal.employee.id
+    schedule.removeEmployeeShifts(id)
+    setTeam(prev => prev.filter(e => e.id !== id))
+    deleteEmployee(id).catch(err => console.error('[supabase] deleteEmployee:', err.message))
     setEmpModal(null)
   }
 

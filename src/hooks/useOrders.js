@@ -16,6 +16,12 @@ import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import { fetchOrders as fetchWebflowOrders } from '../services/webflowAdapter'
 import { useOrdersGoogleSync } from './useOrdersGoogleSync'
 import { dateToStr } from '../utils/date'
+import {
+  fetchOrders    as fetchSupabaseOrders,
+  upsertOrder,
+  upsertOrders,
+  deleteOrder    as deleteSupabaseOrder,
+} from '../services/ordersService'
 
 const LOCAL_KEY   = 'kubo_boutique_orders'  // localStorage  — persistant
 const SESSION_KEY = 'kubo_webflow_orders'   // sessionStorage — cache session
@@ -98,6 +104,58 @@ export function useOrders({ onToast } = {}) {
   useEffect(() => { ordersRef.current  = orders  }, [orders])
   useEffect(() => { onToastRef.current = onToast }, [onToast])
 
+  // Chargement Supabase au montage
+  useEffect(() => {
+    fetchSupabaseOrders()
+      .then(async supabaseOrders => {
+        if (supabaseOrders.length > 0) {
+          setOrders(prev => {
+            const supabaseIds   = new Set(supabaseOrders.map(o => o.id))
+            const supabaseWfIds = new Set(supabaseOrders.filter(o => o.webflowOrderId).map(o => o.webflowOrderId))
+
+            // Commandes absentes de Supabase → à seeder
+            const localOnly = prev.filter(o =>
+              !supabaseIds.has(o.id) &&
+              !(o.webflowOrderId && supabaseWfIds.has(o.webflowOrderId))
+            )
+            if (localOnly.length > 0) {
+              upsertOrders(localOnly).catch(err => console.error('[supabase] seed local orders:', err.message))
+            }
+
+            // Commandes boutique présentes dans Supabase sans items
+            // mais dont la version locale a des items → re-upsert
+            const toRepair = supabaseOrders.filter(so => {
+              if (so.webflowOrderId) return false         // Webflow gère ses propres items
+              if ((so.items ?? []).length > 0) return false // déjà OK
+              const local = prev.find(o => o.id === so.id)
+              return local?.items?.length > 0
+            })
+            if (toRepair.length > 0) {
+              const withLocalItems = toRepair.map(so => ({
+                ...so,
+                items: prev.find(o => o.id === so.id).items,
+              }))
+              upsertOrders(withLocalItems).catch(err => console.error('[supabase] repair items:', err.message))
+              console.log('[supabase] repair items pour', toRepair.length, 'commandes')
+            }
+
+            return [...supabaseOrders, ...localOnly]
+          })
+          console.log('[supabase] commandes chargées:', supabaseOrders.length)
+        } else {
+          // Table vide — seed avec les commandes locales
+          setOrders(prev => {
+            if (prev.length > 0) {
+              upsertOrders(prev).catch(err => console.error('[supabase] seed orders:', err.message))
+              console.log('[supabase] commandes seedées:', prev.length)
+            }
+            return prev
+          })
+        }
+      })
+      .catch(err => console.error('[supabase] fetchOrders:', err.message))
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
   // Auto-save debounce 500ms — boutique → localStorage, webflow → sessionStorage
   useEffect(() => {
     clearTimeout(saveTimer.current)
@@ -170,19 +228,23 @@ export function useOrders({ onToast } = {}) {
       updatedAt:      now,
     }
     setOrders(prev => [...prev, order])
+    upsertOrder(order).catch(err => console.error('[supabase] addOrder:', err.message))
     return order
   }
 
   function updateOrder(id, updates) {
-    setOrders(prev => prev.map(o =>
-      o.id === id
-        ? { ...o, ...updates, updatedAt: new Date().toISOString() }
-        : o
-    ))
+    let updated
+    setOrders(prev => prev.map(o => {
+      if (o.id !== id) return o
+      updated = { ...o, ...updates, updatedAt: new Date().toISOString() }
+      return updated
+    }))
+    if (updated) upsertOrder(updated).catch(err => console.error('[supabase] updateOrder:', err.message))
   }
 
   function deleteOrder(id) {
     setOrders(prev => prev.filter(o => o.id !== id))
+    deleteSupabaseOrder(id).catch(err => console.error('[supabase] deleteOrder:', err.message))
   }
 
   function updateStatus(id, status) {
@@ -224,6 +286,9 @@ export function useOrders({ onToast } = {}) {
         const msg = `${n} nouvelle${n > 1 ? 's' : ''} commande${n > 1 ? 's' : ''} reçue${n > 1 ? 's' : ''}`
         onToastRef.current?.(msg, '#7AC5FF')
       }
+
+      // Sync Webflow → Supabase (toutes les commandes web, nouvelles ou mises à jour)
+      upsertOrders(allWebflowOrders).catch(err => console.error('[supabase] syncWebflow upsert:', err.message))
 
       setWebflowStatus('connected')
     } catch (err) {

@@ -1,6 +1,13 @@
 import { useState, useRef, useEffect } from 'react'
 import { sessionSave, sessionLoad } from '../../../utils/session'
 import { dateToStr, mondayOf } from '../../../utils/date'
+import {
+  fetchShifts,
+  upsertShift,
+  upsertShifts,
+  deleteShift,
+  deleteShifts,
+} from '../../../services/planningService'
 
 export { dateToStr, fmtH } from '../../../utils/date'
 
@@ -38,98 +45,124 @@ for (let h = START_HOUR; h <= END_HOUR; h++) {
 // ─── Hook ──────────────────────────────────────────────────────────────────
 
 export function useSchedule() {
-  // Priorité : sessionStorage → liste vide
   const [shifts, setShifts] = useState(() => sessionLoad('shifts') ?? [])
 
   const saveTimer = useRef(null)
 
-  // Auto-save : debounce 500ms après chaque modification
+  // Auto-save sessionStorage (debounce 500ms)
   useEffect(() => {
     clearTimeout(saveTimer.current)
     saveTimer.current = setTimeout(() => sessionSave('shifts', shifts), 500)
     return () => clearTimeout(saveTimer.current)
   }, [shifts])
 
+  // Chargement Supabase au montage — remplace les données locales si Supabase a des données
+  useEffect(() => {
+    fetchShifts()
+      .then(supabaseShifts => {
+        if (supabaseShifts.length > 0) {
+          setShifts(supabaseShifts)
+          console.log('[supabase] shifts chargés:', supabaseShifts.length)
+        }
+      })
+      .catch(err => console.error('[supabase] fetchShifts:', err.message))
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
   function addShift(employeeId, dateStr, startHour, endHour, pause = 0, type = 'work', extra = {}) {
-    const id = crypto.randomUUID()
-    setShifts(prev => [
-      ...prev,
-      { id, employeeId, date: dateStr, startHour, endHour, pause, type, ...extra },
-    ])
+    const shift = { id: crypto.randomUUID(), employeeId, date: dateStr, startHour, endHour, pause, type, ...extra }
+    setShifts(prev => [...prev, shift])
+    upsertShift(shift).catch(err => console.error('[supabase] addShift:', err.message))
   }
 
   function moveShift(shiftId, dateStr, startHour) {
+    let updated
     setShifts(prev => prev.map(s => {
       if (s.id !== shiftId) return s
       const duration = s.endHour - s.startHour
       const endHour  = Math.min(startHour + duration, END_HOUR)
       const adjStart = endHour === END_HOUR ? END_HOUR - duration : startHour
-      return { ...s, date: dateStr, startHour: adjStart, endHour }
+      updated = { ...s, date: dateStr, startHour: adjStart, endHour }
+      return updated
     }))
+    if (updated) upsertShift(updated).catch(err => console.error('[supabase] moveShift:', err.message))
   }
 
   function removeShift(shiftId) {
     setShifts(prev => prev.filter(s => s.id !== shiftId))
+    deleteShift(shiftId).catch(err => console.error('[supabase] removeShift:', err.message))
   }
 
   function removeEmployeeShifts(employeeId) {
+    const ids = shifts.filter(s => s.employeeId === employeeId).map(s => s.id)
     setShifts(prev => prev.filter(s => s.employeeId !== employeeId))
+    deleteShifts(ids).catch(err => console.error('[supabase] removeEmployeeShifts:', err.message))
   }
 
   function updateShift(shiftId, startHour, endHour, pause = 0, type = 'work', extra = {}) {
-    setShifts(prev => prev.map(s =>
-      s.id === shiftId ? { ...s, startHour, endHour, pause, type, ...extra } : s
-    ))
+    let updated
+    setShifts(prev => prev.map(s => {
+      if (s.id !== shiftId) return s
+      updated = { ...s, startHour, endHour, pause, type, ...extra }
+      return updated
+    }))
+    if (updated) upsertShift(updated).catch(err => console.error('[supabase] updateShift:', err.message))
   }
 
   function toggleValidated(shiftId) {
-    setShifts(prev => prev.map(s =>
-      s.id === shiftId ? { ...s, validated: !s.validated } : s
-    ))
+    let updated
+    setShifts(prev => prev.map(s => {
+      if (s.id !== shiftId) return s
+      updated = { ...s, validated: !s.validated }
+      return updated
+    }))
+    if (updated) upsertShift(updated).catch(err => console.error('[supabase] toggleValidated:', err.message))
   }
 
-  // Remplace tous les shifts d'une semaine par de nouveaux (utilisé par le sync Sheets)
+  // Remplace tous les shifts d'une semaine (utilisé par le sync Sheets)
   function replaceWeekShifts(weekDates, newShifts) {
-    const strs = new Set(weekDates.map(dateToStr))
-    setShifts(prev => [
-      ...prev.filter(s => !strs.has(s.date)),
-      ...newShifts,
-    ])
+    const strs     = new Set(weekDates.map(dateToStr))
+    const toDelete = shifts.filter(s => strs.has(s.date)).map(s => s.id)
+    setShifts(prev => [...prev.filter(s => !strs.has(s.date)), ...newShifts])
+    deleteShifts(toDelete).catch(err => console.error('[supabase] replaceWeekShifts delete:', err.message))
+    upsertShifts(newShifts).catch(err => console.error('[supabase] replaceWeekShifts upsert:', err.message))
   }
 
   // Colle les shifts d'une semaine source vers un autre employé
-  // mode 'merge'   : ajoute uniquement sur les jours vides de la semaine cible
-  // mode 'replace' : écrase tous les shifts non-validés de la semaine cible
   function pasteShifts(targetEmployeeId, sourceShifts, sourceWeekKey, targetWeekKey, mode) {
     console.log('[pasteShifts] in', { targetEmployeeId, sourceWeekKey, targetWeekKey, mode, sourceShifts })
     const sourceMonday = new Date(sourceWeekKey + 'T00:00:00')
     const targetMonday = new Date(targetWeekKey + 'T00:00:00')
 
-    setShifts(prev => {
-      let next = mode === 'replace'
-        ? prev.filter(s => !(s.employeeId === targetEmployeeId && mondayOf(s.date) === targetWeekKey && !s.validated))
-        : prev
+    const toRemove = mode === 'replace'
+      ? shifts.filter(s => s.employeeId === targetEmployeeId && mondayOf(s.date) === targetWeekKey && !s.validated)
+      : []
+    const removeIds = toRemove.map(s => s.id)
 
-      const existingDays = new Set(
-        next.filter(s => s.employeeId === targetEmployeeId && mondayOf(s.date) === targetWeekKey).map(s => s.date)
-      )
+    const remaining    = shifts.filter(s => !removeIds.includes(s.id))
+    const existingDays = new Set(
+      remaining
+        .filter(s => s.employeeId === targetEmployeeId && mondayOf(s.date) === targetWeekKey)
+        .map(s => s.date)
+    )
 
-      const newShifts = sourceShifts.flatMap(s => {
-        const dayOffset  = Math.round((new Date(s.date + 'T00:00:00') - sourceMonday) / 86400000)
-        const td         = new Date(targetMonday)
-        td.setDate(targetMonday.getDate() + dayOffset)
-        const targetDate = dateToStr(td)
-        if (mode === 'merge' && existingDays.has(targetDate)) return []
-        const { id: _id, employeeId: _emp, date: _date, validated: _val, ...rest } = s
-        return [{ ...rest, id: crypto.randomUUID(), employeeId: targetEmployeeId, date: targetDate, validated: false }]
-      })
-
-      console.log('[pasteShifts] out', { newShifts, existingDays: [...existingDays] })
-      return [...next, ...newShifts]
+    const toAdd = sourceShifts.flatMap(s => {
+      const dayOffset  = Math.round((new Date(s.date + 'T00:00:00') - sourceMonday) / 86400000)
+      const td         = new Date(targetMonday)
+      td.setDate(targetMonday.getDate() + dayOffset)
+      const targetDate = dateToStr(td)
+      if (mode === 'merge' && existingDays.has(targetDate)) return []
+      const { id: _id, employeeId: _emp, date: _date, validated: _val, ...rest } = s
+      return [{ ...rest, id: crypto.randomUUID(), employeeId: targetEmployeeId, date: targetDate, validated: false }]
     })
+
+    console.log('[pasteShifts] out', { toAdd, existingDays: [...existingDays] })
+    setShifts([...remaining, ...toAdd])
+
+    if (removeIds.length) deleteShifts(removeIds).catch(err => console.error('[supabase] pasteShifts delete:', err.message))
+    if (toAdd.length)     upsertShifts(toAdd).catch(err => console.error('[supabase] pasteShifts upsert:', err.message))
   }
 
-  // Vide tous les shifts (après confirmation utilisateur)
+  // Vide tous les shifts localement — ne touche PAS Supabase (opération destructive)
   function resetShifts() {
     setShifts([])
   }
@@ -163,17 +196,14 @@ export function useSchedule() {
   }
 
   // Solde semaine courante en tenant compte du report des semaines précédentes
-  // Retourne { prevBalance, weekObjective, weekBalance, weekHours, prevHours, prevWeeks }
   function getWeekBalance(employeeId, weekDates, contract = WEEKLY_CONTRACT, startBalance = 0) {
     const strs = new Set(weekDates.map(dateToStr))
 
-    // Shifts hors de la semaine visible
     const prevShifts  = shifts.filter(s => s.employeeId === employeeId && !strs.has(s.date))
     const prevHours   = prevShifts.reduce((sum, s) => sum + shiftEffective(s), 0)
     const prevWeeks   = new Set(prevShifts.map(s => mondayOf(s.date))).size
     const prevBalance = prevHours - prevWeeks * contract + startBalance
 
-    // Objectif de la semaine ajusté du report
     const weekObjective = contract - prevBalance
     const weekHrs       = getWeekHours(employeeId, weekDates)
     const weekBalance   = weekHrs - weekObjective

@@ -1,6 +1,9 @@
 // ─── Hook — état et logique du module Traçabilité ─────────────────────────────
 import { useState, useEffect, useRef } from 'react'
-import { DEMO_SUPPLIERS, DEMO_PRODUCTS } from '../../../data/traceabilityDemo'
+import {
+  fetchSuppliers,  upsertSupplier,  deleteSupplier as deleteSupplierSupabase,
+  fetchDeliveries, upsertDelivery,  deleteDelivery as deleteDeliverySupabase,
+} from '../../../services/traceabilityService'
 
 const SUPPLIERS_KEY = 'kubo_tr_suppliers'
 const PRODUCTS_KEY  = 'kubo_tr_products'
@@ -22,11 +25,13 @@ function save(key, data) {
 // ── Hook ──────────────────────────────────────────────────────────────────────
 
 export function useTraceability() {
-  const [suppliers, setSuppliers] = useState(() => load(SUPPLIERS_KEY, DEMO_SUPPLIERS))
-  const [deliveries, setDeliveries] = useState(() => load(PRODUCTS_KEY, DEMO_PRODUCTS))
+  const [suppliers, setSuppliers] = useState(() => load(SUPPLIERS_KEY, []))
+  const [deliveries, setDeliveries] = useState(() => load(PRODUCTS_KEY, []))
 
-  const timerS = useRef(null)
-  const timerD = useRef(null)
+  const timerS  = useRef(null)
+  const timerD  = useRef(null)
+  // slugMap : slug (ex: "sup-001") → UUID Supabase
+  const slugMap = useRef({})
 
   useEffect(() => {
     clearTimeout(timerS.current)
@@ -40,6 +45,33 @@ export function useTraceability() {
     return () => clearTimeout(timerD.current)
   }, [deliveries])
 
+  // ── Chargement Supabase au montage ────────────────────────────────────────
+
+  useEffect(() => {
+    fetchSuppliers()
+      .then(async supabaseSuppliers => {
+        if (supabaseSuppliers.length > 0) {
+          supabaseSuppliers.forEach(s => { if (s.id) slugMap.current[s.id] = s._supabaseId })
+          setSuppliers(supabaseSuppliers)
+          console.log('[supabase] fournisseurs chargés:', supabaseSuppliers.length)
+        } else {
+          console.log('[supabase] aucun fournisseur — module vide')
+        }
+      })
+      .catch(err => console.error('[supabase] fetchSuppliers:', err.message))
+
+    fetchDeliveries()
+      .then(supabaseDeliveries => {
+        if (supabaseDeliveries.length > 0) {
+          setDeliveries(supabaseDeliveries)
+          console.log('[supabase] livraisons chargées:', supabaseDeliveries.length)
+        } else {
+          console.log('[supabase] aucune livraison — module vide')
+        }
+      })
+      .catch(err => console.error('[supabase] fetchDeliveries:', err.message))
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
   // ── Helpers ─────────────────────────────────────────────────────────────────
 
   function getDeliveriesForDay(supplierId, dateStr) {
@@ -49,34 +81,58 @@ export function useTraceability() {
   // ── CRUD fournisseurs ────────────────────────────────────────────────────────
 
   function addSupplier(data) {
-    const newSupplier = { ...data, id: `sup-${Date.now()}`, active: true }
+    const newSupplier = { ...data, id: crypto.randomUUID(), active: true }
     setSuppliers(prev => [...prev, newSupplier])
+    upsertSupplier(newSupplier)
+      .then(({ id, slug }) => { if (slug) slugMap.current[slug] = id })
+      .catch(err => console.error('[supabase] addSupplier:', err.message))
     return newSupplier
   }
 
   function updateSupplier(id, data) {
-    setSuppliers(prev => prev.map(s => s.id === id ? { ...s, ...data } : s))
+    let updated
+    setSuppliers(prev => prev.map(s => {
+      if (s.id !== id) return s
+      updated = { ...s, ...data }
+      return updated
+    }))
+    if (updated) upsertSupplier(updated).catch(err => console.error('[supabase] updateSupplier:', err.message))
   }
 
   function deleteSupplier(id) {
     setSuppliers(prev => prev.filter(s => s.id !== id))
     setDeliveries(prev => prev.filter(d => d.supplierId !== id))
+    deleteSupplierSupabase(id).catch(err => console.error('[supabase] deleteSupplier:', err.message))
   }
 
   // ── CRUD produits livrés ─────────────────────────────────────────────────────
 
   function addDelivery(data) {
-    const newDelivery = { ...data, id: `dp-${Date.now()}` }
+    const newDelivery = { ...data, id: crypto.randomUUID() }
     setDeliveries(prev => [...prev, newDelivery])
+    const supabaseSupplierId = slugMap.current[newDelivery.supplierId] ?? newDelivery.supplierId
+    upsertDelivery(newDelivery, supabaseSupplierId)
+      .catch(err => console.error('[supabase] addDelivery:', err.message))
     return newDelivery
   }
 
   function updateDelivery(id, data) {
-    setDeliveries(prev => prev.map(d => d.id === id ? { ...d, ...data } : d))
+    let updated
+    setDeliveries(prev => prev.map(d => {
+      if (d.id !== id) return d
+      updated = { ...d, ...data }
+      return updated
+    }))
+    if (updated) {
+      const supabaseSupplierId = slugMap.current[updated.supplierId] ?? updated.supplierId
+      upsertDelivery(updated, supabaseSupplierId)
+        .catch(err => console.error('[supabase] updateDelivery:', err.message))
+    }
   }
 
   function deleteDelivery(id) {
     setDeliveries(prev => prev.filter(d => d.id !== id))
+    deleteDeliverySupabase(id).catch(err => console.error('[supabase] deleteDelivery:', err.message))
   }
 
   return {

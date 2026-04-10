@@ -5,7 +5,13 @@
 // Sprint 5 ajoutera la sync Google Sheets.
 
 import { useState, useCallback, useMemo, useEffect } from 'react'
-import { fetchProducts } from '../services/webflowAdapter'
+import { fetchProducts as fetchWebflowProducts } from '../services/webflowAdapter'
+import {
+  fetchProducts    as fetchSupabaseProducts,
+  upsertProduct,
+  upsertProducts,
+  deleteProduct    as deleteSupabaseProduct,
+} from '../services/productsService'
 
 const LOCAL_KEY = 'kubo_products'
 
@@ -28,33 +34,61 @@ export function useProducts({ onToast } = {}) {
     return saved ?? []
   })
 
+  // ── Chargement Supabase au montage ────────────────────────────────────────
+
+  useEffect(() => {
+    fetchSupabaseProducts()
+      .then(supabaseProducts => {
+        if (supabaseProducts.length > 0) {
+          setProducts(prev => {
+            const supabaseIds   = new Set(supabaseProducts.map(p => p.id))
+            const supabaseWfIds = new Set(supabaseProducts.filter(p => p.webflowProductId).map(p => p.webflowProductId))
+            const localOnly = prev.filter(p =>
+              !supabaseIds.has(p.id) &&
+              !(p.webflowProductId && supabaseWfIds.has(p.webflowProductId))
+            )
+            if (localOnly.length > 0) {
+              upsertProducts(localOnly)
+                .catch(err => console.error('[supabase] seed local products:', err.message))
+            }
+            return [...supabaseProducts, ...localOnly]
+          })
+          console.log('[supabase] produits chargés:', supabaseProducts.length)
+        } else {
+          setProducts(prev => {
+            if (prev.length > 0) {
+              upsertProducts(prev).catch(err => console.error('[supabase] seed products:', err.message))
+              console.log('[supabase] produits seedés:', prev.length)
+            }
+            return prev
+          })
+        }
+      })
+      .catch(err => console.error('[supabase] fetchProducts:', err.message))
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
   // ── Sync Webflow au montage ────────────────────────────────────────────────
 
   useEffect(() => {
-    console.log('[useProducts] sync Webflow démarrée')
-    fetchProducts().then(webflowProducts => {
+    fetchWebflowProducts().then(webflowProducts => {
       if (!webflowProducts.length) return
       setProducts(prev => {
         const existingWfIds = new Set(prev.filter(p => p.webflowProductId).map(p => p.webflowProductId))
-        const toAdd = webflowProducts.filter(p => !existingWfIds.has(p.webflowProductId))
-        const toUpdate = webflowProducts.filter(p => existingWfIds.has(p.webflowProductId))
+        const toAdd    = webflowProducts.filter(p => !existingWfIds.has(p.webflowProductId))
+        const toUpdate = webflowProducts.filter(p =>  existingWfIds.has(p.webflowProductId))
 
         let next = prev.map(p => {
           if (!p.webflowProductId) return p
           const wf = toUpdate.find(w => w.webflowProductId === p.webflowProductId)
           if (!wf) return p
-          return {
-            ...p,
-            name:     wf.name,
-            active:   wf.active,
-            sizes:    wf.sizes,
-            photoUrl: wf.photoUrl,
-            updatedAt: new Date().toISOString(),
-          }
+          const updated = { ...p, name: wf.name, active: wf.active, sizes: wf.sizes, photoUrl: wf.photoUrl, updatedAt: new Date().toISOString() }
+          upsertProduct(updated).catch(err => console.error('[supabase] updateWebflowProduct:', err.message))
+          return updated
         })
 
         if (toAdd.length) {
           next = [...next, ...toAdd]
+          upsertProducts(toAdd).catch(err => console.error('[supabase] addWebflowProducts:', err.message))
           onToast?.(`${toAdd.length} nouveau(x) produit(s) importé(s) depuis Webflow`, null)
         }
 
@@ -78,29 +112,29 @@ export function useProducts({ onToast } = {}) {
 
   const addProduct = useCallback((data) => {
     const now = new Date().toISOString()
-    const product = {
-      ...data,
-      id:        `prod-${Date.now()}`,
-      createdAt: now,
-      updatedAt: now,
-    }
+    const product = { ...data, id: crypto.randomUUID(), createdAt: now, updatedAt: now }
     update(prev => {
       const next = [...prev, product]
       localSave(next)
       return next
     })
+    upsertProduct(product).catch(err => console.error('[supabase] addProduct:', err.message))
     onToast?.(`${data.name} ajouté ✓`, null)
     return product
   }, [onToast])
 
   const updateProduct = useCallback((id, changes) => {
+    let updated
     update(prev => {
-      const next = prev.map(p =>
-        p.id === id ? { ...p, ...changes, updatedAt: new Date().toISOString() } : p
-      )
+      const next = prev.map(p => {
+        if (p.id !== id) return p
+        updated = { ...p, ...changes, updatedAt: new Date().toISOString() }
+        return updated
+      })
       localSave(next)
       return next
     })
+    if (updated) upsertProduct(updated).catch(err => console.error('[supabase] updateProduct:', err.message))
     onToast?.('Produit mis à jour ✓', null)
   }, [onToast])
 
@@ -110,19 +144,22 @@ export function useProducts({ onToast } = {}) {
       localSave(next)
       return next
     })
+    deleteSupabaseProduct(id).catch(err => console.error('[supabase] deleteProduct:', err.message))
     onToast?.('Produit supprimé', null)
   }, [onToast])
 
   const toggleActive = useCallback((id) => {
+    let updated
     update(prev => {
-      const next = prev.map(p =>
-        p.id === id
-          ? { ...p, active: !p.active, updatedAt: new Date().toISOString() }
-          : p
-      )
+      const next = prev.map(p => {
+        if (p.id !== id) return p
+        updated = { ...p, active: !p.active, updatedAt: new Date().toISOString() }
+        return updated
+      })
       localSave(next)
       return next
     })
+    if (updated) upsertProduct(updated).catch(err => console.error('[supabase] toggleActive:', err.message))
   }, [])
 
   // ── Dérivés ────────────────────────────────────────────────────────────────
