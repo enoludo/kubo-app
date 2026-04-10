@@ -14,7 +14,7 @@ import { mondayOf, dateToStr } from '../../utils/date'
 import './planning-tokens.css'
 import './PlanningApp.css'
 
-export default function PlanningApp({ showToast, onSyncChange, schedule, teamCtx, dataSource, setDataSource }) {
+export default function PlanningApp({ showToast, onSyncChange, schedule, teamCtx, dataSource, setDataSource, isManager = false }) {
   const week = useWeek()
 
   const [copiedEmployeePlan, setCopiedEmployeePlan] = useState(null)
@@ -102,11 +102,11 @@ export default function PlanningApp({ showToast, onSyncChange, schedule, teamCtx
             schedule={schedule}
             weekDates={week.dates}
             visibleIds={visibleIds}
-            onAddForDay={shiftCtx.handleAddForDay}
-            onEditShift={shiftCtx.handleEditShift}
-            onToggleValidated={schedule.toggleValidated}
+            onAddForDay={isManager ? shiftCtx.handleAddForDay : null}
+            onEditShift={isManager ? shiftCtx.handleEditShift : null}
+            onToggleValidated={isManager ? schedule.toggleValidated : null}
             onEmployeeClick={emp => teamCtx.setProfileModal(emp)}
-            onAddEmployee={() => teamCtx.setEmpModal({ employee: null })}
+            onAddEmployee={isManager ? () => teamCtx.setEmpModal({ employee: null }) : null}
           />
         </div>
 
@@ -114,7 +114,7 @@ export default function PlanningApp({ showToast, onSyncChange, schedule, teamCtx
           <ShiftModal
             info={shiftCtx.shiftModal}
             onSave={shiftCtx.handleSaveShift}
-            onDelete={shiftCtx.handleDeleteShift}
+            onDelete={isManager ? shiftCtx.handleDeleteShift : null}
             onCancel={() => shiftCtx.setShiftModal(null)}
             onToggleValidated={schedule.toggleValidated}
             schedule={schedule}
@@ -127,7 +127,7 @@ export default function PlanningApp({ showToast, onSyncChange, schedule, teamCtx
             employee={teamCtx.profileModal}
             weekDates={week.dates}
             schedule={schedule}
-            onEdit={() => { teamCtx.setEmpModal({ employee: teamCtx.profileModal }); teamCtx.setProfileModal(null) }}
+            onEdit={isManager ? () => { teamCtx.setEmpModal({ employee: teamCtx.profileModal }); teamCtx.setProfileModal(null) } : null}
             onClose={() => teamCtx.setProfileModal(null)}
             copiedEmployeePlan={copiedEmployeePlan}
             onCopyPlan={handleCopyEmployeePlan}
@@ -150,7 +150,7 @@ export default function PlanningApp({ showToast, onSyncChange, schedule, teamCtx
             onSave={teamCtx.handleSaveEmployee}
             onCancel={() => teamCtx.setEmpModal(null)}
             onArchive={teamCtx.handleArchiveEmployee}
-            onDelete={teamCtx.handleDeleteEmployee}
+            onDelete={isManager ? teamCtx.handleDeleteEmployee : null}
           />
         )}
 

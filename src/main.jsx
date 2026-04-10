@@ -11,6 +11,7 @@ import './design-system/components/Badge/Badge.css'
 import './design-system/components/Modal/Modal.css'
 import './design-system/components/Dropdown/Dropdown.css'
 import './index.css'
+import { AuthProvider } from './hooks/useAuth.jsx'
 import App from './App.jsx'
 
 // Migration one-shot : convertit les IDs entiers (legacy) en UUIDs
@@ -19,6 +20,8 @@ migrateSessionIds()
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <App />
+    <AuthProvider>
+      <App />
+    </AuthProvider>
   </StrictMode>,
 )

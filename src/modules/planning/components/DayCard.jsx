@@ -36,12 +36,12 @@ export default function DayCard({ shifts, onAdd, onEdit, onToggleValidated, defa
       const st = STATUS[defaultType] || STATUS.work
       return (
         <div
-          className="day-card"
+          className={`day-card${onAdd ? '' : ' day-card--readonly'}`}
           style={{
             background: `var(--planning-shift-${defaultType}-bg)`,
             '--card-border': `var(--planning-shift-${defaultType}-color)`,
           }}
-          onClick={onAdd}
+          onClick={onAdd ?? undefined}
         >
           <span className="day-card-badge" style={{ background: `var(--planning-shift-${defaultType}-badge-bg)`, color: 'var(--text)' }}>
             {st.label}
@@ -50,6 +50,7 @@ export default function DayCard({ shifts, onAdd, onEdit, onToggleValidated, defa
         </div>
       )
     }
+    if (!onAdd) return <div className="day-card day-card--empty day-card--readonly" />
     return (
       <div className="day-card day-card--empty add-trigger add-trigger--icon" style={{ '--card-border': 'var(--color-purple-400)' }} onClick={onAdd}>
         +
@@ -72,7 +73,7 @@ export default function DayCard({ shifts, onAdd, onEdit, onToggleValidated, defa
         background: isValidated ? `var(--planning-shift-${type}-bg-validated)` : `var(--planning-shift-${type}-bg)`,
         '--card-border': `var(--planning-shift-${type}-color)`,
       }}
-      onClick={() => onEdit(mainShift.id)}
+      onClick={onEdit ? () => onEdit(mainShift.id) : undefined}
     >
       {/* Badge statut */}
       <span
@@ -83,7 +84,7 @@ export default function DayCard({ shifts, onAdd, onEdit, onToggleValidated, defa
       </span>
 
       {/* Bouton validation — masqué pour le type Repos */}
-      {!isRest && (
+      {!isRest && onToggleValidated && (
         <button
           className={`day-card-validate${isValidated ? ' is-validated' : ''}`}
           onClick={e => { e.stopPropagation(); onToggleValidated(mainShift.id) }}

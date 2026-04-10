@@ -21,10 +21,11 @@ export default function TableView({
       {/* En-tête des colonnes jours */}
       <div className="tv-header-row">
         <div className="tv-emp-col tv-emp-col--add">
-          <button className="tv-add-employee-btn add-trigger add-trigger--labeled" onClick={onAddEmployee}>
-            
-            <span className="tv-add-label">+ Employé</span>
-          </button>
+          {onAddEmployee && (
+            <button className="tv-add-employee-btn add-trigger add-trigger--labeled" onClick={onAddEmployee}>
+              <span className="tv-add-label">+ Employé</span>
+            </button>
+          )}
         </div>
         {weekDates.map((date, i) => {
           const holiday = getHolidayName(date)
@@ -84,7 +85,7 @@ export default function TableView({
                     <DayCard
                       employee={emp}
                       shifts={dayShifts}
-                      onAdd={() => onAddForDay(emp.id, date, (i === 0 || i === 6) ? 'rest' : undefined)}
+                      onAdd={onAddForDay ? () => onAddForDay(emp.id, date, (i === 0 || i === 6) ? 'rest' : undefined) : null}
                       onEdit={onEditShift}
                       onToggleValidated={onToggleValidated}
                       defaultType={dayShifts.length === 0 && (i === 0 || i === 6) ? 'rest' : undefined}

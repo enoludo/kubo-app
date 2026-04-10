@@ -41,12 +41,14 @@ function FilterBar({ search, onSearch, category, onCategory, showInactive, onTog
       </div>
 
       {/* Droite : nouveau produit */}
-      <button
-        className="add-trigger add-trigger--labeled"
-        onClick={onAdd}
-      >
-        + Nouveau produit
-      </button>
+      {onAdd && (
+        <button
+          className="add-trigger add-trigger--labeled"
+          onClick={onAdd}
+        >
+          + Nouveau produit
+        </button>
+      )}
 
     </div>
   )

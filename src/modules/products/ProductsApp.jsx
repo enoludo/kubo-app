@@ -7,7 +7,7 @@ import ProductForm                from './ProductForm'
 import './products-tokens.css'
 import './ProductsApp.css'
 
-export default function ProductsApp({ productsCtx, showToast, getToken }) {
+export default function ProductsApp({ productsCtx, showToast, getToken, isManager = false }) {
   useProductsGoogleSync({
     products:    productsCtx.products,
     getToken:    getToken ?? (() => null),
@@ -59,19 +59,19 @@ export default function ProductsApp({ productsCtx, showToast, getToken }) {
         products={productsCtx.products}
         categories={productsCtx.categories}
         onProductClick={handleOpenDetail}
-        onAdd={handleOpenNew}
+        onAdd={isManager ? handleOpenNew : null}
       />
 
       {selected && (
         <ProductDetailModal
           product={selected}
           onClose={() => setSelected(null)}
-          onEdit={handleOpenEdit}
-          onDelete={handleDeleteFromDetail}
+          onEdit={isManager ? handleOpenEdit : null}
+          onDelete={isManager ? handleDeleteFromDetail : null}
         />
       )}
 
-      {formTarget && (
+      {isManager && formTarget && (
         <ProductForm
           product={formTarget === 'new' ? null : formTarget}
           onSave={handleSave}

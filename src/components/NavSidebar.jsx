@@ -120,7 +120,7 @@ const GROUP_HACCP = [
 
 // ── Composant ──────────────────────────────────────────────────────────────────
 
-export default function NavSidebar({ activeModule = 'planning', onModuleChange, badges = {}, connections = [] }) {
+export default function NavSidebar({ activeModule = 'planning', onModuleChange, badges = {}, connections = [], userName = null, onSignOut }) {
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [popPos,       setPopPos]       = useState({ top: 0, left: 0 })
   const settingsBtnRef = useRef(null)
@@ -254,7 +254,11 @@ export default function NavSidebar({ activeModule = 'planning', onModuleChange, 
             />
           )}
         </button>
-        <button className="nav-item nav-item--sm nav-item--disabled" title="Profil">
+        <button
+          className="nav-item nav-item--sm"
+          title={userName ? `${userName} — Se déconnecter` : 'Se déconnecter'}
+          onClick={onSignOut}
+        >
           <IconProfile />
         </button>
       </div>

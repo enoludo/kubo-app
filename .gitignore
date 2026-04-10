@@ -29,3 +29,6 @@ dist-ssr
 *.sw?
 .vercel
 .env*.local
+VITE_MANAGER_EMAIL=contact@kubo-patisserie.com
+VITE_TEAM_EMAIL=enoludo@hotmail.com
+VITE_TEAM_PASSWORD=r!Vs6DMav$%4p5$vF^vS9@@odw$JT45V

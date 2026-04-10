@@ -1,4 +1,7 @@
 import { useState, useEffect } from 'react'
+import { useAuth }          from './hooks/useAuth.jsx'
+import { signOut }          from './services/authService'
+import ModeSelector         from './components/ModeSelector'
 import NavSidebar           from './components/NavSidebar'
 import OrdersApp            from './modules/orders/OrdersApp'
 import ProductsApp          from './modules/products/ProductsApp'
@@ -22,6 +25,7 @@ import './App.css'
 const INITIAL_SYNC = { status: 'disconnected', errMsg: null, loading: false, connect: null, retry: null, getToken: null }
 
 export default function App() {
+  const { user, name, isManager, loading } = useAuth()
   const [activeModule,     setActiveModule]   = useState('dashboard')
   const [startupDismissed, setStartupDismissed] = useState(false)
   const [toast,            setToast]          = useState(null)
@@ -54,6 +58,9 @@ export default function App() {
     ordersCtx.sheetsConnectFromShared()
   }
 
+  if (loading) return null
+  if (!user)   return <ModeSelector />
+
   return (
     <div className="app-shell">
       {!startupDismissed && (
@@ -71,6 +78,8 @@ export default function App() {
         activeModule={activeModule}
         onModuleChange={setActiveModule}
         badges={{ orders: ordersCtx.upcomingCount }}
+        userName={name}
+        onSignOut={signOut}
         connections={[
           {
             label:     'Google Sheets',
@@ -100,8 +109,8 @@ export default function App() {
 
       {activeModule === 'dashboard'     && <DashboardApp     schedule={schedule} teamCtx={teamCtx} cleanCtx={cleanCtx} tempCtx={tempCtx} trCtx={trCtx} ordersCtx={ordersCtx} productsCtx={productsCtx} onNavigate={setActiveModule} />}
       {activeModule === 'orders'        && <OrdersApp        ordersCtx={ordersCtx} productsCtx={productsCtx} showToast={showToast} />}
-      {activeModule === 'products'      && <ProductsApp      productsCtx={productsCtx} showToast={showToast} getToken={sync.getToken} />}
-      {activeModule === 'planning'      && <PlanningApp      showToast={showToast} onSyncChange={setSync} schedule={schedule} teamCtx={teamCtx} dataSource={dataSource} setDataSource={setDataSource} />}
+      {activeModule === 'products'      && <ProductsApp      productsCtx={productsCtx} showToast={showToast} getToken={sync.getToken} isManager={isManager} />}
+      {activeModule === 'planning'      && <PlanningApp      showToast={showToast} onSyncChange={setSync} schedule={schedule} teamCtx={teamCtx} dataSource={dataSource} setDataSource={setDataSource} isManager={isManager} />}
       {activeModule === 'temperatures'  && <TemperaturesApp  showToast={showToast} tempCtx={tempCtx} />}
       {activeModule === 'cleaning'      && <CleaningApp      showToast={showToast} cleanCtx={cleanCtx} />}
       {activeModule === 'tracability'   && <TraceabilityApp  showToast={showToast} trCtx={trCtx} />}

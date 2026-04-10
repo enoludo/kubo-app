@@ -101,7 +101,7 @@ export default function EmployeeProfileModal({
   const [emailWeek, setEmailWeek] = useState(currentKey)
 
   function handleSend() {
-    if (!employee.email) { onEdit(); return }
+    if (!employee.email) { onEdit?.(); return }
     const dates = getWeekDates(emailWeek)
     const href  = buildIndividualMailto(employee, dates, schedule.shifts)
     if (href) window.location.href = href
@@ -162,7 +162,7 @@ export default function EmployeeProfileModal({
             <div className="modal-emp-name">{employee.name}</div>
             <div className="text-meta modal-emp-role">{employee.role}</div>
           </div>
-          <button className="emp-profile-edit-btn" onClick={onEdit}>Modifier</button>
+          {onEdit && <button className="emp-profile-edit-btn" onClick={onEdit}>Modifier</button>}
         </div>
 
         {/* Contrat */}
@@ -306,10 +306,10 @@ export default function EmployeeProfileModal({
               <Button
                 variant="success"
                 style={{ opacity: employee.email ? 1 : 0.8, flex: canPaste ? undefined : 1 }}
-                onClick={employee.email ? () => setActivePanel('email') : onEdit}
+                onClick={employee.email ? () => setActivePanel('email') : (onEdit ?? undefined)}
               >
                 <MailIcon size={13} style={{ marginRight: 6 }} />
-                {employee.email ? 'Envoyer' : "Ajouter un email"}
+                {employee.email ? 'Envoyer' : onEdit ? "Ajouter un email" : 'Envoyer'}
               </Button>
             </>
           )}

@@ -1,0 +1,127 @@
+/* ── ModeSelector ────────────────────────────────────────────────────────────── */
+
+.mode-screen {
+  position: fixed;
+  inset: 0;
+  background: var(--bg-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-family-base);
+  z-index: var(--z-overlay);
+}
+
+.mode-card {
+  background: var(--bg-default);
+  border-radius: var(--radius-md);
+  padding: var(--space-xl);
+  width: 420px;
+  max-width: calc(100vw - var(--space-xl));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+  box-shadow: var(--shadow-md);
+}
+
+.mode-logo {
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+.mode-title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.mode-subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin: 0 0 var(--space-sm);
+}
+
+/* ── Boutons de sélection ─────────────────────────────────────────────────── */
+
+.mode-choices {
+  display: flex;
+  gap: var(--space-md);
+  width: 100%;
+}
+
+.mode-btn {
+  flex: 1;
+  min-width: 160px;
+  min-height: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  border-radius: var(--radius-md);
+  border: 2px solid var(--color-grey-300);
+  background: var(--color-white);
+  cursor: pointer;
+  font-family: var(--font-family-base);
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.mode-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.mode-btn--selected {
+  border-color: var(--color-grey-500);
+  background: var(--color-grey-100);
+}
+
+.mode-btn-icon {
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+.mode-btn-label {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+}
+
+/* ── Formulaire mot de passe ─────────────────────────────────────────────── */
+
+.mode-password-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.mode-access-btn {
+  width: 100%;
+  height: var(--control-height-md);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+}
+
+.mode-access-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.mode-error {
+  font-size: var(--font-size-sm);
+  color: var(--color-danger);
+  margin: 0;
+  text-align: center;
+}
+
+.mode-loading {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin: 0;
+}
