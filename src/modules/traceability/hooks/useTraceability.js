@@ -5,69 +5,29 @@ import {
   fetchDeliveries, upsertDelivery,  deleteDelivery as deleteDeliverySupabase,
 } from '../../../services/traceabilityService'
 
-const SUPPLIERS_KEY = 'kubo_tr_suppliers'
-const PRODUCTS_KEY  = 'kubo_tr_products'
-const DEBOUNCE_MS   = 500
-
-// ── Persistance locale ────────────────────────────────────────────────────────
-
-function load(key, fallback) {
-  try {
-    const raw = localStorage.getItem(key)
-    return raw ? JSON.parse(raw) : fallback
-  } catch { return fallback }
-}
-
-function save(key, data) {
-  try { localStorage.setItem(key, JSON.stringify(data)) } catch {}
-}
-
 // ── Hook ──────────────────────────────────────────────────────────────────────
 
 export function useTraceability() {
-  const [suppliers, setSuppliers] = useState(() => load(SUPPLIERS_KEY, []))
-  const [deliveries, setDeliveries] = useState(() => load(PRODUCTS_KEY, []))
+  const [suppliers,  setSuppliers]  = useState([])
+  const [deliveries, setDeliveries] = useState([])
 
-  const timerS  = useRef(null)
-  const timerD  = useRef(null)
   // slugMap : slug (ex: "sup-001") → UUID Supabase
   const slugMap = useRef({})
 
-  useEffect(() => {
-    clearTimeout(timerS.current)
-    timerS.current = setTimeout(() => save(SUPPLIERS_KEY, suppliers), DEBOUNCE_MS)
-    return () => clearTimeout(timerS.current)
-  }, [suppliers])
-
-  useEffect(() => {
-    clearTimeout(timerD.current)
-    timerD.current = setTimeout(() => save(PRODUCTS_KEY, deliveries), DEBOUNCE_MS)
-    return () => clearTimeout(timerD.current)
-  }, [deliveries])
-
-  // ── Chargement Supabase au montage ────────────────────────────────────────
-
+  // Chargement Supabase au montage
   useEffect(() => {
     fetchSuppliers()
-      .then(async supabaseSuppliers => {
-        if (supabaseSuppliers.length > 0) {
-          supabaseSuppliers.forEach(s => { if (s.id) slugMap.current[s.id] = s._supabaseId })
-          setSuppliers(supabaseSuppliers)
-          console.log('[supabase] fournisseurs chargés:', supabaseSuppliers.length)
-        } else {
-          console.log('[supabase] aucun fournisseur — module vide')
-        }
+      .then(supabaseSuppliers => {
+        supabaseSuppliers.forEach(s => { if (s.id) slugMap.current[s.id] = s._supabaseId })
+        setSuppliers(supabaseSuppliers)
+        console.log('[supabase] fournisseurs chargés:', supabaseSuppliers.length)
       })
       .catch(err => console.error('[supabase] fetchSuppliers:', err.message))
 
     fetchDeliveries()
       .then(supabaseDeliveries => {
-        if (supabaseDeliveries.length > 0) {
-          setDeliveries(supabaseDeliveries)
-          console.log('[supabase] livraisons chargées:', supabaseDeliveries.length)
-        } else {
-          console.log('[supabase] aucune livraison — module vide')
-        }
+        setDeliveries(supabaseDeliveries)
+        console.log('[supabase] livraisons chargées:', supabaseDeliveries.length)
       })
       .catch(err => console.error('[supabase] fetchDeliveries:', err.message))
   }, []) // eslint-disable-line react-hooks/exhaustive-deps

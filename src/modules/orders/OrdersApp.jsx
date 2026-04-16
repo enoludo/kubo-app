@@ -7,14 +7,25 @@ import SaturdayChoiceModal  from './SaturdayChoiceModal'
 import NewOrderModal        from './NewOrderModal'
 import BrunchModal          from './BrunchModal'
 import OrderDetailModal     from './OrderDetailModal'
+import { useGoogleExport }  from '../../hooks/useGoogleExport'
+import { exportOrdersToSheets } from '../../services/sheetsExport'
 import { dateToStr }        from '../../utils/date'
 import './orders-tokens.css'
 import './OrdersApp.css'
 
-export default function OrdersApp({ ordersCtx, productsCtx, showToast }) {
+export default function OrdersApp({ ordersCtx, productsCtx, showToast, getGoogleToken }) {
   const now = new Date()
   const [year,  setYear]  = useState(now.getFullYear())
   const [month, setMonth] = useState(now.getMonth())
+
+  const { exporting: sheetsExporting, runExport } = useGoogleExport({ getToken: getGoogleToken, onToast: showToast })
+
+  function handleSheetsExport() {
+    const localOrders = ordersCtx.orders.filter(
+      o => o.channel === 'boutique' || (o.channel === 'brunch' && o.brunchSource === 'boutique')
+    )
+    runExport(token => exportOrdersToSheets(token, localOrders), 'Commandes')
+  }
 
   // ── États modales ──────────────────────────────────────────────────────────
 
@@ -146,10 +157,8 @@ export default function OrdersApp({ ordersCtx, productsCtx, showToast }) {
         webflowStatus={ordersCtx.webflowStatus}
         webflowError={ordersCtx.webflowError}
         onRetryWebflow={ordersCtx.retryWebflow}
-        sheetsStatus={ordersCtx.sheetsStatus}
-        sheetsError={ordersCtx.sheetsError}
-        onSheetsConnect={ordersCtx.sheetsConnect}
-        onSheetsRetry={ordersCtx.sheetsRetry}
+        onSheetsExport={getGoogleToken ? handleSheetsExport : undefined}
+        sheetsExporting={sheetsExporting}
       />
       <div className="app-body orders-body">
         <OrdersCalendar

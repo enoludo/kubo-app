@@ -34,7 +34,7 @@ export async function loadGIS() {
 
 // Initialise le client OAuth (à appeler après loadGIS).
 // Supporte les appels simultanés : tous les appelants en attente reçoivent le token
-// via la queue — évite la race condition entre useGoogleSync et useOrdersGoogleSync.
+// via la queue — évite la race condition si plusieurs modules initialisent le client simultanément.
 export function initTokenClient(clientId, onSuccess, onError) {
   _clientId = clientId
   _pendingQueue.push({ onSuccess, onError })
@@ -45,7 +45,7 @@ export function initTokenClient(clientId, onSuccess, onError) {
 
   _tokenClient = window.google.accounts.oauth2.initTokenClient({
     client_id:      clientId,
-    scope:          'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file',
+    scope:          'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.readonly',
     callback:       (r) => {
       const queue = _pendingQueue.splice(0)
       if (r.error) { queue.forEach(({ onError: e }) => e(r.error)); return }

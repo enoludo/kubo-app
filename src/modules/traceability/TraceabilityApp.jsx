@@ -1,5 +1,6 @@
 // ─── Module Traçabilité — Shell principal ─────────────────────────────────────
 import { useState, useRef, useMemo } from 'react'
+import heic2any from 'heic2any'
 import { useWeek }               from '../../hooks/useWeek'
 import { useDrivePhotos }        from './hooks/useDrivePhotos'
 import TraceCalendar             from './components/TraceCalendar'
@@ -158,11 +159,20 @@ export default function TraceabilityApp({ showToast, trCtx }) {
   // ── Handler upload photo directe ─────────────────────────────────────────────
 
   async function handleAddPhotoFile(e) {
-    const file = e.target.files?.[0]
+    let file = e.target.files?.[0]
     if (!file) return
     e.target.value = ''
     setPhotoUploading(true)
     try {
+      if (file.type === 'image/heic' || file.type === 'image/heif' ||
+          file.name.toLowerCase().endsWith('.heic') || file.name.toLowerCase().endsWith('.heif')) {
+        try {
+          const converted = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.9 })
+          file = new File([converted], file.name.replace(/\.hei[cf]$/i, '.jpg'), { type: 'image/jpeg' })
+        } catch (err) {
+          console.error('[heic] conversion failed:', err)
+        }
+      }
       const today = new Date().toISOString().slice(0, 10)
       await uploadReceptionPhoto({
         file,
@@ -253,11 +263,22 @@ export default function TraceabilityApp({ showToast, trCtx }) {
                 <input
                   ref={photoInputRef}
                   type="file"
-                  accept="image/*"
+                  accept="image/*,.heic,.heif"
                   capture="environment"
                   style={{ display: 'none' }}
                   onChange={handleAddPhotoFile}
                 />
+                <button
+                  className="nav-btn"
+                  onClick={syncDrivePhotos}
+                  aria-label="Rafraîchir les photos"
+                  title="Rafraîchir les photos depuis Drive"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="23 4 23 10 17 10"/>
+                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+                  </svg>
+                </button>
                 <button
                   className="add-trigger add-trigger--labeled"
                   onClick={() => photoInputRef.current?.click()}

@@ -1,13 +1,13 @@
 // ─── Module Nettoyage — Shell principal ───────────────────────────────────────
-import { useState, useRef }   from 'react'
-import { useWeek }            from '../../hooks/useWeek'
-import CleaningCalendar       from './components/CleaningCalendar'
-import CleaningTaskModal       from './components/CleaningTaskModal'
-import CleaningZoneDetailModal from './components/CleaningZoneDetailModal'
-import CleaningZoneForm        from './components/CleaningZoneForm'
-import Dropdown               from '../../design-system/components/Dropdown/Dropdown'
-import { PdfIcon }            from '../../components/Icons'
-import { generateCleaningPdf } from './utils/exportCleaningPdf'
+import { useState, useRef }      from 'react'
+import { useWeek }               from '../../hooks/useWeek'
+import CleaningCalendar          from './components/CleaningCalendar'
+import CleaningTaskModal          from './components/CleaningTaskModal'
+import CleaningRoomDetailModal   from './components/CleaningRoomDetailModal'
+import CleaningRoomForm          from './components/CleaningRoomForm'
+import Dropdown                  from '../../design-system/components/Dropdown/Dropdown'
+import { PdfIcon }               from '../../components/Icons'
+import { generateCleaningPdf }   from './utils/exportCleaningPdf'
 import '../../design-system/layout/ModuleLayout.css'
 import '../../design-system/components/WeekGrid/WeekGrid.css'
 import '../../design-system/components/DayCard/DayCard.css'
@@ -32,22 +32,21 @@ function NavNextIcon() {
 
 function MenuIcon() {
   return (
-  <svg xmlns="http://www.w3.org/2000/svg" width="21.5" height="22.5" viewBox="0 0 21.5 22.5" fill='currentcolor'>
-  <path id="Union_14" data-name="Union 14" d="M3.1,22.566a3.086,3.086,0,0,1-2.9-2.75c-.107-1-.2-3.409-.2-5.255s.091-4.253.2-5.255A3.088,3.088,0,0,1,3.1,6.554c.865-.064,2.387-.112,3.5-.148l.626-.021a.75.75,0,0,1,.051,1.5l-.629.02c-1.1.035-2.6.084-3.433.145A1.588,1.588,0,0,0,1.689,9.464c-.1.943-.189,3.325-.189,5.1s.088,4.153.189,5.1A1.586,1.586,0,0,0,3.214,21.07c1.436.11,3.91.24,7.536.24s6.1-.13,7.536-.24a1.587,1.587,0,0,0,1.525-1.414c.1-.943.189-3.325.189-5.1s-.088-4.152-.189-5.095A1.589,1.589,0,0,0,18.284,8.05c-.829-.061-2.33-.11-3.426-.144l-.634-.021a.75.75,0,1,1,.051-1.5l.63.021c1.11.035,2.629.084,3.49.148A3.089,3.089,0,0,1,21.3,9.305c.107,1,.2,3.409.2,5.254s-.091,4.253-.2,5.256a3.086,3.086,0,0,1-2.9,2.75c-1.462.112-3.976.245-7.65.245S4.562,22.677,3.1,22.566ZM10,10.881V2.872L8.094,4.778a.75.75,0,1,1-1.06-1.061L10.22.53a.751.751,0,0,1,1.061,0l3.187,3.187a.75.75,0,0,1-1.061,1.061L11.5,2.871v8.01a.75.75,0,0,1-1.5,0Z" transform="translate(0 -0.311)"/>
-</svg>
-  
+    <svg xmlns="http://www.w3.org/2000/svg" width="21.5" height="22.5" viewBox="0 0 21.5 22.5" fill='currentcolor'>
+      <path d="M3.1,22.566a3.086,3.086,0,0,1-2.9-2.75c-.107-1-.2-3.409-.2-5.255s.091-4.253.2-5.255A3.088,3.088,0,0,1,3.1,6.554c.865-.064,2.387-.112,3.5-.148l.626-.021a.75.75,0,0,1,.051,1.5l-.629.02c-1.1.035-2.6.084-3.433.145A1.588,1.588,0,0,0,1.689,9.464c-.1.943-.189,3.325-.189,5.1s.088,4.153.189,5.1A1.586,1.586,0,0,0,3.214,21.07c1.436.11,3.91.24,7.536.24s6.1-.13,7.536-.24a1.587,1.587,0,0,0,1.525-1.414c.1-.943.189-3.325.189-5.1s-.088-4.152-.189-5.095A1.589,1.589,0,0,0,18.284,8.05c-.829-.061-2.33-.11-3.426-.144l-.634-.021a.75.75,0,1,1,.051-1.5l.63.021c1.11.035,2.629.084,3.49.148A3.089,3.089,0,0,1,21.3,9.305c.107,1,.2,3.409.2,5.254s-.091,4.253-.2,5.256a3.086,3.086,0,0,1-2.9,2.75c-1.462.112-3.976.245-7.65.245S4.562,22.677,3.1,22.566ZM10,10.881V2.872L8.094,4.778a.75.75,0,1,1-1.06-1.061L10.22.53a.751.751,0,0,1,1.061,0l3.187,3.187a.75.75,0,0,1-1.061,1.061L11.5,2.871v8.01a.75.75,0,0,1-1.5,0Z" transform="translate(0 -0.311)"/>
+    </svg>
   )
 }
 
 export default function CleaningApp({ showToast, cleanCtx }) {
-  const week = useWeek()
+  const week      = useWeek()
   const menuBtnRef = useRef(null)
 
-  const [menuOpen,       setMenuOpen]       = useState(false)
-  const [pdfLoading,     setPdfLoading]     = useState(false)
-  const [taskModal,       setTaskModal]       = useState(null)
-  const [zoneDetailModal, setZoneDetailModal] = useState(null)
-  const [zoneFormModal,   setZoneFormModal]   = useState(null)
+  const [menuOpen,        setMenuOpen]        = useState(false)
+  const [pdfLoading,      setPdfLoading]      = useState(false)
+  const [taskModal,        setTaskModal]        = useState(null) // { room, roomId, dateStr, tasks }
+  const [roomDetailModal,  setRoomDetailModal]  = useState(null) // { room }
+  const [roomFormModal,    setRoomFormModal]    = useState(null) // {} | { room }
 
   const fmt   = d => d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
   const range = `${fmt(week.dates[0])} – ${fmt(week.dates[6])}`
@@ -61,8 +60,8 @@ export default function CleaningApp({ showToast, cleanCtx }) {
         cleanCtx.tasks,
         cleanCtx.records,
         week.dates.map(d => {
-          const y = d.getFullYear()
-          const m = String(d.getMonth() + 1).padStart(2, '0')
+          const y   = d.getFullYear()
+          const m   = String(d.getMonth() + 1).padStart(2, '0')
           const day = String(d.getDate()).padStart(2, '0')
           return `${y}-${m}-${day}`
         }),
@@ -71,6 +70,24 @@ export default function CleaningApp({ showToast, cleanCtx }) {
     } finally {
       setPdfLoading(false)
     }
+  }
+
+  // Données filtrées pour la room active dans les modals
+  function zonesForRoom(roomId) {
+    return cleanCtx.zones.filter(z => z.roomId === roomId)
+  }
+
+  function subzonesForRoom(roomId) {
+    const zoneIds = zonesForRoom(roomId).map(z => z.id)
+    return cleanCtx.subzones.filter(s => zoneIds.includes(s.zoneId))
+  }
+
+  function tasksForRoom(roomId) {
+    const zoneIds    = zonesForRoom(roomId).map(z => z.id)
+    const subzoneIds = subzonesForRoom(roomId).map(s => s.id)
+    return cleanCtx.tasks.filter(t =>
+      zoneIds.includes(t.zoneId) || subzoneIds.includes(t.subzoneId)
+    )
   }
 
   return (
@@ -115,10 +132,7 @@ export default function CleaningApp({ showToast, cleanCtx }) {
           align="right"
           className="header-menu-dropdown"
         >
-          <button
-            onClick={() => action(handleExportPdf)}
-            disabled={pdfLoading}
-          >
+          <button onClick={() => action(handleExportPdf)} disabled={pdfLoading}>
             <PdfIcon size={15} /><span>{pdfLoading ? 'Génération…' : 'Exporter PDF'}</span>
           </button>
         </Dropdown>
@@ -128,22 +142,25 @@ export default function CleaningApp({ showToast, cleanCtx }) {
       <div className="app-body">
         <CleaningCalendar
           weekDates={week.dates}
+          rooms={cleanCtx.rooms}
           zones={cleanCtx.zones}
-          getTasksForDay={cleanCtx.getTasksForDay}
-          getZoneStats={(zone, dates) => cleanCtx.getZoneStats(zone, dates)}
-          getZoneActiveCount={cleanCtx.getZoneActiveCount}
-          onCellClick={(zone, dateStr, tasks) => setTaskModal({ zone, dateStr, tasks })}
-          onZoneClick={zone => setZoneDetailModal({ zone })}
-          onAddZone={() => setZoneFormModal({})}
+          getTasksForRoomDay={cleanCtx.getTasksForRoomDay}
+          getRoomStats={(roomId, dates) => cleanCtx.getRoomStats(roomId, dates)}
+          getRoomActiveTaskCount={cleanCtx.getRoomActiveTaskCount}
+          onCellClick={(room, roomId, dateStr, tasks) => setTaskModal({ room, roomId, dateStr, tasks })}
+          onRoomClick={room => setRoomDetailModal({ room })}
+          onAddRoom={() => setRoomFormModal({})}
         />
       </div>
 
       {/* Modal validation tâches */}
       {taskModal && (
         <CleaningTaskModal
-          zone={taskModal.zone}
+          room={taskModal.room}
           dateStr={taskModal.dateStr}
           tasks={taskModal.tasks}
+          zones={zonesForRoom(taskModal.room.id)}
+          subzones={subzonesForRoom(taskModal.room.id)}
           getRecordForDay={cleanCtx.getRecordForDay}
           markDone={cleanCtx.markDone}
           unmarkDone={cleanCtx.unmarkDone}
@@ -151,40 +168,39 @@ export default function CleaningApp({ showToast, cleanCtx }) {
         />
       )}
 
-      {/* Modal détail zone */}
-      {zoneDetailModal && (
-        <CleaningZoneDetailModal
-          zone={zoneDetailModal.zone}
-          tasks={cleanCtx.tasks.filter(t => t.zone === zoneDetailModal.zone.id)}
+      {/* Modal détail pièce */}
+      {roomDetailModal && (
+        <CleaningRoomDetailModal
+          room={roomDetailModal.room}
+          zones={zonesForRoom(roomDetailModal.room.id)}
+          subzones={subzonesForRoom(roomDetailModal.room.id)}
+          tasks={tasksForRoom(roomDetailModal.room.id)}
           onEdit={() => {
-            setZoneDetailModal(null)
-            setZoneFormModal({ zone: zoneDetailModal.zone })
+            setRoomDetailModal(null)
+            setRoomFormModal({ room: roomDetailModal.room })
           }}
-          onClose={() => setZoneDetailModal(null)}
+          onClose={() => setRoomDetailModal(null)}
         />
       )}
 
-      {/* Modal création / édition zone */}
-      {zoneFormModal !== null && (
-        <CleaningZoneForm
-          zone={zoneFormModal.zone ?? null}
-          tasks={zoneFormModal.zone ? cleanCtx.tasks.filter(t => t.zone === zoneFormModal.zone.id) : []}
-          onSave={(zoneData, tasksData) => {
-            if (zoneFormModal.zone) {
-              cleanCtx.updateZone(zoneFormModal.zone.id, zoneData, tasksData)
-              showToast?.('Zone modifiée ✓', 'var(--color-success)')
-            } else {
-              cleanCtx.addZone(zoneData, tasksData)
-              showToast?.('Zone créée ✓', 'var(--color-success)')
-            }
-            setZoneFormModal(null)
+      {/* Modal création / édition pièce */}
+      {roomFormModal !== null && (
+        <CleaningRoomForm
+          room={roomFormModal.room ?? null}
+          zones={roomFormModal.room ? zonesForRoom(roomFormModal.room.id) : []}
+          subzones={roomFormModal.room ? subzonesForRoom(roomFormModal.room.id) : []}
+          tasks={roomFormModal.room ? tasksForRoom(roomFormModal.room.id) : []}
+          onSave={(roomData, zonesData) => {
+            cleanCtx.saveRoomFull(roomFormModal.room?.id ?? null, roomData, zonesData)
+            showToast?.(roomFormModal.room ? 'Pièce modifiée ✓' : 'Pièce créée ✓', 'var(--color-success)')
+            setRoomFormModal(null)
           }}
           onDelete={id => {
-            cleanCtx.deleteZone(id)
-            showToast?.('Zone supprimée', 'var(--color-danger)')
-            setZoneFormModal(null)
+            cleanCtx.deleteRoom(id)
+            showToast?.('Pièce supprimée', 'var(--color-danger)')
+            setRoomFormModal(null)
           }}
-          onClose={() => setZoneFormModal(null)}
+          onClose={() => setRoomFormModal(null)}
         />
       )}
 

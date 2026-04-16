@@ -6,10 +6,12 @@ import EmployeeProfileModal from './components/EmployeeProfileModal'
 import WeekPickerPanel      from './components/WeekPickerPanel'
 import TableView            from './components/TableView'
 import { useGoogleSync }    from './hooks/useGoogleSync'
+import { useGoogleExport }  from '../../hooks/useGoogleExport'
 import { useWeek }          from './hooks/useWeek'
 import { useShiftActions }  from './hooks/useShiftActions'
 import { useTemplates }     from './hooks/useTemplates'
 import { useExports }       from './hooks/useExports'
+import { exportPlanningToSheets } from '../../services/sheetsExport'
 import { mondayOf, dateToStr } from '../../utils/date'
 import './planning-tokens.css'
 import './PlanningApp.css'
@@ -19,30 +21,22 @@ export default function PlanningApp({ showToast, onSyncChange, schedule, teamCtx
 
   const [copiedEmployeePlan, setCopiedEmployeePlan] = useState(null)
 
-  const sync = useGoogleSync({
-    shifts:            schedule.shifts,
-    team:              teamCtx.team,
-    weekDates:         week.dates,
-    setTeam:           teamCtx.setTeam,
-    replaceWeekShifts: schedule.replaceWeekShifts,
-    onToast:           showToast,
-  })
+  const sync = useGoogleSync()
 
   // Expose sync vers App.jsx (NavSidebar, StartupModal, ProductsApp)
   useEffect(() => {
     onSyncChange({
       status:   sync.status,
       errMsg:   sync.errMsg,
-      loading:  sync.loading,
       connect:  sync.connect,
       retry:    sync.retry,
       getToken: sync.getToken,
     })
-  }, [sync.status, sync.errMsg, sync.loading]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [sync.status, sync.errMsg]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Suivi de la source de données selon l'état de la sync
   useEffect(() => {
-    if (sync.status === 'synced') {
+    if (sync.status === 'connected') {
       setDataSource('synced')
     } else if (dataSource === 'synced') {
       setDataSource('session')
@@ -71,15 +65,18 @@ export default function PlanningApp({ showToast, onSyncChange, schedule, teamCtx
   const shiftCtx    = useShiftActions({ schedule, team: teamCtx.team })
   const templateCtx = useTemplates({ schedule, week })
   const exportCtx   = useExports({ week, team: teamCtx.team, schedule })
+  const { exporting: sheetsExporting, runExport } = useGoogleExport({ getToken: sync.getToken, onToast: showToast })
+
+  function handleSheetsExport() {
+    runExport(
+      token => exportPlanningToSheets(token, schedule.shifts, teamCtx.team, week.dates),
+      'Planning'
+    )
+  }
 
   return (
     <>
-      {sync.loading && (
-        <div className="app-loading-overlay">
-          <span className="app-loading-spinner" />
-          <span>Chargement du planning…</span>
-        </div>
-      )}
+
       <div className="app">
         <Header
           week={week}
@@ -95,6 +92,8 @@ export default function PlanningApp({ showToast, onSyncChange, schedule, teamCtx
           onLoadTemplate={templateCtx.handleLoadTemplate}
           dataSource={dataSource}
           onReset={teamCtx.handleReset}
+          onSheetsExport={handleSheetsExport}
+          sheetsExporting={sheetsExporting}
         />
         <div className="app-body">
           <TableView

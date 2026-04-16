@@ -7,6 +7,14 @@ import ShiftTypeBadge      from '../../../design-system/components/ShiftTypeBadg
 
 const FULL_WIDTH_TYPES = new Set(['rest', 'school', 'sick', 'absent', 'leave'])
 
+function formatPause(minutes) {
+  if (minutes < 60) return `${minutes} min. pause`
+  const h = Math.floor(minutes / 60)
+  const m = minutes % 60
+  if (m === 0) return `${h}h pause`
+  return `${h}h${String(m).padStart(2, '0')} pause`
+}
+
 const START_HOUR  = 5
 const END_HOUR    = 21
 const TOTAL_HOURS = END_HOUR - START_HOUR
@@ -130,7 +138,7 @@ export default function DashPlanningBlock({ schedule, team, todayStr, onNavigate
                           )}
                           <span className="dash-timeline-start">{fmtTime(start)}</span>
                           {(shift.pause ?? 0) > 0 && (
-                            <span className="dash-timeline-pause">{shift.pause} min. pause</span>
+                            <span className="dash-timeline-pause">{formatPause(Math.round(shift.pause * 60))}</span>
                           )}
                           <span className="dash-timeline-end">{fmtTime(end)}</span>
                         </div>

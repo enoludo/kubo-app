@@ -195,6 +195,11 @@ export default function NavSidebar({ activeModule = 'planning', onModuleChange, 
               Connecter
             </button>
           )}
+          {c.status === 'connected' && c.onReconnect && (
+            <button className="conn-popover-action" onClick={() => { c.onReconnect(); setSettingsOpen(false) }}>
+              Reconnecter
+            </button>
+          )}
         </div>
       ))}
     </div>,

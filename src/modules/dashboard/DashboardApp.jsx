@@ -84,7 +84,9 @@ export default function DashboardApp({
               todayStr={todayStr}
             />
             <DashCleaningBlock
+              rooms={cleanCtx.rooms}
               zones={cleanCtx.zones}
+              subzones={cleanCtx.subzones}
               tasks={cleanCtx.tasks}
               records={cleanCtx.records}
               today={today}

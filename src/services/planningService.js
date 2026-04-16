@@ -61,7 +61,7 @@ function shiftToRow(shift) {
     pause:                   shift.pause          ?? 0,
     validated:               shift.validated      ?? false,
     school_absence:          shift.schoolAbsence  ?? false,
-    school_absence_duration: shift.schoolAbsenceDuration ?? null,
+    school_absence_duration: shift.schoolAbsenceDuration || null,
   }
 }
 

@@ -175,22 +175,12 @@ function FreeInputForm({ onAdd, onClose }) {
 
 // ── Grille principale ─────────────────────────────────────────────────────────
 
-export default function ProductGrid({ products, onAdd }) {
-  const [freeOpen, setFreeOpen] = useState(false)
-
+export default function ProductGrid({ products, onAdd, freeOpen, onFreeClose }) {
   return (
     <div className="nom-grid-col">
 
-      {freeOpen ? (
-        <FreeInputForm onAdd={onAdd} onClose={() => setFreeOpen(false)} />
-      ) : (
-        <button
-          type="button"
-          className="add-trigger add-trigger--labeled nom-manual-btn"
-          onClick={() => setFreeOpen(true)}
-        >
-          + Saisie manuelle
-        </button>
+      {freeOpen && (
+        <FreeInputForm onAdd={onAdd} onClose={onFreeClose} />
       )}
 
       <div className="nom-product-grid">

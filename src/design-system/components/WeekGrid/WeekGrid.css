@@ -122,7 +122,7 @@
 }
 
 .wg-body--stretch {
-  overflow: hidden;
+  overflow-y: auto;
 }
 .wg-body--stretch .wg-row {
   flex: 1;

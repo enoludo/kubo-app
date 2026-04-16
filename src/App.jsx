@@ -22,10 +22,18 @@ import { sessionHasData }   from './utils/session'
 import initialTeam          from './modules/planning/data/team.json'
 import './App.css'
 
-const INITIAL_SYNC = { status: 'disconnected', errMsg: null, loading: false, connect: null, retry: null, getToken: null }
+const INITIAL_SYNC = { status: 'disconnected', errMsg: null, connect: null, retry: null, getToken: null }
 
 export default function App() {
   const { user, name, isManager, loading } = useAuth()
+
+  if (loading) return null
+  if (!user)   return <ModeSelector />
+
+  return <AuthenticatedApp name={name} isManager={isManager} />
+}
+
+function AuthenticatedApp({ name, isManager }) {
   const [activeModule,     setActiveModule]   = useState('dashboard')
   const [startupDismissed, setStartupDismissed] = useState(false)
   const [toast,            setToast]          = useState(null)
@@ -45,31 +53,20 @@ export default function App() {
   const tempCtx     = useTemperatures()
   const trCtx       = useTraceability()
 
-  // Auto-dismiss startup modal quand les deux services sont connectés
+  // Auto-dismiss startup modal quand Webflow est connecté
   useEffect(() => {
-    if (!startupDismissed && sync.status === 'synced' && ordersCtx.webflowStatus === 'connected') {
+    if (!startupDismissed && ordersCtx.webflowStatus === 'connected') {
       const t = setTimeout(() => setStartupDismissed(true), 800)
       return () => clearTimeout(t)
     }
-  }, [sync.status, ordersCtx.webflowStatus, startupDismissed])
-
-  async function handleStartupSheetsConnect() {
-    await sync.connect?.()
-    ordersCtx.sheetsConnectFromShared()
-  }
-
-  if (loading) return null
-  if (!user)   return <ModeSelector />
+  }, [ordersCtx.webflowStatus, startupDismissed])
 
   return (
     <div className="app-shell">
       {!startupDismissed && (
         <StartupModal
-          sheetsStatus={sync.status}
-          sheetsError={sync.errMsg}
           webflowStatus={ordersCtx.webflowStatus}
           webflowError={ordersCtx.webflowError}
-          onSheetsConnect={handleStartupSheetsConnect}
           onDismiss={() => setStartupDismissed(true)}
         />
       )}
@@ -83,14 +80,15 @@ export default function App() {
         connections={[
           {
             label:     'Google Sheets',
-            status:    sync.status === 'synced' ? 'connected' : sync.status,
-            detail:    sync.status === 'synced'       ? 'Synchronisé'
+            status:    sync.status === 'connected' ? 'connected' : sync.status,
+            detail:    sync.status === 'connected'    ? 'Connecté'
                      : sync.status === 'disconnected' ? 'Non connecté'
                      : sync.status === 'expired'      ? 'Session expirée'
-                     : sync.status === 'error'        ? (sync.errMsg ?? 'Erreur de synchronisation')
+                     : sync.status === 'error'        ? (sync.errMsg ?? 'Erreur de connexion')
                      : 'Connexion en cours…',
-            onConnect: sync.status === 'disconnected' ? sync.connect : undefined,
-            onRetry:   (sync.status === 'error' || sync.status === 'expired') ? sync.retry : undefined,
+            onConnect:   sync.status === 'disconnected' ? sync.connect : undefined,
+            onRetry:     (sync.status === 'error' || sync.status === 'expired') ? sync.retry : undefined,
+            onReconnect: sync.status === 'connected' ? sync.connect : undefined,
           },
           {
             label:     'Webflow',
@@ -108,10 +106,10 @@ export default function App() {
       />
 
       {activeModule === 'dashboard'     && <DashboardApp     schedule={schedule} teamCtx={teamCtx} cleanCtx={cleanCtx} tempCtx={tempCtx} trCtx={trCtx} ordersCtx={ordersCtx} productsCtx={productsCtx} onNavigate={setActiveModule} />}
-      {activeModule === 'orders'        && <OrdersApp        ordersCtx={ordersCtx} productsCtx={productsCtx} showToast={showToast} />}
+      {activeModule === 'orders'        && <OrdersApp        ordersCtx={ordersCtx} productsCtx={productsCtx} showToast={showToast} getGoogleToken={sync.getToken} />}
       {activeModule === 'products'      && <ProductsApp      productsCtx={productsCtx} showToast={showToast} getToken={sync.getToken} isManager={isManager} />}
       {activeModule === 'planning'      && <PlanningApp      showToast={showToast} onSyncChange={setSync} schedule={schedule} teamCtx={teamCtx} dataSource={dataSource} setDataSource={setDataSource} isManager={isManager} />}
-      {activeModule === 'temperatures'  && <TemperaturesApp  showToast={showToast} tempCtx={tempCtx} />}
+      {activeModule === 'temperatures'  && <TemperaturesApp  showToast={showToast} tempCtx={tempCtx} getGoogleToken={sync.getToken} />}
       {activeModule === 'cleaning'      && <CleaningApp      showToast={showToast} cleanCtx={cleanCtx} />}
       {activeModule === 'tracability'   && <TraceabilityApp  showToast={showToast} trCtx={trCtx} />}
 

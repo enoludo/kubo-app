@@ -5,11 +5,15 @@ import Button from '../../../design-system/components/Button/Button'
 import { COLOR_PALETTE } from '../utils/cleaningZones.jsx'
 
 const FREQUENCIES = [
-  { value: 'daily',     label: 'Quotidienne' },
-  { value: 'weekly',    label: 'Hebdomadaire' },
-  { value: 'monthly',   label: 'Mensuelle' },
-  { value: 'quarterly', label: 'Trimestrielle' },
+  { value: 'daily',      label: 'Quotidienne' },
+  { value: 'weekly',     label: 'Hebdomadaire' },
+  { value: 'regularly',  label: 'Régulièrement' },
+  { value: 'monthly',    label: 'Mensuelle' },
+  { value: 'quarterly',  label: 'Trimestrielle' },
+  { value: 'semiannual', label: 'Semestrielle' },
 ]
+
+const MONTHS_FR = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre']
 
 const DAYS_OF_WEEK = [
   { value: 1, label: 'Lundi' },
@@ -31,11 +35,16 @@ function emptyTask() {
     name:         '',
     frequency:    'daily',
     dayOfWeek:    1,
-    protocol:     [''],
-    product:      '',
+    cycleStart:   1,
+    protocol:     [{ text: '', product: '' }],
     duration_min: 15,
     active:       true,
   }
+}
+
+function normalizeProtocol(protocol) {
+  if (!protocol?.length) return [{ text: '', product: '' }]
+  return protocol.map(s => typeof s === 'string' ? { text: s, product: '' } : s)
 }
 
 function TaskForm({ task, index, onChange, onRemove }) {
@@ -43,13 +52,13 @@ function TaskForm({ task, index, onChange, onRemove }) {
     onChange({ ...task, [key]: value })
   }
 
-  function updateStep(i, value) {
-    const protocol = task.protocol.map((s, idx) => idx === i ? value : s)
+  function updateStep(i, field, value) {
+    const protocol = task.protocol.map((s, idx) => idx === i ? { ...s, [field]: value } : s)
     onChange({ ...task, protocol })
   }
 
   function addStep() {
-    onChange({ ...task, protocol: [...task.protocol, ''] })
+    onChange({ ...task, protocol: [...task.protocol, { text: '', product: '' }] })
   }
 
   function removeStep(i) {
@@ -105,6 +114,16 @@ function TaskForm({ task, index, onChange, onRemove }) {
               </select>
             </div>
           )}
+          {task.frequency === 'semiannual' && (
+            <div className="modal-field-full">
+              <label>Début du cycle</label>
+              <select value={task.cycleStart ?? 1} onChange={e => set('cycleStart', Number(e.target.value))}>
+                {MONTHS_FR.map((m, i) => (
+                  <option key={i + 1} value={i + 1}>{m}</option>
+                ))}
+              </select>
+            </div>
+          )}
         </div>
 
         {/* Protocole */}
@@ -112,23 +131,32 @@ function TaskForm({ task, index, onChange, onRemove }) {
           <label>Protocole</label>
           <div className="cln-protocol-steps">
             {task.protocol.map((step, i) => (
-              <div key={i} className="cln-step-row">
-                <span className="cln-step-num">{i + 1}.</span>
+              <div key={i} className="cln-step-block">
+                <div className="cln-step-row">
+                  <span className="cln-step-num">{i + 1}.</span>
+                  <input
+                    type="text"
+                    className="cln-step-input"
+                    placeholder={`Étape ${i + 1}`}
+                    value={step.text}
+                    onChange={e => updateStep(i, 'text', e.target.value)}
+                  />
+                  {task.protocol.length > 1 && (
+                    <button
+                      type="button"
+                      className="cln-step-remove"
+                      onClick={() => removeStep(i)}
+                      aria-label="Supprimer cette étape"
+                    >×</button>
+                  )}
+                </div>
                 <input
                   type="text"
-                  className="cln-step-input"
-                  placeholder={`Étape ${i + 1}`}
-                  value={step}
-                  onChange={e => updateStep(i, e.target.value)}
+                  className="cln-step-product"
+                  placeholder="Produit & dosage (optionnel)"
+                  value={step.product}
+                  onChange={e => updateStep(i, 'product', e.target.value)}
                 />
-                {task.protocol.length > 1 && (
-                  <button
-                    type="button"
-                    className="cln-step-remove"
-                    onClick={() => removeStep(i)}
-                    aria-label="Supprimer cette étape"
-                  >×</button>
-                )}
               </div>
             ))}
             <button
@@ -139,17 +167,6 @@ function TaskForm({ task, index, onChange, onRemove }) {
               + Étape
             </button>
           </div>
-        </div>
-
-        {/* Produit */}
-        <div className="modal-field-full">
-          <label>Produit & dosage</label>
-          <input
-            type="text"
-            placeholder="ex : Détergent dégraissant — 2%"
-            value={task.product}
-            onChange={e => set('product', e.target.value)}
-          />
         </div>
 
         {/* Durée + actif */}
@@ -196,9 +213,9 @@ export default function CleaningZoneForm({ zone, tasks: initialTasks, onSave, on
     if (isEdit && initialTasks?.length > 0) {
       return initialTasks.map(t => ({
         ...t,
-        _key:     t.id ?? crypto.randomUUID(),
-        protocol: t.protocol?.length ? t.protocol : [''],
-        product:  t.product ?? '',
+        _key:       t.id ?? crypto.randomUUID(),
+        protocol:   normalizeProtocol(t.protocol),
+        cycleStart: t.cycleStart ?? 1,
       }))
     }
     return [emptyTask()]
@@ -232,9 +249,12 @@ export default function CleaningZoneForm({ zone, tasks: initialTasks, onSave, on
         ...(t.id ? { id: t.id } : {}),
         name:         t.name.trim(),
         frequency:    t.frequency,
-        dayOfWeek:    t.frequency === 'weekly' ? t.dayOfWeek : null,
-        protocol:     t.protocol.filter(s => s.trim()),
-        product:      t.product?.trim() || null,
+        dayOfWeek:    t.frequency === 'weekly'     ? t.dayOfWeek  : null,
+        cycleStart:   t.frequency === 'semiannual' ? t.cycleStart : null,
+        protocol:     t.protocol.filter(s => s.text.trim()).map(s => ({
+          text:    s.text.trim(),
+          product: s.product.trim() || null,
+        })),
         duration_min: t.duration_min,
         active:       t.active,
       }))

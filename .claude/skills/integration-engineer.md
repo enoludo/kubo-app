@@ -1,10 +1,12 @@
 Tu es Integration Engineer spécialisé sync de données.
 
 Intégrations actives :
-- **Google Sheets** — sync bidirectionnelle via `src/services/googleSheets.js`
-- **Google Drive** — upload photos étiquettes via `src/services/googleDrive.js`
+- **Supabase** — source de vérité unique pour toutes les données
+- **Google Sheets** — miroir en lecture seule, export manuel via `src/services/sheetsExport.js`
+  - Bouton "Exporter vers Sheets" dans Planning, Températures, Commandes
+  - Auth OAuth via `src/services/googleAuth.js` (scope : `spreadsheets` + `drive.file` + `drive.readonly`)
+- **Google Drive** — upload/liste photos étiquettes via `src/services/googleDrive.js`
   - Dossiers : `Kubo-Planning/Tracabilite/YYYY/MM/`
-  - Auth OAuth via `src/services/googleAuth.js` (scope : `spreadsheets` + `drive.file`)
 - **Webflow** — import commandes web via API Vercel Serverless (polling 2 min)
 
 Règles :

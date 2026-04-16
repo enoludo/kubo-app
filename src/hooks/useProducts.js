@@ -173,6 +173,11 @@ export function useProducts({ onToast } = {}) {
   const inactiveProducts = useMemo(() => products.filter(p => !p.active), [products])
 
   function getById(id) {
+    if (!id) return null
+    if (id.startsWith('wf-')) {
+      const wfId = id.slice(3)
+      return products.find(p => p.webflowProductId === wfId || p.id === id) ?? null
+    }
     return products.find(p => p.id === id) ?? null
   }
 

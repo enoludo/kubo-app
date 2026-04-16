@@ -1,7 +1,8 @@
 import { useState, useRef }  from 'react'
 import { useWeek }           from '../../hooks/useWeek'
-import { useTemperaturesGoogleSync } from './hooks/useTemperaturesGoogleSync'
+import { useGoogleExport }   from '../../hooks/useGoogleExport'
 import { generateTempPdf }   from './utils/exportTempPdf'
+import { exportTemperaturesToSheets } from '../../services/sheetsExport'
 import TempCalendar          from './components/TempCalendar'
 import TempModal             from './components/TempModal'
 import TempEquipmentModal    from './components/TempEquipmentModal'
@@ -51,7 +52,7 @@ function MenuIcon() {
   )
 }
 
-export default function TemperaturesApp({ showToast, tempCtx }) {
+export default function TemperaturesApp({ showToast, tempCtx, getGoogleToken }) {
   const week = useWeek()
   const menuBtnRef = useRef(null)
 
@@ -60,14 +61,14 @@ export default function TemperaturesApp({ showToast, tempCtx }) {
   const [pdfLoading, setPdfLoading] = useState(false)
   const [menuOpen,   setMenuOpen]   = useState(false)
 
-  // Google Sheets sync
-  useTemperaturesGoogleSync({
-    equipment:       tempCtx.equipment,
-    readings:        tempCtx.readings,
-    onPullEquipment: tempCtx.setEquipment,
-    onPullReadings:  tempCtx.setReadings,
-    onToast:         showToast,
-  })
+  const { exporting: sheetsExporting, runExport } = useGoogleExport({ getToken: getGoogleToken, onToast: showToast })
+
+  function handleSheetsExport() {
+    runExport(
+      token => exportTemperaturesToSheets(token, tempCtx.equipment, tempCtx.readings),
+      'Températures'
+    )
+  }
 
   const fmt    = d => d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
   const range  = `${fmt(week.dates[0])} – ${fmt(week.dates[6])}`
@@ -140,6 +141,11 @@ export default function TemperaturesApp({ showToast, tempCtx }) {
           {sheetId && (
             <button onClick={() => action(() => window.open(`https://docs.google.com/spreadsheets/d/${sheetId}`, '_blank'))}>
               <SheetsIcon /><span>Voir Google Sheet</span>
+            </button>
+          )}
+          {getGoogleToken && (
+            <button onClick={() => action(handleSheetsExport)} disabled={sheetsExporting}>
+              <SheetsIcon /><span>{sheetsExporting ? 'Export en cours…' : 'Exporter vers Sheets'}</span>
             </button>
           )}
           <button

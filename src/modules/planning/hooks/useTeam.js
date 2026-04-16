@@ -6,8 +6,25 @@ import {
   deleteEmployee,
 } from '../../../services/planningService'
 
+const ROLE_ORDER = {
+  'Cheffe Pâtissière': 0,
+  'Pâtissier':         1,
+  'Pâtissière':        1,
+  'Vendeur':           2,
+  'Vendeuse':          2,
+}
+
+function sortTeam(employees) {
+  return [...employees].sort((a, b) => {
+    const orderA = ROLE_ORDER[a.role] ?? 99
+    const orderB = ROLE_ORDER[b.role] ?? 99
+    if (orderA !== orderB) return orderA - orderB
+    return a.name.localeCompare(b.name)
+  })
+}
+
 export function useTeam({ initialTeam, schedule, setDataSource, showToast }) {
-  const [team,         setTeam]         = useState(() => sessionLoad('team') ?? initialTeam)
+  const [team,         setTeam]         = useState(() => sortTeam(sessionLoad('team') ?? initialTeam))
   const [empModal,     setEmpModal]     = useState(null)
   const [profileModal, setProfileModal] = useState(null)
   const saveTimer = useRef(null)
@@ -33,7 +50,7 @@ export function useTeam({ initialTeam, schedule, setDataSource, showToast }) {
     fetchEmployees()
       .then(async employees => {
         if (employees.length > 0) {
-          setTeam(employees)
+          setTeam(sortTeam(employees))
         } else {
           const toSeed = sessionLoad('team') ?? initialTeam
           await Promise.all(toSeed.map(emp => upsertEmployee(emp)))
@@ -46,7 +63,7 @@ export function useTeam({ initialTeam, schedule, setDataSource, showToast }) {
   function handleReset() {
     sessionClear()
     schedule.resetShifts()
-    setTeam(initialTeam)
+    setTeam(sortTeam(initialTeam))
     setDataSource('demo')
     // Note : resetShifts ne touche pas Supabase intentionnellement
   }
@@ -63,7 +80,7 @@ export function useTeam({ initialTeam, schedule, setDataSource, showToast }) {
         initials:     data.initials,
         startBalance: data.startBalance ?? 0,
       }
-      setTeam(prev => prev.map(e => e.id === empModal.employee.id ? updated : e))
+      setTeam(prev => sortTeam(prev.map(e => e.id === empModal.employee.id ? updated : e)))
       upsertEmployee(updated).catch(err => console.error('[supabase] upsertEmployee:', err.message))
     } else {
       const newEmp = {
@@ -77,7 +94,7 @@ export function useTeam({ initialTeam, schedule, setDataSource, showToast }) {
         archived:     false,
         startBalance: data.startBalance ?? 0,
       }
-      setTeam(prev => [...prev, newEmp])
+      setTeam(prev => sortTeam([...prev, newEmp]))
       upsertEmployee(newEmp).catch(err => console.error('[supabase] upsertEmployee:', err.message))
     }
     setEmpModal(null)

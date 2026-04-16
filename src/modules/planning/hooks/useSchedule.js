@@ -35,11 +35,11 @@ export function weeksElapsed() {
   return Math.max(1, Math.ceil(ms / (7 * 24 * 60 * 60 * 1000)))
 }
 
-// Options de temps pour les selects (7:00 … 20:00 par demi-heures)
+// Options de temps pour les selects (4:00 … 21:00 par quarts d'heure)
 export const TIME_OPTIONS = []
 for (let h = START_HOUR; h <= END_HOUR; h++) {
   TIME_OPTIONS.push(h)
-  if (h < END_HOUR) TIME_OPTIONS.push(h + 0.5)
+  if (h < END_HOUR) TIME_OPTIONS.push(h + 0.25, h + 0.5, h + 0.75)
 }
 
 // ─── Hook ──────────────────────────────────────────────────────────────────

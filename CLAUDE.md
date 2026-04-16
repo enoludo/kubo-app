@@ -50,10 +50,11 @@ Lire aussi `.claude/skills/README.md` pour les conventions générales.
 **En cas de conflit entre une instruction et `/docs` → suivre `/docs`.**
 
 ## Intégrations actives
-- **Google Auth** — `src/services/googleAuth.js` — OAuth2 GIS, scope `spreadsheets` + `drive.file`
-- **Google Sheets** — `src/services/googleSheets.js` — sync bidirectionnelle
-- **Google Drive** — `src/services/googleDrive.js` — upload photos étiquettes traçabilité
+- **Google Auth** — `src/services/googleAuth.js` — OAuth2 GIS, scope `spreadsheets` + `drive.file` + `drive.readonly`
+- **Google Sheets** — `src/services/sheetsExport.js` — export manuel depuis Supabase (miroir lecture seule)
+- **Google Drive** — `src/services/googleDrive.js` — upload/liste photos étiquettes traçabilité
 - **Webflow** — import commandes web via API Vercel Serverless
+- **Supabase** — source de vérité unique pour toutes les données
 
 ## Données de démo
 - Shifts : `src/data/demoShifts.js`

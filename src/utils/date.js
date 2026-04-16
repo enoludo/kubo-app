@@ -47,14 +47,16 @@ export function weekSheetName(weekDates) {
 
 // ── Formatage des heures ──────────────────────────────────────────────────────
 
-/** h (nombre) → "HH:30" / "HH:00" — séparateur `:` pour les <select> */
+/** h (nombre) → "HH:mm" — séparateur `:` pour les <select> */
 export function fmtH(h) {
-  return `${String(Math.floor(h)).padStart(2, '0')}:${h % 1 === 0.5 ? '30' : '00'}`
+  const mins = Math.round((h % 1) * 60)
+  return `${String(Math.floor(h)).padStart(2, '0')}:${String(mins).padStart(2, '0')}`
 }
 
-/** h (nombre) → "HHh30" / "HHh00" — séparateur `h` pour l'affichage */
+/** h (nombre) → "HHhMM" — séparateur `h` pour l'affichage */
 export function fmtTime(h) {
-  return `${String(Math.floor(h)).padStart(2, '0')}h${h % 1 === 0.5 ? '30' : '00'}`
+  const mins = Math.round((h % 1) * 60)
+  return `${String(Math.floor(h)).padStart(2, '0')}h${String(mins).padStart(2, '0')}`
 }
 
 /** Date → "JJ/MM" */

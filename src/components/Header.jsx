@@ -153,7 +153,7 @@ const DATA_SOURCE_LABEL = {
 export default function Header({
   week, onOpenPicker, onPdfExport, pdfGenerating, onSendToAll,
   copiedPlan, templates, onCopyPlan, onPastePlan, onSaveTemplate, onLoadTemplate,
-  dataSource, onReset,
+  dataSource, onReset, onSheetsExport, sheetsExporting,
 }) {
   const { dates, prev, next } = week
   const [menuOpen, setMenuOpen] = useState(false)
@@ -225,6 +225,11 @@ export default function Header({
         {sheetId && (
           <button onClick={() => action(() => window.open(`https://docs.google.com/spreadsheets/d/${sheetId}`, '_blank'))}>
             <SheetsIcon /><span>Ouvrir Google Sheet</span>
+          </button>
+        )}
+        {onSheetsExport && (
+          <button onClick={() => action(onSheetsExport)} disabled={sheetsExporting}>
+            <SheetsIcon /><span>{sheetsExporting ? 'Export en cours…' : 'Exporter vers Sheets'}</span>
           </button>
         )}
         <button onClick={() => action(onPdfExport)} disabled={pdfGenerating}>

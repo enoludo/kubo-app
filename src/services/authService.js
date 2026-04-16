@@ -17,6 +17,12 @@ export async function getSession() {
   return data.session
 }
 
+export async function setTeamSession(access_token, refresh_token) {
+  const { data, error } = await supabase.auth.setSession({ access_token, refresh_token })
+  if (error) throw error
+  return data.session
+}
+
 export async function fetchProfile(userId) {
   const { data, error } = await supabase
     .from('profiles')

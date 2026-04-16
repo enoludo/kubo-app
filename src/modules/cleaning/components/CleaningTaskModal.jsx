@@ -1,4 +1,4 @@
-// ─── Modal validation des tâches d'une zone pour un jour ─────────────────────
+// ─── Modal validation des tâches d'une pièce pour un jour ────────────────────
 import { useState } from 'react'
 import Modal  from '../../../design-system/components/Modal/Modal'
 import Button from '../../../design-system/components/Button/Button'
@@ -8,13 +8,6 @@ import teamData from '../../planning/data/team.json'
 
 const activeTeam = teamData.filter(e => !e.archived)
 const teamById   = Object.fromEntries(activeTeam.map(e => [e.id, e]))
-
-function fmtDayTitle(dateStr) {
-  const s = new Date(dateStr + 'T00:00:00').toLocaleDateString('fr-FR', {
-    weekday: 'long', day: 'numeric', month: 'long',
-  })
-  return s.charAt(0).toUpperCase() + s.slice(1)
-}
 
 function fmtTime(isoStr) {
   const d = new Date(isoStr)
@@ -40,10 +33,16 @@ function TaskCard({ task, record, onMarkDone, onUnmark }) {
       {/* ── En-tête tâche ── */}
       <div className="cln-task-card-header">
         <span className="cln-task-card-name">{task.name}</span>
-        {task.duration_min && (
-          <span className="cln-task-card-duration">~{task.duration_min} min</span>
-        )}
       </div>
+
+      {/* ── Produit / dosage ── */}
+      {(task.product || task.dosage) && (
+        <div className="cln-task-product">
+          {task.product && <span>{task.product}</span>}
+          {task.product && task.dosage && <span className="cln-task-product-sep">—</span>}
+          {task.dosage  && <span className="cln-task-dosage">{task.dosage}</span>}
+        </div>
+      )}
 
       {/* ── Protocole ── */}
       {task.protocol?.length > 0 && (
@@ -54,15 +53,6 @@ function TaskCard({ task, record, onMarkDone, onUnmark }) {
         </ol>
       )}
 
-      {/* ── Produit ── */}
-      {task.product && (
-        <div className="cln-task-product">
-          <span className="cln-task-product-label">Produit :</span> {task.product}
-        </div>
-      )}
-
-      {/* ── Validation ── */}
-      
       {/* ── Champs validation (état "À faire" seulement) ── */}
       {!isDone && (
         <div className="cln-validate-section">
@@ -86,13 +76,13 @@ function TaskCard({ task, record, onMarkDone, onUnmark }) {
           />
         </div>
       )}
+
       {/* ── Toggle statut ── */}
       <Toggle
         checked={isDone}
         onChange={val => val ? handleMarkDone() : onUnmark()}
         label={isDone ? 'Fait' : 'À faire'}
       />
-
 
       {/* ── Info validation (état "Fait") ── */}
       {isDone && (record?.authorId || record?.note) && (
@@ -113,17 +103,68 @@ function TaskCard({ task, record, onMarkDone, onUnmark }) {
   )
 }
 
+// ── Groupe de tâches (zone ou sous-zone) ─────────────────────────────────────
+
+function TaskGroup({ label, tasks, dateStr, getRecordForDay, onMarkDone, onUnmark }) {
+  if (!tasks.length) return null
+  return (
+    <div className="cln-task-group">
+      <div className="cln-task-group-label">{label}</div>
+      {tasks.map(task => (
+        <TaskCard
+          key={task.id}
+          task={task}
+          record={getRecordForDay(task.id, dateStr)}
+          onMarkDone={(taskId, authorId, note) => onMarkDone(taskId, dateStr, authorId, note)}
+          onUnmark={() => onUnmark(task.id, dateStr)}
+        />
+      ))}
+    </div>
+  )
+}
+
 // ── Modal principale ──────────────────────────────────────────────────────────
 
 export default function CleaningTaskModal({
-  zone,
+  room,
   dateStr,
   tasks,
+  zones,
+  subzones,
   getRecordForDay,
   markDone,
   unmarkDone,
   onClose,
 }) {
+  // Grouper les tâches par zone puis sous-zone
+  const roomZones = zones.filter(z => z.roomId === room.id)
+
+  const groups = []
+  for (const zone of roomZones) {
+    const zoneTasks = tasks.filter(t => t.zoneId === zone.id)
+    if (zoneTasks.length) groups.push({ label: zone.name, tasks: zoneTasks })
+
+    const zoneSubzones = subzones.filter(s => s.zoneId === zone.id)
+    for (const sz of zoneSubzones) {
+      const szTasks = tasks.filter(t => t.subzoneId === sz.id)
+      if (szTasks.length) groups.push({ label: `${zone.name} · ${sz.name}`, tasks: szTasks })
+    }
+  }
+
+  // Tâches non rattachées à une zone connue (sécurité)
+  const knownTaskIds = new Set(groups.flatMap(g => g.tasks.map(t => t.id)))
+  const orphans      = tasks.filter(t => !knownTaskIds.has(t.id))
+  if (orphans.length) groups.push({ label: 'Autres', tasks: orphans })
+
+  const totalCount = tasks.length
+
+  function fmtDayTitle(ds) {
+    const s = new Date(ds + 'T00:00:00').toLocaleDateString('fr-FR', {
+      weekday: 'long', day: 'numeric', month: 'long',
+    })
+    return s.charAt(0).toUpperCase() + s.slice(1)
+  }
+
   return (
     <Modal size="lg" scrollBody onClose={onClose}>
 
@@ -132,14 +173,14 @@ export default function CleaningTaskModal({
         <div className="cln-zone-profile">
           <div
             className="cln-zone-avatar"
-            style={{ background: zone.token, color: 'var(--color-white)' }}
+            style={{ background: room.token, color: 'var(--color-white)' }}
           >
-            {zone.icon ?? zone.initials}
+            {room.icon ?? room.initials}
           </div>
           <div className="cln-zone-identity">
-            <span className="cln-zone-title">{zone.label}</span>
+            <span className="cln-zone-title">{room.label}</span>
             <span className="cln-zone-subtitle">
-              {tasks.length} tâche{tasks.length !== 1 ? 's' : ''} planifiée{tasks.length !== 1 ? 's' : ''}
+              {totalCount} tâche{totalCount !== 1 ? 's' : ''} planifiée{totalCount !== 1 ? 's' : ''}
             </span>
           </div>
         </div>
@@ -147,18 +188,19 @@ export default function CleaningTaskModal({
       </div>
 
       {/* ── Liste des tâches ── */}
-      {tasks.length === 0 ? (
+      {totalCount === 0 ? (
         <div className="cln-modal-empty">Aucune tâche prévue ce jour.</div>
       ) : (
         <div className="cln-task-list">
-          {tasks.map(task => (
-            <TaskCard
-              key={task.id}
-              task={task}
-              record={getRecordForDay(task.id, dateStr)}
-
-              onMarkDone={(taskId, authorId, note) => markDone(taskId, dateStr, authorId, note)}
-              onUnmark={() => unmarkDone(task.id, dateStr)}
+          {groups.map((g, i) => (
+            <TaskGroup
+              key={i}
+              label={g.label}
+              tasks={g.tasks}
+              dateStr={dateStr}
+              getRecordForDay={getRecordForDay}
+              onMarkDone={markDone}
+              onUnmark={unmarkDone}
             />
           ))}
         </div>

@@ -10,10 +10,6 @@ import {
   deleteReading      as deleteReadingSupabase,
 } from '../../../services/temperaturesService'
 
-const EQUIP_KEY    = 'kubo_temp_equipment'
-const READINGS_KEY = 'kubo_temp_readings'
-const DEBOUNCE_MS  = 500
-
 // Migration : anciens types et anciens champs color/order
 function migrateEquipment(eq) {
   const TYPE_MAP = { frigo: 'positif', tour: 'positif', autre: 'positif', congelateur: 'negatif' }
@@ -23,29 +19,6 @@ function migrateEquipment(eq) {
     type:       TYPE_MAP[eq.type] ?? eq.type,
     colorIndex: eq.colorIndex ?? colorKeyToIndex[eq.color] ?? 0,
   }
-}
-
-function loadEquipment() {
-  try {
-    const raw = localStorage.getItem(EQUIP_KEY)
-    const data = raw ? JSON.parse(raw) : initialEquipment
-    return data.map(migrateEquipment)
-  } catch { return initialEquipment }
-}
-
-function loadReadings() {
-  try {
-    const raw = localStorage.getItem(READINGS_KEY)
-    return raw ? JSON.parse(raw) : []
-  } catch { return [] }
-}
-
-function saveEquipment(eq) {
-  try { localStorage.setItem(EQUIP_KEY, JSON.stringify(eq)) } catch {}
-}
-
-function saveReadings(r) {
-  try { localStorage.setItem(READINGS_KEY, JSON.stringify(r)) } catch {}
 }
 
 // ── Pure helpers ────────────────────────────────────────────────────────────
@@ -71,24 +44,11 @@ export function getMissingSlots(readings) {
 // ── Hook ────────────────────────────────────────────────────────────────────
 
 export function useTemperatures() {
-  const [equipment, setEquipment] = useState(loadEquipment)
-  const [readings,  setReadings]  = useState(loadReadings)
+  const [equipment, setEquipment] = useState([])
+  const [readings,  setReadings]  = useState([])
 
   // slugToSupabaseId : slug (ex: "eq-joel") → UUID Supabase
   const slugMap = useRef({})
-
-  const debounceEqRef  = useRef(null)
-  const debounceRdRef  = useRef(null)
-
-  useEffect(() => {
-    clearTimeout(debounceEqRef.current)
-    debounceEqRef.current = setTimeout(() => saveEquipment(equipment), DEBOUNCE_MS)
-  }, [equipment])
-
-  useEffect(() => {
-    clearTimeout(debounceRdRef.current)
-    debounceRdRef.current = setTimeout(() => saveReadings(readings), DEBOUNCE_MS)
-  }, [readings])
 
   // Chargement Supabase au montage
   useEffect(() => {
@@ -96,15 +56,15 @@ export function useTemperatures() {
     fetchEquipments()
       .then(async supabaseEq => {
         if (supabaseEq.length > 0) {
-          // Construit le mapping slug → supabase id
           supabaseEq.forEach(e => { if (e.slug) slugMap.current[e.slug] = e.id })
-          setEquipment(supabaseEq.map(e => ({ ...e, id: e.slug ?? e.id })))
+          setEquipment(supabaseEq)   // id = UUID Supabase
           console.log('[supabase] équipements chargés:', supabaseEq.length)
         } else {
-          const local = loadEquipment()
-          const mapping = await upsertEquipments(local)
+          const seed = initialEquipment.map(migrateEquipment)
+          const mapping = await upsertEquipments(seed)
           mapping.forEach(({ id, slug }) => { if (slug) slugMap.current[slug] = id })
-          console.log('[supabase] équipements seedés:', local.length)
+          setEquipment(seed)
+          console.log('[supabase] équipements seedés:', seed.length)
         }
       })
       .catch(err => console.error('[supabase] fetchEquipments:', err.message))
@@ -112,10 +72,8 @@ export function useTemperatures() {
     // Relevés
     fetchReadings()
       .then(supabaseReadings => {
-        if (supabaseReadings.length > 0) {
-          setReadings(supabaseReadings)
-          console.log('[supabase] relevés chargés:', supabaseReadings.length)
-        }
+        setReadings(supabaseReadings)
+        console.log('[supabase] relevés chargés:', supabaseReadings.length)
       })
       .catch(err => console.error('[supabase] fetchReadings:', err.message))
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
@@ -126,11 +84,6 @@ export function useTemperatures() {
     return readings.filter(r => r.equipmentId === equipmentId && r.date === date)
   }
 
-  /**
-   * Remplace tous les relevés d'un équipement pour une date donnée.
-   * newReadings : [{ id?, slot, time, temperature, createdBy? }]
-   * Les entrées sans `time` sont ignorées.
-   */
   function saveReadingsForDay(equipmentId, date, newReadings) {
     const created = newReadings
       .filter(r => r.time !== '' && r.temperature !== '' && r.temperature !== null && r.temperature !== undefined)

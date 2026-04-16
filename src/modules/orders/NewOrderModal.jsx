@@ -69,6 +69,7 @@ export default function NewOrderModal({ onSave, onCancel, initialDate, initialCh
   )
   const [paidAmount,     setPaidAmount]     = useState(initialOrder?.paidAmount ?? '')
   const [submitted,      setSubmitted]      = useState(false)
+  const [freeOpen,       setFreeOpen]       = useState(false)
 
   // ── Total auto-calculé ────────────────────────────────────────────────────
   const computedTotal = cart.reduce((sum, item) => {
@@ -143,12 +144,23 @@ export default function NewOrderModal({ onSave, onCancel, initialDate, initialCh
         {/* ══ COLONNE GAUCHE — grille produits ══ */}
         <div className="nom-left-col">
           <div className="nom-col-header">
-            <span className="nom-col-title">
-              {isEdit ? 'Modifier la commande' : 'Nouvelle commande'}
-            </span>
-            <span className="nom-col-date">{fmtDateLabel(pickupDate)}</span>
+            <div className="nom-col-header-text">
+              <span className="nom-col-title">
+                {isEdit ? 'Modifier la commande' : 'Nouvelle commande'}
+              </span>
+              <span className="nom-col-date">{fmtDateLabel(pickupDate)}</span>
+            </div>
+            {!freeOpen && (
+              <button
+                type="button"
+                className="add-trigger add-trigger--labeled nom-manual-btn"
+                onClick={() => setFreeOpen(true)}
+              >
+                + Saisie manuelle
+              </button>
+            )}
           </div>
-          <ProductGrid products={activeProducts} onAdd={handleAdd} />
+          <ProductGrid products={activeProducts} onAdd={handleAdd} freeOpen={freeOpen} onFreeClose={() => setFreeOpen(false)} />
         </div>
 
         {/* ══ COLONNE DROITE — panier + infos ══ */}
@@ -172,7 +184,6 @@ export default function NewOrderModal({ onSave, onCancel, initialDate, initialCh
                 placeholder="Nom du client"
                 value={name}
                 onChange={e => setName(e.target.value)}
-                autoFocus
               />
             </div>
             <div className="nom-client-field">

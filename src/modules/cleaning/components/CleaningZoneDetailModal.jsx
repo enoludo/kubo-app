@@ -90,23 +90,28 @@ export default function CleaningZoneDetailModal({ zone, tasks, onEdit, onClose }
                 {/* Corps expandable */}
                 <div className="czd-item-body-wrap">
                   <div className="czd-item-body">
-                    {task.protocol?.filter(s => s.trim()).length > 0 && (
+                    {task.protocol?.filter(s => (typeof s === 'string' ? s : s.text).trim()).length > 0 && (
                       <div className="czd-detail-section">
                         <div className="czd-detail-label">Protocole</div>
                         <ol className="cln-task-protocol">
-                          {task.protocol.filter(s => s.trim()).map((step, i) => (
-                            <li key={i}>{step}</li>
-                          ))}
+                          {task.protocol
+                            .filter(s => (typeof s === 'string' ? s : s.text).trim())
+                            .map((step, i) => {
+                              const text    = typeof step === 'string' ? step : step.text
+                              const product = typeof step === 'string' ? null : step.product
+                              return (
+                                <li key={i}>
+                                  {text}
+                                  {product && (
+                                    <span className="cln-step-product-badge">{product}</span>
+                                  )}
+                                </li>
+                              )
+                            })}
                         </ol>
                       </div>
                     )}
-                    {task.product && (
-                      <div className="czd-detail-section">
-                        <div className="czd-detail-label">Produit</div>
-                        <div className="cln-task-product">{task.product}</div>
-                      </div>
-                    )}
-                    {!task.protocol?.filter(s => s.trim()).length && !task.product && (
+                    {!task.protocol?.filter(s => (typeof s === 'string' ? s : s.text).trim()).length && (
                       <div className="cln-modal-empty" style={{ padding: 'var(--space-md) 0' }}>
                         Aucun protocole renseigné.
                       </div>

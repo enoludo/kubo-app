@@ -26,6 +26,7 @@ function Lightbox({ item, onClose }) {
         <button className="tr-lightbox-close" onClick={onClose} aria-label="Fermer">×</button>
         <DriveImage
           driveUrl={item.photo_url}
+          mimeType={item.mimeType}
           alt={item.label ?? item.productName}
           className="tr-lightbox-img"
         />
@@ -55,6 +56,7 @@ function PhotoCard({ item, supplierColors, recentDeliveries, supplierMap, onAsso
       <div className="tr-gallery-img-wrap">
         <DriveImage
           driveUrl={item.photo_url}
+          mimeType={item.mimeType}
           alt={item.label ?? item.productName}
           className="tr-gallery-img"
         />
@@ -159,6 +161,7 @@ export default function TraceGalleryView({
         id:          `drive-${p.fileId}`,
         fileId:      p.fileId,
         photo_url:   p.url,
+        mimeType:    p.mimeType ?? null,
         label:       p.description || p.name,
         createdTime: p.createdTime,
         date:        p.createdTime?.slice(0, 10) ?? null,

@@ -1,5 +1,4 @@
 // ─── Header du module Commandes ───────────────────────────────────────────────
-import ConnectionDot from '../../components/ConnectionDot'
 
 const MONTHS_FR = [
   'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
@@ -26,11 +25,24 @@ function ArrowRight() {
 
 // ── Header principal ──────────────────────────────────────────────────────────
 
+function SheetsIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="3" width="18" height="18" rx="2"/>
+      <line x1="3"  y1="9"  x2="21" y2="9"/>
+      <line x1="3"  y1="15" x2="21" y2="15"/>
+      <line x1="9"  y1="3"  x2="9"  y2="21"/>
+      <line x1="15" y1="3"  x2="15" y2="21"/>
+    </svg>
+  )
+}
+
 export default function OrdersHeader({
   year, month, upcomingCount,
   onPrev, onNext, onNewOrder,
   webflowStatus, webflowError, onRetryWebflow,
-  sheetsStatus, sheetsError, onSheetsConnect, onSheetsRetry,
+  onSheetsExport, sheetsExporting,
 }) {
   return (
     <header className="header">
@@ -61,9 +73,18 @@ export default function OrdersHeader({
           </button>
         </div>
 
-        {/* Droite : statut Webflow + nouvelle commande */}
+        {/* Droite : export + nouvelle commande */}
         <div className="header-nav-right">
-          
+          {onSheetsExport && (
+            <button
+              className="nav-btn"
+              onClick={onSheetsExport}
+              disabled={sheetsExporting}
+              title={sheetsExporting ? 'Export en cours…' : 'Exporter vers Sheets'}
+            >
+              <SheetsIcon />
+            </button>
+          )}
           <button className="orders-new-btn add-trigger add-trigger--labeled" onClick={onNewOrder}>
             + Nouvelle commande
           </button>

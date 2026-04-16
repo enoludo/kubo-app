@@ -1,15 +1,12 @@
 // ─── ModeSelector — écran de sélection du mode d'accès ───────────────────────
 import { useState } from 'react'
-import { signIn }   from '../services/authService'
+import { signIn, setTeamSession } from '../services/authService'
 import './ModeSelector.css'
 
-const MANAGER_EMAIL  = import.meta.env.VITE_MANAGER_EMAIL
-const TEAM_EMAIL     = import.meta.env.VITE_TEAM_EMAIL
-const TEAM_PASSWORD  = import.meta.env.VITE_TEAM_PASSWORD
-
+const MANAGER_EMAIL = import.meta.env.VITE_MANAGER_EMAIL
 
 export default function ModeSelector() {
-  const [mode,     setMode]     = useState(null)   // null | 'team' | 'manager'
+  const [mode,     setMode]     = useState(null)
   const [password, setPassword] = useState('')
   const [error,    setError]    = useState(null)
   const [loading,  setLoading]  = useState(false)
@@ -22,7 +19,10 @@ export default function ModeSelector() {
     if (selected === 'team') {
       setLoading(true)
       try {
-        await signIn(TEAM_EMAIL, TEAM_PASSWORD)
+        const res = await fetch('/api/auth-team', { method: 'POST' })
+        if (!res.ok) throw new Error('auth-team error')
+        const { access_token, refresh_token } = await res.json()
+        await setTeamSession(access_token, refresh_token)
       } catch {
         setError('Erreur de connexion. Contactez le gérant.')
         setMode(null)

@@ -8,7 +8,36 @@ import cors from 'cors'
 const app = express()
 const PORT = 3001
 
-app.use(cors({ origin: 'http://localhost:5173' }))
+app.use(cors({ origin: true }))  // autorise toutes les origines (dev local uniquement)
+
+app.post('/api/auth-team', async (_req, res) => {
+  const { SUPABASE_URL, SUPABASE_ANON_KEY, TEAM_EMAIL, TEAM_PASSWORD } = process.env
+
+  if (!SUPABASE_URL || !SUPABASE_ANON_KEY || !TEAM_EMAIL || !TEAM_PASSWORD) {
+    console.error('[proxy] auth-team — variables manquantes')
+    return res.status(500).json({ error: 'Server configuration error' })
+  }
+
+  try {
+    const authRes = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON_KEY },
+      body:    JSON.stringify({ email: TEAM_EMAIL, password: TEAM_PASSWORD }),
+    })
+
+    if (!authRes.ok) {
+      console.error('[proxy] auth-team Supabase error:', authRes.status)
+      return res.status(401).json({ error: "Échec de l'authentification" })
+    }
+
+    const data = await authRes.json()
+    console.log('[proxy] auth-team OK')
+    res.json({ access_token: data.access_token, refresh_token: data.refresh_token, expires_in: data.expires_in })
+  } catch (err) {
+    console.error('[proxy] auth-team error:', err.message)
+    res.status(500).json({ error: 'Internal server error' })
+  }
+})
 
 app.get('/api/webflow-orders', async (req, res) => {
   const siteId = process.env.WEBFLOW_SITE_ID

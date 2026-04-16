@@ -191,7 +191,7 @@ export default function ShiftModal({ info, onSave, onDelete, onCancel, onToggleV
 
   function buildExtra() {
     if (type !== 'school' || !schoolAbsence) {
-      return { schoolAbsence: false, schoolAbsenceDuration: '' }
+      return { schoolAbsence: false, schoolAbsenceDuration: null }
     }
     return {
       schoolAbsence: true,

@@ -1,26 +1,17 @@
 // ─── Startup Connection Modal ─────────────────────────────────────────────────
 import Modal from '../design-system/components/Modal/Modal'
 
-const LOADING  = new Set(['connecting', 'syncing', 'loading', 'reconnecting', 'idle'])
+const LOADING   = new Set(['connecting', 'syncing', 'loading', 'reconnecting', 'idle'])
 const CONNECTED = new Set(['synced', 'connected'])
 
-function ServiceStatus({ status, onConnect }) {
+function ServiceStatus({ status }) {
   if (LOADING.has(status))   return <span className="startup-spinner" />
   if (CONNECTED.has(status)) return <span className="startup-dot startup-dot--ok" />
-  if (status === 'error')    return <span className="startup-dot startup-dot--err" />
-  // disconnected | expired
-  return onConnect
-    ? <button className="startup-action-btn" onClick={onConnect}>Connecter</button>
-    : <span className="startup-dot startup-dot--err" />
+  return <span className="startup-dot startup-dot--err" />
 }
 
-export default function StartupModal({
-  sheetsStatus, sheetsError,
-  webflowStatus, webflowError,
-  onSheetsConnect,
-  onDismiss,
-}) {
-  const allOk = CONNECTED.has(sheetsStatus) && CONNECTED.has(webflowStatus)
+export default function StartupModal({ webflowStatus, webflowError, onDismiss }) {
+  const allOk = CONNECTED.has(webflowStatus)
 
   return (
     <Modal overlayVariant="dark" size="sm">
@@ -32,19 +23,6 @@ export default function StartupModal({
 
         <div className="startup-rows">
 
-          {/* Google Sheets */}
-          <div className="startup-row">
-            <div className="startup-logo startup-logo--sheets">G</div>
-            <div className="startup-info">
-              <span className="startup-svc-name">Google Sheets</span>
-              <span className="startup-svc-desc">Planning & Commandes</span>
-              {sheetsStatus === 'error' && sheetsError && (
-                <span className="startup-svc-error">{sheetsError}</span>
-              )}
-            </div>
-            <ServiceStatus status={sheetsStatus} onConnect={onSheetsConnect} />
-          </div>
-
           {/* Webflow */}
           <div className="startup-row">
             <div className="startup-logo startup-logo--webflow">W</div>
@@ -55,7 +33,7 @@ export default function StartupModal({
                 <span className="startup-svc-error">{webflowError}</span>
               )}
             </div>
-            <ServiceStatus status={webflowStatus} onConnect={null} />
+            <ServiceStatus status={webflowStatus} />
           </div>
 
         </div>

@@ -173,6 +173,17 @@
   color: var(--text-primary);
 }
 
+.cln-step-product-badge {
+  display: inline-block;
+  margin-left: var(--space-xs);
+  padding: 0 var(--space-xs);
+  border-radius: var(--radius-full);
+  background: var(--bg-subtle);
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+  vertical-align: middle;
+}
+
 /* ── Section validation ──────────────────────────────────────────────────── */
 
 .cln-validate-section {
@@ -244,11 +255,33 @@
   gap: var(--space-sm);
 }
 
+.cln-step-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
 .cln-step-row {
   display: flex;
   align-items: center;
   gap: var(--space-sm);
 }
+
+.cln-step-product {
+  height: var(--control-height-sm);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--bg-subtle);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  padding: 0 var(--space-sm);
+  margin-left: calc(var(--space-lg) + var(--space-sm));
+  outline: none;
+  width: calc(100% - var(--space-lg) - var(--space-sm)) !important;
+}
+
+.cln-step-product:focus { background: var(--color-grey-200); }
 
 .cln-step-num {
   font-family: var(--font-family-base);
@@ -498,6 +531,119 @@
 
 .cln-zone-add-btn {
   margin-top: var(--space-xs);
+}
+
+/* ── Groupes tâches dans CleaningTaskModal ───────────────────────────────── */
+
+.cln-task-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.cln-task-group-label {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: var(--space-xs) 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.cln-task-product-sep {
+  margin: 0 var(--space-xs);
+  color: var(--text-secondary);
+}
+
+.cln-task-dosage {
+  color: var(--text-secondary);
+}
+
+/* ── Sections dans CleaningRoomDetailModal ───────────────────────────────── */
+
+.czd-zone-section {
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.czd-zone-section-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--bg-subtle);
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  min-height: var(--control-height-md);
+}
+
+.czd-zone-section-name {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  flex: 1;
+}
+
+.czd-count {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.czd-zone-section-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: var(--space-xs) 0;
+}
+
+.czd-subzone-section {
+  padding: var(--space-xs) var(--space-md);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.czd-subzone-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-secondary);
+  padding: var(--space-xs) 0;
+  padding-left: var(--space-md);
+}
+
+.czd-task-row {
+  border-top: 1px solid var(--border-subtle);
+}
+
+.czd-task-row:first-child { border-top: none; }
+
+.czd-task-row-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  background: none;
+  border: none;
+  text-align: left;
+  min-height: var(--control-height-md);
+}
+
+.czd-task-row-body {
+  padding: 0 var(--space-md) var(--space-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
 }
 
 /* ── Confirmation suppression ────────────────────────────────────────────── */
@@ -756,4 +902,228 @@
   background: var(--color-success);
   color: var(--text-primary);
   font-weight: var(--font-weight-semibold);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   CleaningRoomForm — formulaire Pièce > Zone > Sous-zone > Tâche
+══════════════════════════════════════════════════════════════════════════════ */
+
+/* ── Input générique ─────────────────────────────────────────────────────── */
+
+.crf-input {
+  height: var(--control-height-md);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--bg-subtle);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-md);
+  color: var(--text-primary);
+  padding: 0 var(--space-sm);
+  outline: none;
+  width: 100%;
+}
+
+.crf-input:focus { background: var(--color-grey-200); }
+
+/* ── Section zones ───────────────────────────────────────────────────────── */
+
+.crf-zones-section {
+  margin-top: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.crf-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.crf-zones-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+/* ── Zone block ──────────────────────────────────────────────────────────── */
+
+.crf-zone-block {
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.crf-zone-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-sm);
+  background: var(--bg-subtle);
+}
+
+.crf-zone-chevron {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--space-xl);
+  min-height: var(--control-height-md);
+  border: none;
+  background: none;
+  color: var(--text-secondary);
+  font-size: var(--font-size-xs);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.crf-zone-name {
+  flex: 1;
+  height: var(--control-height-md);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--bg-default);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-primary);
+  padding: 0 var(--space-sm);
+  outline: none;
+}
+
+.crf-zone-name:focus { background: var(--color-grey-200); }
+
+.crf-zone-count {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+/* ── Zone body ───────────────────────────────────────────────────────────── */
+
+.crf-zone-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-md);
+  padding-left: calc(var(--space-xl) + var(--space-xs));
+}
+
+/* ── Sous-zones ──────────────────────────────────────────────────────────── */
+
+.crf-subzones-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.crf-subzone-block {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.crf-subzone-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-sm);
+  background: var(--bg-subtle);
+}
+
+.crf-subzone-block .crf-tasks-list {
+  padding: var(--space-sm) var(--space-sm);
+  padding-left: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.crf-add-subzone {
+  align-self: flex-start;
+  color: var(--text-secondary);
+}
+
+/* ── Tasks list ──────────────────────────────────────────────────────────── */
+
+.crf-tasks-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+/* ── Task block ──────────────────────────────────────────────────────────── */
+
+.crf-task-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  background: var(--bg-default);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: var(--space-sm);
+}
+
+.crf-task-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.crf-task-name {
+  flex: 1;
+  height: var(--control-height-md);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--bg-subtle);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-md);
+  color: var(--text-primary);
+  padding: 0 var(--space-sm);
+  outline: none;
+}
+
+.crf-task-name:focus { background: var(--color-grey-200); }
+
+.crf-task-fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.crf-row-2col {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+.crf-row-2col > * { flex: 1; }
+
+/* ── Bouton supprimer ────────────────────────────────────────────────────── */
+
+.crf-remove-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--space-xl);
+  min-height: var(--space-xl);
+  border: none;
+  border-radius: var(--radius-full);
+  background: none;
+  color: var(--text-secondary);
+  font-size: var(--font-size-md);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.crf-remove-btn:active {
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+}
+
+/* ── Bouton ajouter ──────────────────────────────────────────────────────── */
+
+.crf-add-btn {
+  align-self: flex-start;
+  margin-top: var(--space-xs);
 }

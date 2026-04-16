@@ -10,10 +10,12 @@ import { resolveZone, INITIAL_ZONES } from '../utils/cleaningZones.jsx'
 // Si absente, repli sur INITIAL_ZONES.
 
 const FREQUENCIES = [
-  { value: 'daily',     label: 'Quotidienne' },
-  { value: 'weekly',    label: 'Hebdomadaire' },
-  { value: 'monthly',   label: 'Mensuelle' },
-  { value: 'quarterly', label: 'Trimestrielle' },
+  { value: 'daily',       label: 'Quotidienne' },
+  { value: 'weekly',      label: 'Hebdomadaire' },
+  { value: 'regularly',   label: 'Régulièrement' },
+  { value: 'monthly',     label: 'Mensuelle' },
+  { value: 'quarterly',   label: 'Trimestrielle' },
+  { value: 'semiannual',  label: 'Semestrielle' },
 ]
 
 // Ordre lundi-dimanche pour l'affichage (dayOfWeek suit getDay() : 0=dim)
@@ -39,9 +41,13 @@ export default function CleaningTaskForm({ task, zones: zonesProp, onSave, onDel
   const [zone,        setZone]        = useState(task?.zone        ?? 'laboratoire')
   const [frequency,   setFrequency]   = useState(task?.frequency   ?? 'daily')
   const [dayOfWeek,   setDayOfWeek]   = useState(task?.dayOfWeek   ?? 1)
-  const [protocol,    setProtocol]    = useState(task?.protocol    ?? [''])
-  const [product,     setProduct]     = useState(task?.product     ?? '')
+  const [protocol,    setProtocol]    = useState(() => {
+    const raw = task?.protocol ?? []
+    if (!raw.length) return [{ text: '', product: '' }]
+    return raw.map(s => typeof s === 'string' ? { text: s, product: '' } : s)
+  })
   const [duration,    setDuration]    = useState(task?.duration_min ?? 15)
+  const [cycleStart,  setCycleStart]  = useState(task?.cycleStart  ?? 1)
   const [active,      setActive]      = useState(task?.active      ?? true)
   const [submitted,   setSubmitted]   = useState(false)
   const [confirmDel,  setConfirmDel]  = useState(false)
@@ -50,12 +56,12 @@ export default function CleaningTaskForm({ task, zones: zonesProp, onSave, onDel
 
   // ── Protocole ──────────────────────────────────────────────────────────────
 
-  function updateStep(i, value) {
-    setProtocol(prev => prev.map((s, idx) => idx === i ? value : s))
+  function updateStep(i, field, value) {
+    setProtocol(prev => prev.map((s, idx) => idx === i ? { ...s, [field]: value } : s))
   }
 
   function addStep() {
-    setProtocol(prev => [...prev, ''])
+    setProtocol(prev => [...prev, { text: '', product: '' }])
   }
 
   function removeStep(i) {
@@ -80,8 +86,11 @@ export default function CleaningTaskForm({ task, zones: zonesProp, onSave, onDel
       zone,
       frequency,
       dayOfWeek:    frequency === 'weekly' ? dayOfWeek : null,
-      protocol:     protocol.filter(s => s.trim()),
-      product:      product.trim() || null,
+      cycleStart:   frequency === 'semiannual' ? cycleStart : null,
+      protocol:     protocol.filter(s => s.text.trim()).map(s => ({
+        text:    s.text.trim(),
+        product: s.product.trim() || null,
+      })),
       duration_min: duration,
       active,
     })
@@ -163,28 +172,50 @@ export default function CleaningTaskForm({ task, zones: zonesProp, onSave, onDel
           </div>
         )}
 
+        {/* Mois de début de cycle — uniquement si semestrielle */}
+        {frequency === 'semiannual' && (
+          <div className="modal-field-full">
+            <label>Début du cycle</label>
+            <select value={cycleStart} onChange={e => setCycleStart(Number(e.target.value))}>
+              {['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre']
+                .map((m, i) => (
+                  <option key={i + 1} value={i + 1}>{m}</option>
+                ))}
+            </select>
+          </div>
+        )}
+
         {/* Protocole */}
         <div className="modal-field-full">
           <label>Protocole</label>
           <div className="cln-protocol-steps">
             {protocol.map((step, i) => (
-              <div key={i} className="cln-step-row">
-                <span className="cln-step-num">{i + 1}.</span>
+              <div key={i} className="cln-step-block">
+                <div className="cln-step-row">
+                  <span className="cln-step-num">{i + 1}.</span>
+                  <input
+                    type="text"
+                    className="cln-step-input"
+                    placeholder={`Étape ${i + 1}`}
+                    value={step.text}
+                    onChange={e => updateStep(i, 'text', e.target.value)}
+                  />
+                  {protocol.length > 1 && (
+                    <button
+                      type="button"
+                      className="cln-step-remove"
+                      onClick={() => removeStep(i)}
+                      aria-label="Supprimer cette étape"
+                    >×</button>
+                  )}
+                </div>
                 <input
                   type="text"
-                  className="cln-step-input"
-                  placeholder={`Étape ${i + 1}`}
-                  value={step}
-                  onChange={e => updateStep(i, e.target.value)}
+                  className="cln-step-product"
+                  placeholder="Produit & dosage (optionnel)"
+                  value={step.product}
+                  onChange={e => updateStep(i, 'product', e.target.value)}
                 />
-                {protocol.length > 1 && (
-                  <button
-                    type="button"
-                    className="cln-step-remove"
-                    onClick={() => removeStep(i)}
-                    aria-label="Supprimer cette étape"
-                  >×</button>
-                )}
               </div>
             ))}
             <button
@@ -195,17 +226,6 @@ export default function CleaningTaskForm({ task, zones: zonesProp, onSave, onDel
               + Ajouter une étape
             </button>
           </div>
-        </div>
-
-        {/* Produit */}
-        <div className="modal-field-full">
-          <label>Produit & dosage</label>
-          <input
-            type="text"
-            placeholder="ex : Détergent dégraissant — dilution 2%"
-            value={product}
-            onChange={e => setProduct(e.target.value)}
-          />
         </div>
 
         {/* Durée (stepper) */}

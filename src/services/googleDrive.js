@@ -207,19 +207,77 @@ export async function listDrivePhotos() {
   const token = getToken()
   if (!token) return []
 
+  console.log('[drive] listDrivePhotos — début')
+
+  // Chercher dans Kubo-Planning/Tracabilite/ si le dossier existe
+  // Pas de filtre mimeType dans la query — on récupère tout depuis le dossier
+  // et on filtre côté client (Drive ne supporte pas name contains '.heic')
+  let q = "not mimeType='application/vnd.google-apps.folder' and trashed=false"
+  try {
+    const root  = await findFolder('Kubo-Planning', null,  token)
+    const trace = root ? await findFolder('Tracabilite', root, token) : null
+    if (trace) {
+      const subFolders = await driveGet('/files', {
+        q:        `'${trace}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false`,
+        fields:   'files(id)',
+        pageSize: '50',
+      }, token).catch(() => ({ files: [] }))
+      const allParents = [trace, ...(subFolders.files ?? []).map(f => f.id)]
+      // sous-sous-dossiers (YYYY/MM)
+      const leafFolders = []
+      for (const parentId of subFolders.files ?? []) {
+        const sub = await driveGet('/files', {
+          q:        `'${parentId.id}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false`,
+          fields:   'files(id)',
+          pageSize: '50',
+        }, token).catch(() => ({ files: [] }))
+        leafFolders.push(...(sub.files ?? []).map(f => f.id))
+      }
+      const allIds = [...allParents, ...leafFolders]
+      const parentFilter = allIds.map(id => `'${id}' in parents`).join(' or ')
+      if (parentFilter) {
+        q = `not mimeType='application/vnd.google-apps.folder' and trashed=false and (${parentFilter})`
+        console.log('[drive] Dossier Tracabilite ID:', trace, '— total dossiers:', allIds.length)
+      }
+    } else {
+      console.log('[drive] Dossier Kubo-Planning/Tracabilite non trouvé — recherche globale')
+    }
+  } catch (err) {
+    console.warn('[drive] résolution dossier:', err.message, '— recherche globale')
+  }
+
+  console.log('[drive] query:', q)
+
   const data = await driveGet('/files', {
-    q:        "mimeType contains 'image/' and trashed=false",
-    fields:   'files(id,name,description,createdTime)',
+    q,
+    fields:   'files(id,name,description,createdTime,mimeType)',
     orderBy:  'createdTime desc',
     pageSize: '100',
   }, token).catch(err => {
-    console.error('[drive] listDrivePhotos:', err.message)
+    console.error('[drive] listDrivePhotos erreur:', err.message)
     return { files: [] }
   })
 
-  return (data.files ?? []).map(f => ({
+  const files = data.files ?? []
+  console.log('[drive] tous les fichiers:', files)
+  console.log('[drive] mimeTypes:', files.map(f => ({ name: f.name, type: f.mimeType })))
+  console.log('[drive] fichiers HEIC:', files.filter(f =>
+    f.name.toLowerCase().endsWith('.heic') || f.name.toLowerCase().endsWith('.heif') ||
+    f.mimeType?.includes('heic') || f.mimeType?.includes('heif')
+  ))
+
+  // Filtre côté client : images + HEIC/HEIF
+  const imageFiles = files.filter(f =>
+    f.mimeType?.startsWith('image/') ||
+    f.name.toLowerCase().endsWith('.heic') ||
+    f.name.toLowerCase().endsWith('.heif')
+  )
+  console.log('[drive] photos filtrées:', imageFiles.length)
+
+  return imageFiles.map(f => ({
     fileId:      f.id,
     name:        f.name,
+    mimeType:    f.mimeType ?? null,
     description: f.description ?? null,
     createdTime: f.createdTime ?? null,
     url:         `https://drive.google.com/uc?export=view&id=${f.id}`,
