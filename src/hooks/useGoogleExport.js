@@ -1,37 +1,49 @@
-// ─── Export manuel Supabase → Google Sheets ────────────────────────────────────
+// ─── Export Supabase → Google Sheets via Edge Function ────────────────────────
 //
-// Reçoit un getToken() depuis useGoogleSync (via App.jsx ou PlanningApp).
-// Expose une fonction export + un statut d'export.
+// Remplace l'ancien export OAuth utilisateur.
+// Appelle la Edge Function export-to-sheets qui utilise le Service Account Google.
+// Plus besoin de token OAuth — le frontend ne touche plus à l'API Sheets directement.
 
 import { useState } from 'react'
+import { supabase } from '../services/supabase'
 
 /**
  * @param {object} params
- * @param {() => string|null} params.getToken  — retourne le token OAuth actuel
- * @param {(msg, color) => void} params.onToast
+ * @param {(msg: string, color?: string) => void} params.onToast
  */
-export function useGoogleExport({ getToken, onToast }) {
+export function useGoogleExport({ onToast } = {}) {
   const [exporting, setExporting] = useState(false)
 
   /**
-   * Déclenche un export et affiche un toast.
-   * @param {() => Promise<void>} exportFn — appel à sheetsExport.*
-   * @param {string} label — nom du module pour les messages toast
+   * Déclenche l'export d'un module vers Sheets via la Edge Function.
+   * @param {'planning'|'temperatures'|'cleaning'|'traceability'|'all'} module
+   * @returns {Promise<boolean>}
    */
-  async function runExport(exportFn, label) {
-    const token = getToken?.()
-    if (!token) {
-      onToast?.(`Google non connecté — connectez-vous d'abord`, 'var(--color-danger)')
-      return false
-    }
+  async function runExport(module = 'all') {
     setExporting(true)
-    onToast?.(`Export ${label} en cours…`, 'var(--color-grey-500)')
+    const label = {
+      planning:      'Planning',
+      temperatures:  'Températures',
+      cleaning:      'Nettoyage',
+      traceability:  'Traçabilité',
+      all:           'complet',
+    }[module] ?? module
+
+    onToast?.(`Export ${label} en cours…`, null)
+
     try {
-      await exportFn(token)
-      onToast?.(`Export ${label} terminé ✓`, 'var(--color-success)')
+      const { data, error } = await supabase.functions.invoke('export-to-sheets', {
+        body: { module },
+      })
+
+      if (error) throw error
+      if (data?.error) throw new Error(data.error)
+
+      onToast?.(`Export ${label} terminé ✓`, null)
       return true
     } catch (err) {
-      onToast?.(`Export ${label} échoué : ${err.message}`, 'var(--color-danger)')
+      const msg = err?.message ?? 'Erreur inconnue'
+      onToast?.(`Export ${label} échoué : ${msg}`, 'var(--color-danger)')
       return false
     } finally {
       setExporting(false)

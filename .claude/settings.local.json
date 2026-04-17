@@ -13,7 +13,8 @@
       "Bash(node -e \"require\\('@supabase/supabase-js'\\); console.log\\('ok'\\)\")",
       "Bash(ps -p 791 -o comm=)",
       "Bash(ps -p 3141 -o comm=)",
-      "Bash(curl -s -X POST http://localhost:3001/api/auth-team)"
+      "Bash(curl -s -X POST http://localhost:3001/api/auth-team)",
+      "Bash(npx supabase:*)"
     ]
   }
 }

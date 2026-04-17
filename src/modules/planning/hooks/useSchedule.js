@@ -58,11 +58,12 @@ export function useSchedule() {
 
   // Chargement Supabase au montage — remplace les données locales si Supabase a des données
   useEffect(() => {
+    console.log('[planning] localStorage shifts:', localStorage.getItem('kubo_shifts'))
     fetchShifts()
       .then(supabaseShifts => {
+        console.log('[planning] shifts loaded:', supabaseShifts.length)
         if (supabaseShifts.length > 0) {
           setShifts(supabaseShifts)
-          console.log('[supabase] shifts chargés:', supabaseShifts.length)
         }
       })
       .catch(err => console.error('[supabase] fetchShifts:', err.message))
@@ -89,7 +90,9 @@ export function useSchedule() {
 
   function removeShift(shiftId) {
     setShifts(prev => prev.filter(s => s.id !== shiftId))
-    deleteShift(shiftId).catch(err => console.error('[supabase] removeShift:', err.message))
+    deleteShift(shiftId)
+      .then(() => console.log('[shift] delete result: OK', shiftId))
+      .catch(err => console.error('[shift] delete result: ERROR', shiftId, err.message))
   }
 
   function removeEmployeeShifts(employeeId) {

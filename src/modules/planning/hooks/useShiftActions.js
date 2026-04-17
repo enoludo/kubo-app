@@ -1,8 +1,16 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { dateToStr } from './useSchedule'
 
 export function useShiftActions({ schedule, team }) {
   const [shiftModal, setShiftModal] = useState(null)
+
+  // Ref pour avoir toujours le schedule le plus récent dans les handlers
+  const scheduleRef = useRef(schedule)
+  useEffect(() => { scheduleRef.current = schedule }, [schedule])
+
+  // Ref pour avoir toujours le shiftModal le plus récent dans les handlers
+  const shiftModalRef = useRef(shiftModal)
+  useEffect(() => { shiftModalRef.current = shiftModal }, [shiftModal])
 
   function handleEditShift(shiftId) {
     const shift    = schedule.shifts.find(s => s.id === shiftId)
@@ -28,7 +36,11 @@ export function useShiftActions({ schedule, team }) {
   }
 
   function handleDeleteShift() {
-    schedule.removeShift(shiftModal.shift.id)
+    const modal = shiftModalRef.current
+    if (!modal?.shift?.id) return
+    const shiftId = modal.shift.id
+    console.log('[shift] delete clicked:', shiftId)
+    scheduleRef.current.removeShift(shiftId)
     setShiftModal(null)
   }
 

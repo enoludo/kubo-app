@@ -347,26 +347,6 @@
 }
 .conn-popover-action:hover { background: var(--bg-3); }
 
-/* ─── Bannière session expirée ────────────────────────────────────── */
-.sync-expired-banner {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 8000;
-  background: var(--color-error-bg);
-  border: 1px solid var(--color-error-border);
-  color: var(--color-error-dark);
-  border-radius: var(--radius-sm);
-  padding: var(--space-md) var(--space-lg);
-  font-size: var(--font-size-md);
-  font-weight: 500;
-  cursor: pointer;
-  white-space: nowrap;
-  box-shadow: var(--shadow-m);
-  transition: background var(--t-base);
-}
-.sync-expired-banner:hover { background: var(--color-error-hover); }
 
 /* ─── Bannière de conflit ─────────────────────────────────────────── */
 .sync-conflict-banner {

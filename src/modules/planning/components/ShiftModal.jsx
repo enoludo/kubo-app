@@ -400,7 +400,7 @@ export default function ShiftModal({ info, onSave, onDelete, onCancel, onToggleV
           {isEdit ? (
             <>
               <Button variant="default" style={{ flex: 1 }} onClick={onCancel}>Annuler</Button>
-              <Button variant="danger" style={{ flex: 1 }} onClick={onDelete}>Supprimer</Button>
+              <Button type="button" variant="danger" style={{ flex: 1 }} onClick={e => { e.stopPropagation(); onDelete() }}>Supprimer</Button>
               <Button
                 variant="success"
                 style={{ flex: 2, ...((dayExceeded || leaveConflict) ? { background: 'var(--color-danger)', borderColor: 'var(--color-danger)', color: 'var(--color-white)' } : {}) }}

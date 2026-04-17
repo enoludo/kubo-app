@@ -1,19 +1,12 @@
 // ─── Module Produits — shell principal ────────────────────────────────────────
 import { useState } from 'react'
-import { useProductsGoogleSync }  from '../../hooks/useProductsGoogleSync'
 import ProductsCatalog            from './ProductsCatalog'
 import ProductDetailModal         from './ProductDetailModal'
 import ProductForm                from './ProductForm'
 import './products-tokens.css'
 import './ProductsApp.css'
 
-export default function ProductsApp({ productsCtx, showToast, getToken, isManager = false }) {
-  useProductsGoogleSync({
-    products:    productsCtx.products,
-    getToken:    getToken ?? (() => null),
-    setProducts: productsCtx.setProductsFromSync,
-    onToast:     showToast,
-  })
+export default function ProductsApp({ productsCtx, showToast, isManager = false }) {
 
   // null = fermé | objet produit = détail | 'new' = création | produit = édition
   const [selected, setSelected] = useState(null)

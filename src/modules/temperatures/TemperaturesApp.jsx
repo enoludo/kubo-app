@@ -2,7 +2,6 @@ import { useState, useRef }  from 'react'
 import { useWeek }           from '../../hooks/useWeek'
 import { useGoogleExport }   from '../../hooks/useGoogleExport'
 import { generateTempPdf }   from './utils/exportTempPdf'
-import { exportTemperaturesToSheets } from '../../services/sheetsExport'
 import TempCalendar          from './components/TempCalendar'
 import TempModal             from './components/TempModal'
 import TempEquipmentModal    from './components/TempEquipmentModal'
@@ -52,7 +51,7 @@ function MenuIcon() {
   )
 }
 
-export default function TemperaturesApp({ showToast, tempCtx, getGoogleToken }) {
+export default function TemperaturesApp({ showToast, tempCtx }) {
   const week = useWeek()
   const menuBtnRef = useRef(null)
 
@@ -61,13 +60,10 @@ export default function TemperaturesApp({ showToast, tempCtx, getGoogleToken }) 
   const [pdfLoading, setPdfLoading] = useState(false)
   const [menuOpen,   setMenuOpen]   = useState(false)
 
-  const { exporting: sheetsExporting, runExport } = useGoogleExport({ getToken: getGoogleToken, onToast: showToast })
+  const { exporting: sheetsExporting, runExport } = useGoogleExport({ onToast: showToast })
 
   function handleSheetsExport() {
-    runExport(
-      token => exportTemperaturesToSheets(token, tempCtx.equipment, tempCtx.readings),
-      'Températures'
-    )
+    runExport('temperatures')
   }
 
   const fmt    = d => d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
@@ -143,11 +139,9 @@ export default function TemperaturesApp({ showToast, tempCtx, getGoogleToken }) 
               <SheetsIcon /><span>Voir Google Sheet</span>
             </button>
           )}
-          {getGoogleToken && (
-            <button onClick={() => action(handleSheetsExport)} disabled={sheetsExporting}>
-              <SheetsIcon /><span>{sheetsExporting ? 'Export en cours…' : 'Exporter vers Sheets'}</span>
-            </button>
-          )}
+          <button onClick={() => action(handleSheetsExport)} disabled={sheetsExporting}>
+            <SheetsIcon /><span>{sheetsExporting ? 'Export en cours…' : 'Exporter vers Sheets'}</span>
+          </button>
           <button
             onClick={() => action(handleExportPdf)}
             disabled={pdfLoading || tempCtx.activeEquipment.length === 0}

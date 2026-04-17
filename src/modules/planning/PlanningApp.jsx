@@ -5,43 +5,23 @@ import EmployeeModal        from './components/EmployeeModal'
 import EmployeeProfileModal from './components/EmployeeProfileModal'
 import WeekPickerPanel      from './components/WeekPickerPanel'
 import TableView            from './components/TableView'
-import { useGoogleSync }    from './hooks/useGoogleSync'
 import { useGoogleExport }  from '../../hooks/useGoogleExport'
 import { useWeek }          from './hooks/useWeek'
 import { useShiftActions }  from './hooks/useShiftActions'
 import { useTemplates }     from './hooks/useTemplates'
 import { useExports }       from './hooks/useExports'
-import { exportPlanningToSheets } from '../../services/sheetsExport'
 import { mondayOf, dateToStr } from '../../utils/date'
 import './planning-tokens.css'
 import './PlanningApp.css'
 
-export default function PlanningApp({ showToast, onSyncChange, schedule, teamCtx, dataSource, setDataSource, isManager = false }) {
+export default function PlanningApp({ showToast, schedule, teamCtx, dataSource, isManager = false }) {
   const week = useWeek()
 
   const [copiedEmployeePlan, setCopiedEmployeePlan] = useState(null)
 
-  const sync = useGoogleSync()
-
-  // Expose sync vers App.jsx (NavSidebar, StartupModal, ProductsApp)
   useEffect(() => {
-    onSyncChange({
-      status:   sync.status,
-      errMsg:   sync.errMsg,
-      connect:  sync.connect,
-      retry:    sync.retry,
-      getToken: sync.getToken,
-    })
-  }, [sync.status, sync.errMsg]) // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Suivi de la source de données selon l'état de la sync
-  useEffect(() => {
-    if (sync.status === 'connected') {
-      setDataSource('synced')
-    } else if (dataSource === 'synced') {
-      setDataSource('session')
-    }
-  }, [sync.status]) // eslint-disable-line react-hooks/exhaustive-deps
+    console.log('[planning] role:', isManager ? 'manager' : 'team')
+  }, [isManager]) // eslint-disable-line react-hooks/exhaustive-deps
 
   function handleCopyEmployeePlan(employee, weekKey, shifts) {
     setCopiedEmployeePlan({ employee, weekKey, shifts })
@@ -65,13 +45,10 @@ export default function PlanningApp({ showToast, onSyncChange, schedule, teamCtx
   const shiftCtx    = useShiftActions({ schedule, team: teamCtx.team })
   const templateCtx = useTemplates({ schedule, week })
   const exportCtx   = useExports({ week, team: teamCtx.team, schedule })
-  const { exporting: sheetsExporting, runExport } = useGoogleExport({ getToken: sync.getToken, onToast: showToast })
+  const { exporting: sheetsExporting, runExport } = useGoogleExport({ onToast: showToast })
 
   function handleSheetsExport() {
-    runExport(
-      token => exportPlanningToSheets(token, schedule.shifts, teamCtx.team, week.dates),
-      'Planning'
-    )
+    runExport('planning')
   }
 
   return (
@@ -166,11 +143,6 @@ export default function PlanningApp({ showToast, onSyncChange, schedule, teamCtx
           />
         )}
 
-        {sync.status === 'expired' && (
-          <div className="sync-expired-banner" onClick={sync.connect} role="button" tabIndex={0}>
-            ⚠ Session Google expirée — Cliquez pour reconnecter
-          </div>
-        )}
       </div>
     </>
   )

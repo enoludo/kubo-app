@@ -2,6 +2,7 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import { supabase }       from '../services/supabase'
 import { fetchProfile }   from '../services/authService'
+import { sessionClear }   from '../utils/session'
 
 const AuthContext = createContext(null)
 
@@ -41,6 +42,9 @@ export function AuthProvider({ children }) {
         setUser(session.user)
         loadProfile(session.user)
       } else {
+        // Nettoyage du cache session : évite qu'une nouvelle session hérite
+        // des données d'une session précédente (ex: gérant → team)
+        sessionClear()
         setUser(null)
         setRole(null)
         setName(null)

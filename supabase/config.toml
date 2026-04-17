@@ -1,0 +1,21 @@
+# Supabase project config
+# Référence du projet : mdozwvpbzuwndhramgws
+# Pour déployer : npx supabase functions deploy export-to-sheets --project-ref mdozwvpbzuwndhramgws
+
+[api]
+enabled = true
+port = 54321
+
+[db]
+port = 54322
+
+[studio]
+enabled = true
+port = 54323
+
+[inbucket]
+enabled = true
+port = 54324
+
+[functions.export-to-sheets]
+verify_jwt = true
