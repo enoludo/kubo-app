@@ -19,11 +19,19 @@ export default function ModeSelector() {
     if (selected === 'team') {
       setLoading(true)
       try {
+        console.log('[auth] mode: team — appel /api/auth-team')
         const res = await fetch('/api/auth-team', { method: 'POST' })
-        if (!res.ok) throw new Error('auth-team error')
+        console.log('[auth] auth-team status:', res.status)
+        if (!res.ok) {
+          const body = await res.json().catch(() => ({}))
+          console.error('[auth] auth-team error:', res.status, body)
+          throw new Error(`auth-team ${res.status}`)
+        }
         const { access_token, refresh_token } = await res.json()
         await setTeamSession(access_token, refresh_token)
-      } catch {
+        console.log('[auth] team session OK')
+      } catch (err) {
+        console.error('[auth] team catch:', err.message)
         setError('Erreur de connexion. Contactez le gérant.')
         setMode(null)
       } finally {
@@ -36,9 +44,12 @@ export default function ModeSelector() {
     e.preventDefault()
     setError(null)
     setLoading(true)
+    console.log('[auth] mode: manager — email:', MANAGER_EMAIL)
     try {
       await signIn(MANAGER_EMAIL, password)
-    } catch {
+      console.log('[auth] manager signIn OK')
+    } catch (err) {
+      console.error('[auth] manager signIn error:', err.message)
       setError('Mot de passe incorrect.')
     } finally {
       setLoading(false)

@@ -37,25 +37,38 @@ export default async function handler(req, res) {
 
   const { SUPABASE_URL, SUPABASE_ANON_KEY, TEAM_EMAIL, TEAM_PASSWORD } = process.env
 
+  const envCheck = {
+    SUPABASE_URL:      SUPABASE_URL      ? SUPABASE_URL.slice(0, 30) + '…' : 'MISSING',
+    SUPABASE_ANON_KEY: SUPABASE_ANON_KEY ? 'OK' : 'MISSING',
+    TEAM_EMAIL:        TEAM_EMAIL        ? 'OK' : 'MISSING',
+    TEAM_PASSWORD:     TEAM_PASSWORD     ? 'OK' : 'MISSING',
+  }
+  console.log('[auth-team] env:', envCheck)
+
   if (!SUPABASE_URL || !SUPABASE_ANON_KEY || !TEAM_EMAIL || !TEAM_PASSWORD) {
-    console.error('[auth-team] Variables manquantes — vérifier .env.local (vercel dev) ou Dashboard Vercel (prod)')
-    return res.status(500).json({ error: 'Server configuration error' })
+    console.error('[auth-team] Variables manquantes')
+    return res.status(500).json({ error: 'Server configuration error', env: envCheck })
   }
 
   try {
-    const authRes = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+    const url = `${SUPABASE_URL.trim()}/auth/v1/token?grant_type=password`
+    console.log('[auth-team] calling:', url)
+
+    const authRes = await fetch(url, {
       method:  'POST',
       headers: {
         'Content-Type': 'application/json',
-        'apikey':        SUPABASE_ANON_KEY,
+        'apikey':        SUPABASE_ANON_KEY.trim(),
       },
-      body: JSON.stringify({ email: TEAM_EMAIL, password: TEAM_PASSWORD }),
+      body: JSON.stringify({ email: TEAM_EMAIL.trim(), password: TEAM_PASSWORD }),
     })
+
+    console.log('[auth-team] Supabase status:', authRes.status)
 
     if (!authRes.ok) {
       const err = await authRes.json().catch(() => ({}))
       console.error('[auth-team] Supabase error:', authRes.status, err)
-      return res.status(401).json({ error: "Échec de l'authentification" })
+      return res.status(401).json({ error: "Échec de l'authentification", detail: err })
     }
 
     const data = await authRes.json()
@@ -67,6 +80,6 @@ export default async function handler(req, res) {
 
   } catch (err) {
     console.error('[auth-team] fetch error:', err.message)
-    return res.status(500).json({ error: 'Internal server error' })
+    return res.status(500).json({ error: err.message })
   }
 }
