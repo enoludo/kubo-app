@@ -21,7 +21,14 @@
       "Bash(curl -s -X POST https://mdozwvpbzuwndhramgws.supabase.co/functions/v1/export-to-sheets -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1kb3p3dnBienV3bmRocmFtZ3dzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3NTk3NzksImV4cCI6MjA5MTMzNTc3OX0.iRm1qlg6ro619I-5x1VdPsJd78YdPK575AClqwZF0S0' -H 'Content-Type: application/json' -d '{\"module\":\"planning\"}')",
       "Bash(python3 -m json.tool)",
       "Bash(npm ls *)",
-      "Bash(python3 -)"
+      "Bash(python3 -)",
+      "Bash(npx vercel *)",
+      "Bash(kill %%)",
+      "Bash(curl -s -X POST https://kubo-planning.vercel.app/api/auth-team -H 'Content-Type: application/json')",
+      "Bash(curl -s -X POST \"https://kubo-planning-chi.vercel.app/api/auth-team\")",
+      "Bash(curl -s -X POST \"https://kubo-app.vercel.app/api/auth-team\")",
+      "Bash(git push *)",
+      "Bash(curl -s -X POST https://kubo-app-one.vercel.app/api/auth-team -H 'Content-Type: application/json')"
     ]
   }
 }
