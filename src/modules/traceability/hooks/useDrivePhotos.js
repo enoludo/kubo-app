@@ -1,9 +1,8 @@
-// ─── Hook — sync photos Google Drive ──────────────────────────────────────────
-// Charge les photos au montage, puis toutes les 5 minutes.
-// Ne plante jamais le module principal si Drive est inaccessible.
+// ─── Hook — photos traçabilité depuis Supabase ─────────────────────────────────
+// Lit la table trace_photos (métadonnées Drive) — pas d'OAuth requis.
 
 import { useState, useEffect, useCallback } from 'react'
-import { listDrivePhotos } from '../../../services/googleDrive'
+import { supabase } from '../../../services/supabase'
 
 const POLL_MS = 5 * 60 * 1000
 
@@ -14,10 +13,22 @@ export function useDrivePhotos() {
   const sync = useCallback(async () => {
     setSyncing(true)
     try {
-      const files = await listDrivePhotos()
-      setPhotos(files)
+      const { data, error } = await supabase
+        .from('trace_photos')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(200)
+      if (error) throw error
+      setPhotos((data ?? []).map(row => ({
+        fileId:      row.file_id,
+        name:        row.name,
+        mimeType:    row.mime_type,
+        description: row.product_name ?? null,
+        createdTime: row.created_at,
+        url:         row.url,
+      })))
     } catch (err) {
-      console.error('[drive] useDrivePhotos sync:', err.message)
+      console.error('[trace_photos] sync:', err.message)
     } finally {
       setSyncing(false)
     }

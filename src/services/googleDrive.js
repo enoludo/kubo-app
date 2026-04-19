@@ -8,7 +8,8 @@
 // Les IDs de dossiers sont mis en cache en mémoire pour éviter les appels
 // répétés sur la même session.
 
-import { getToken } from './googleAuth'
+import { getToken }  from './googleAuth'
+import { supabase } from './supabase'
 
 const BOUNDARY = 'kubo_tr_boundary'
 
@@ -192,6 +193,22 @@ export async function uploadReceptionPhoto({ file, dateStr, supplierName, produc
 
   const url = `https://drive.google.com/uc?export=view&id=${fileId}`
   console.log('[drive] URL finale:', url)
+
+  // Sauvegarde les métadonnées dans Supabase pour l'affichage en prod (sans OAuth)
+  supabase.from('trace_photos').upsert({
+    file_id:        fileId,
+    url,
+    name:           fileName,
+    date:           dateStr,
+    supplier_name:  supplierName  ?? null,
+    product_name:   productName   ?? null,
+    category_label: categoryLabel ?? null,
+    mime_type:      mimeType,
+  }, { onConflict: 'file_id' }).then(({ error }) => {
+    if (error) console.error('[drive] trace_photos upsert:', error.message)
+    else       console.log('[drive] trace_photos sauvegardé ✓')
+  })
+
   return { fileId, url }
 }
 

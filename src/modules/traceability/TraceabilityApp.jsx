@@ -3,6 +3,7 @@ import { useState, useRef, useMemo } from 'react'
 import heic2any from 'heic2any'
 import { useWeek }               from '../../hooks/useWeek'
 import { useGoogleExport }       from '../../hooks/useGoogleExport'
+import { useAuth }               from '../../hooks/useAuth'
 import { useDrivePhotos }        from './hooks/useDrivePhotos'
 import TraceCalendar             from './components/TraceCalendar'
 import TraceListView             from './components/TraceListView'
@@ -11,7 +12,9 @@ import TraceCellModal            from './components/TraceCellModal'
 import TraceDeliveryForm         from './components/TraceDeliveryForm'
 import TraceSupplierForm         from './components/TraceSupplierForm'
 import Dropdown                  from '../../design-system/components/Dropdown/Dropdown'
-import { uploadReceptionPhoto }  from '../../services/googleDrive'
+import { uploadReceptionPhoto, listDrivePhotos } from '../../services/googleDrive'
+import { getToken, loadGIS, initTokenClient, requestToken } from '../../services/googleAuth'
+import { supabase }              from '../../services/supabase'
 import '../../design-system/layout/ModuleLayout.css'
 import '../../design-system/components/WeekGrid/WeekGrid.css'
 import '../../design-system/components/DayCard/DayCard.css'
@@ -67,11 +70,41 @@ const VIEWS = [
   )},
 ]
 
+function parsePhotoMetadata(photo) {
+  const { name, description, createdTime, url, fileId, mimeType } = photo
+  let date = null
+  const dateMatch = name?.match(/^(\d{4}-\d{2}-\d{2})/)
+  if (dateMatch) {
+    date = dateMatch[1]
+  } else if (createdTime) {
+    date = createdTime.slice(0, 10)
+  }
+  let categoryLabel = null
+  let productName = null
+  if (description) {
+    const parts = description.split(' — ')
+    if (parts.length >= 2) {
+      categoryLabel = parts[0] || null
+      productName   = parts[1] || null
+    }
+  }
+  let supplierName = null
+  if (name) {
+    const noExt      = name.replace(/\.[^.]+$/, '')
+    const afterDate  = noExt.slice(11)
+    const idx        = afterDate.indexOf('_')
+    if (idx !== -1) supplierName = afterDate.slice(0, idx) || null
+  }
+  return { file_id: fileId, url, name, date, supplier_name: supplierName, product_name: productName, category_label: categoryLabel, mime_type: mimeType }
+}
+
 export default function TraceabilityApp({ showToast, trCtx }) {
   const week        = useWeek()
+  const { isManager } = useAuth()
   const { photos: drivePhotos, sync: syncDrivePhotos } = useDrivePhotos()
   const photoInputRef  = useRef(null)
   const [photoUploading, setPhotoUploading] = useState(false)
+  const [migrating,      setMigrating]      = useState(false)
   const menuBtnRef  = useRef(null)
 
   const productSuggestions = useMemo(() => {
@@ -191,6 +224,36 @@ export default function TraceabilityApp({ showToast, trCtx }) {
       showToast?.(`Échec upload : ${err.message}`, 'var(--color-danger)')
     } finally {
       setPhotoUploading(false)
+    }
+  }
+
+  // ── Migration Drive → Supabase (gérant, dev uniquement) ──────────────────────
+
+  async function handleMigratePhotos() {
+    setMigrating(true)
+    try {
+      if (!getToken()) {
+        await loadGIS()
+        await new Promise((resolve, reject) => {
+          initTokenClient(import.meta.env.VITE_GOOGLE_CLIENT_ID, resolve, reject)
+          requestToken()
+        })
+      }
+      const photos = await listDrivePhotos()
+      if (photos.length === 0) {
+        showToast?.('Aucune photo trouvée dans Drive', 'var(--color-grey-500)')
+        return
+      }
+      const rows = photos.map(parsePhotoMetadata)
+      const { error } = await supabase
+        .from('trace_photos')
+        .upsert(rows, { onConflict: 'file_id' })
+      if (error) throw error
+      showToast?.(`${photos.length} photos migrées ✓`, 'var(--color-success)')
+    } catch (err) {
+      showToast?.(`Erreur migration : ${err.message}`, 'var(--color-danger)')
+    } finally {
+      setMigrating(false)
     }
   }
 
@@ -325,6 +388,11 @@ export default function TraceabilityApp({ showToast, trCtx }) {
           <button onClick={() => { setMenuOpen(false); showToast?.('Export PDF — bientôt disponible', 'var(--color-grey-500)') }}>
             <span>Exporter PDF</span>
           </button>
+          {isManager && import.meta.env.DEV && (
+            <button onClick={() => { setMenuOpen(false); handleMigratePhotos() }} disabled={migrating}>
+              <span>{migrating ? 'Migration en cours…' : 'Migrer photos Drive → Supabase'}</span>
+            </button>
+          )}
         </Dropdown>
       </header>
 

@@ -1,12 +1,14 @@
-// ─── DriveImage — charge une image Google Drive avec le Bearer token ───────────
+// ─── DriveImage — charge une image Google Drive ────────────────────────────────
 //
-// Flux HEIC/HEIF :
-//  1. Fetch le blob via Drive API (Bearer token)
-//  2. Tente un affichage natif (Safari/iOS supporte HEIF nativement)
-//  3. Si onError → conversion heic2any → JPEG → blob URL
+// Deux chemins selon la présence d'un token OAuth :
 //
-// Flux JPEG/PNG/WebP standard :
-//  1. Fetch le blob → blob URL direct
+// Avec token (local / gérant connecté à Google) :
+//   Fetch blob via Drive API → blob URL.
+//   HEIC : tente affichage natif (Safari), sinon conversion heic2any → JPEG.
+//
+// Sans token (production, mode team) :
+//   <img src> direct sur l'endpoint thumbnail public de Drive.
+//   Pas de fetch → pas de CORS. Google sert un JPEG même pour les sources HEIC.
 
 import { useState, useEffect, useRef } from 'react'
 import heic2any     from 'heic2any'
@@ -20,9 +22,10 @@ function isHeicType(blobType, mimeType) {
 
 export default function DriveImage({ driveUrl, mimeType, alt, className, onClick }) {
   const [blobUrl,    setBlobUrl]    = useState(null)
+  const [directUrl,  setDirectUrl]  = useState(null)
   const [converting, setConverting] = useState(false)
   const [error,      setError]      = useState(false)
-  const blobRef = useRef(null)  // blob original conservé pour fallback heic2any
+  const blobRef = useRef(null)
 
   useEffect(() => {
     if (!driveUrl) return
@@ -31,11 +34,14 @@ export default function DriveImage({ driveUrl, mimeType, alt, className, onClick
     if (!fileId) return
 
     const token = getToken()
+
     if (!token) {
-      console.warn('[drive] Token absent — impossible de charger l\'image')
+      // Sans token — URL thumbnail directe, Google convertit HEIC → JPEG côté serveur
+      setDirectUrl(`/api/drive-photo?id=${fileId}`)
       return
     }
 
+    // Avec token — fetch blob pour support HEIC natif + conversion fallback
     let objectUrl = null
     let cancelled = false
 
@@ -51,20 +57,15 @@ export default function DriveImage({ driveUrl, mimeType, alt, className, onClick
         blobRef.current = blob
 
         const heic = isHeicType(blob.type, mimeType)
-        console.log('[drive] blob chargé:', { type: blob.type, mimeType, size: blob.size, heic })
-
         if (!heic) {
-          // Image standard — affichage direct
           objectUrl = URL.createObjectURL(blob)
           setBlobUrl(objectUrl)
           return
         }
-
-        // HEIC/HEIF — tenter affichage natif d'abord (Safari)
-        // Si le navigateur ne supporte pas → onError déclenchera la conversion
+        // HEIC — tenter affichage natif (Safari), onError déclenchera heic2any si besoin
         objectUrl = URL.createObjectURL(blob)
         setBlobUrl(objectUrl)
-        setConverting(true)  // indique qu'une conversion est peut-être nécessaire
+        setConverting(true)
       })
       .catch(err => {
         if (!cancelled) {
@@ -80,19 +81,16 @@ export default function DriveImage({ driveUrl, mimeType, alt, className, onClick
     }
   }, [driveUrl, mimeType])
 
-  // Appelé quand <img> échoue à afficher le blob (navigateur ne supporte pas HEIF)
   async function handleImgError() {
     const blob = blobRef.current
     if (!blob || !isHeicType(blob.type, mimeType)) {
       setError(true)
       return
     }
-    console.log('[heic] affichage natif échoué — conversion en cours, size:', blob.size)
     try {
-      const result = await heic2any({ blob, toType: 'image/jpeg', quality: 0.8 })
+      const result  = await heic2any({ blob, toType: 'image/jpeg', quality: 0.8 })
       const jpegBlob = Array.isArray(result) ? result[0] : result
       const jpegUrl  = URL.createObjectURL(jpegBlob)
-      console.log('[heic] converted OK, size:', jpegBlob.size)
       setBlobUrl(prev => {
         if (prev) URL.revokeObjectURL(prev)
         return jpegUrl
@@ -106,6 +104,18 @@ export default function DriveImage({ driveUrl, mimeType, alt, className, onClick
   }
 
   if (error) return null
+
+  // Chemin sans token — rendu direct, pas de blob
+  if (directUrl) {
+    return (
+      <img
+        src={directUrl}
+        alt={alt}
+        className={className}
+        onClick={onClick}
+      />
+    )
+  }
 
   if (!blobUrl) {
     return <div className="drive-image-loading" aria-hidden="true" />
