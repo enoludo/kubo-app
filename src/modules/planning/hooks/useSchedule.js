@@ -112,13 +112,11 @@ export function useSchedule() {
   }
 
   function toggleValidated(shiftId) {
-    let updated
-    setShifts(prev => prev.map(s => {
-      if (s.id !== shiftId) return s
-      updated = { ...s, validated: !s.validated }
-      return updated
-    }))
-    if (updated) upsertShift(updated).catch(err => console.error('[supabase] toggleValidated:', err.message))
+    const current = shifts.find(s => s.id === shiftId)
+    if (!current) return
+    const updated = { ...current, validated: !current.validated }
+    setShifts(prev => prev.map(s => s.id === shiftId ? updated : s))
+    upsertShift(updated).catch(err => console.error('[supabase] toggleValidated:', err.message))
   }
 
   // Remplace tous les shifts d'une semaine (utilisé par le sync Sheets)

@@ -68,7 +68,7 @@ export default function TemperaturesApp({ showToast, tempCtx }) {
 
   const fmt    = d => d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
   const range  = `${fmt(week.dates[0])} – ${fmt(week.dates[6])}`
-  const sheetId = import.meta.env.VITE_GOOGLE_SHEET_ID
+  const sheetId = import.meta.env.VITE_SHEET_ID_TEMPERATURES
 
   function action(fn) { setMenuOpen(false); fn() }
 

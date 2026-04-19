@@ -1,6 +1,7 @@
 // ─── Module Nettoyage — Shell principal ───────────────────────────────────────
 import { useState, useRef }      from 'react'
 import { useWeek }               from '../../hooks/useWeek'
+import { useGoogleExport }       from '../../hooks/useGoogleExport'
 import CleaningCalendar          from './components/CleaningCalendar'
 import CleaningTaskModal          from './components/CleaningTaskModal'
 import CleaningRoomDetailModal   from './components/CleaningRoomDetailModal'
@@ -38,12 +39,30 @@ function MenuIcon() {
   )
 }
 
+function SheetsIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="3" width="18" height="18" rx="2"/>
+      <line x1="3"  y1="9"  x2="21" y2="9"/>
+      <line x1="3"  y1="15" x2="21" y2="15"/>
+      <line x1="9"  y1="3"  x2="9"  y2="21"/>
+      <line x1="15" y1="3"  x2="15" y2="21"/>
+    </svg>
+  )
+}
+
 export default function CleaningApp({ showToast, cleanCtx }) {
   const week      = useWeek()
   const menuBtnRef = useRef(null)
 
   const [menuOpen,        setMenuOpen]        = useState(false)
   const [pdfLoading,      setPdfLoading]      = useState(false)
+
+  const { exporting: sheetsExporting, runExport } = useGoogleExport({ onToast: showToast })
+  const sheetId = import.meta.env.VITE_SHEET_ID_CLEANING
+
+  function handleSheetsExport() { runExport('cleaning') }
   const [taskModal,        setTaskModal]        = useState(null) // { room, roomId, dateStr, tasks }
   const [roomDetailModal,  setRoomDetailModal]  = useState(null) // { room }
   const [roomFormModal,    setRoomFormModal]    = useState(null) // {} | { room }
@@ -132,6 +151,14 @@ export default function CleaningApp({ showToast, cleanCtx }) {
           align="right"
           className="header-menu-dropdown"
         >
+          {sheetId && (
+            <button onClick={() => action(() => window.open(`https://docs.google.com/spreadsheets/d/${sheetId}`, '_blank'))}>
+              <SheetsIcon /><span>Voir Google Sheet</span>
+            </button>
+          )}
+          <button onClick={() => action(handleSheetsExport)} disabled={sheetsExporting}>
+            <SheetsIcon /><span>{sheetsExporting ? 'Export en cours…' : 'Exporter vers Sheets'}</span>
+          </button>
           <button onClick={() => action(handleExportPdf)} disabled={pdfLoading}>
             <PdfIcon size={15} /><span>{pdfLoading ? 'Génération…' : 'Exporter PDF'}</span>
           </button>

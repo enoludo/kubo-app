@@ -14,7 +14,14 @@
       "Bash(ps -p 791 -o comm=)",
       "Bash(ps -p 3141 -o comm=)",
       "Bash(curl -s -X POST http://localhost:3001/api/auth-team)",
-      "Bash(npx supabase:*)"
+      "Bash(npx supabase:*)",
+      "Bash(python3)",
+      "Bash(npm start *)",
+      "Bash(echo \"PID: $!\")",
+      "Bash(curl -s -X POST https://mdozwvpbzuwndhramgws.supabase.co/functions/v1/export-to-sheets -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1kb3p3dnBienV3bmRocmFtZ3dzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3NTk3NzksImV4cCI6MjA5MTMzNTc3OX0.iRm1qlg6ro619I-5x1VdPsJd78YdPK575AClqwZF0S0' -H 'Content-Type: application/json' -d '{\"module\":\"planning\"}')",
+      "Bash(python3 -m json.tool)",
+      "Bash(npm ls *)",
+      "Bash(python3 -)"
     ]
   }
 }

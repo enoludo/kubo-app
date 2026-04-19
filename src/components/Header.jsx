@@ -165,7 +165,7 @@ export default function Header({
 
   function action(fn) { setMenuOpen(false); fn() }
 
-  const sheetId = import.meta.env.VITE_GOOGLE_SHEET_ID
+  const sheetId = import.meta.env.VITE_SHEET_ID_PLANNING
 
   return (
     <header className="header">

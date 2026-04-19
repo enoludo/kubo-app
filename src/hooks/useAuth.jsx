@@ -25,16 +25,8 @@ export function AuthProvider({ children }) {
   }
 
   useEffect(() => {
-    // Vérifie la session existante au montage
-    supabase.auth.getSession().then(({ data }) => {
-      const session = data.session
-      if (session?.user) {
-        setUser(session.user)
-        loadProfile(session.user).finally(() => setLoading(false))
-      } else {
-        setLoading(false)
-      }
-    })
+    // Pas de restauration de session — reconnexion obligatoire à chaque chargement
+    supabase.auth.signOut().finally(() => setLoading(false))
 
     // Écoute les changements d'état auth
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {

@@ -2,6 +2,7 @@
 import { useState, useRef, useMemo } from 'react'
 import heic2any from 'heic2any'
 import { useWeek }               from '../../hooks/useWeek'
+import { useGoogleExport }       from '../../hooks/useGoogleExport'
 import { useDrivePhotos }        from './hooks/useDrivePhotos'
 import TraceCalendar             from './components/TraceCalendar'
 import TraceListView             from './components/TraceListView'
@@ -17,7 +18,7 @@ import '../../design-system/components/DayCard/DayCard.css'
 import './traceability-tokens.css'
 import './TraceabilityApp.css'
 
-const SHEET_URL = `https://docs.google.com/spreadsheets/d/${import.meta.env.VITE_GOOGLE_SHEET_ID ?? ''}/edit`
+const SHEET_URL = `https://docs.google.com/spreadsheets/d/${import.meta.env.VITE_SHEET_ID_TRACEABILITY ?? ''}/edit`
 const DRIVE_URL = 'https://drive.google.com/drive/search?q=Kubo-App'
 
 function NavPrevIcon() {
@@ -77,6 +78,8 @@ export default function TraceabilityApp({ showToast, trCtx }) {
     const names = [...new Set(trCtx.deliveries.map(d => d.productName).filter(Boolean))]
     return names.sort((a, b) => a.localeCompare(b, 'fr'))
   }, [trCtx.deliveries])
+
+  const { exporting: sheetsExporting, runExport } = useGoogleExport({ onToast: showToast })
 
   const [view,           setView]           = useState('calendar')
   const [menuOpen,       setMenuOpen]       = useState(false)
@@ -312,6 +315,9 @@ export default function TraceabilityApp({ showToast, trCtx }) {
             className="tr-menu-link" onClick={() => setMenuOpen(false)}>
             <span>Voir Google Sheet</span>
           </a>
+          <button onClick={() => { setMenuOpen(false); runExport('traceability') }} disabled={sheetsExporting}>
+            <span>{sheetsExporting ? 'Export en cours…' : 'Exporter vers Sheets'}</span>
+          </button>
           <a href={DRIVE_URL} target="_blank" rel="noopener noreferrer"
             className="tr-menu-link" onClick={() => setMenuOpen(false)}>
             <span>Voir Google Drive</span>
