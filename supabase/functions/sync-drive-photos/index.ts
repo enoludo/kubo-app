@@ -108,7 +108,7 @@ async function listSubfolders(parentId: string, token: string): Promise<string[]
     `'${parentId}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false`,
     'id',
     token,
-  ).catch(() => [])
+  )
   return files.map((f: any) => f.id)
 }
 
@@ -117,7 +117,7 @@ async function listImages(parentId: string, token: string): Promise<any[]> {
     `'${parentId}' in parents and not mimeType='application/vnd.google-apps.folder' and trashed=false`,
     'id,name,description,createdTime,mimeType',
     token,
-  ).catch(() => [])
+  )
 }
 
 async function setPublicPermission(fileId: string, token: string): Promise<boolean> {
@@ -217,7 +217,17 @@ Deno.serve(async (req) => {
     }
 
     // ── Sync bidirectionnelle ─────────────────────────────────────────────────
+    // Sécurité : si Drive retourne 0 fichier alors qu'il en existe dans Supabase,
+    // c'est probablement une erreur d'accès — on abandonne plutôt que de tout supprimer.
     const { data: existing } = await supabase.from('trace_photos').select('file_id')
+    const supabaseCount = (existing ?? []).length
+    if (imageFiles.length === 0 && supabaseCount > 0) {
+      return Response.json(
+        { synced: 0, deleted: 0, total: 0, message: `Drive vide ou inaccessible — sync annulée (${supabaseCount} photos protégées)` },
+        { headers: CORS },
+      )
+    }
+
     const existingIds  = new Set((existing ?? []).map((r: any) => r.file_id))
     const driveIds     = new Set(imageFiles.map((f: any) => f.id))
 
