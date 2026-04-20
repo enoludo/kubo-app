@@ -3,7 +3,6 @@ import { useState, useRef, useEffect } from 'react'
 import Modal  from '../../../design-system/components/Modal/Modal'
 import Button from '../../../design-system/components/Button/Button'
 import { getSupplierColors } from '../utils/traceabilityColors'
-import { uploadReceptionPhoto } from '../../../services/googleDrive'
 import DriveImage from './DriveImage'
 
 const CONFORMITY_OPTIONS = [
@@ -108,14 +107,15 @@ function ProductPhoto({ photoUrl, productName, supplier, dateStr, onUploaded, on
     setUploading(true)
     setUploadError(null)
     try {
-      const { url } = await uploadReceptionPhoto({
-        file,
-        dateStr,
-        supplierName:  supplier.name,
-        productName:   productName.trim() || 'produit',
-        categoryLabel: supplier.name,
-      })
-      console.log('[trace] photo_url:', url)
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('dateStr', dateStr)
+      formData.append('supplierName', supplier.name)
+      formData.append('productName', productName.trim() || 'produit')
+      formData.append('categoryLabel', supplier.name)
+      const res = await fetch('/api/upload-photo', { method: 'POST', body: formData })
+      if (!res.ok) throw new Error((await res.json()).error ?? 'Erreur upload')
+      const { url } = await res.json()
       onUploaded(url)
       setPendingFile(null)
     } catch (err) {
@@ -134,7 +134,6 @@ function ProductPhoto({ photoUrl, productName, supplier, dateStr, onUploaded, on
   }
 
   if (photoUrl) {
-    console.log('[trace] photo_url brut:', photoUrl)
     return (
       <div className="tr-photo-container">
         <DriveImage
