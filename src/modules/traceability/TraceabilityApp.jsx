@@ -1,6 +1,5 @@
 // ─── Module Traçabilité — Shell principal ─────────────────────────────────────
 import { useState, useRef, useMemo } from 'react'
-import heic2any from 'heic2any'
 import { useWeek }               from '../../hooks/useWeek'
 import { useGoogleExport }       from '../../hooks/useGoogleExport'
 import { useAuth }               from '../../hooks/useAuth'
@@ -12,7 +11,7 @@ import TraceCellModal            from './components/TraceCellModal'
 import TraceDeliveryForm         from './components/TraceDeliveryForm'
 import TraceSupplierForm         from './components/TraceSupplierForm'
 import Dropdown                  from '../../design-system/components/Dropdown/Dropdown'
-import { uploadReceptionPhoto, listDrivePhotos } from '../../services/googleDrive'
+import { listDrivePhotos } from '../../services/googleDrive'
 import { getToken, loadGIS, initTokenClient, requestToken } from '../../services/googleAuth'
 import { supabase }              from '../../services/supabase'
 import '../../design-system/layout/ModuleLayout.css'
@@ -196,29 +195,20 @@ export default function TraceabilityApp({ showToast, trCtx }) {
   // ── Handler upload photo directe ─────────────────────────────────────────────
 
   async function handleAddPhotoFile(e) {
-    let file = e.target.files?.[0]
+    const file = e.target.files?.[0]
     if (!file) return
     e.target.value = ''
     setPhotoUploading(true)
     try {
-      if (file.type === 'image/heic' || file.type === 'image/heif' ||
-          file.name.toLowerCase().endsWith('.heic') || file.name.toLowerCase().endsWith('.heif')) {
-        try {
-          const converted = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.9 })
-          file = new File([converted], file.name.replace(/\.hei[cf]$/i, '.jpg'), { type: 'image/jpeg' })
-        } catch (err) {
-          console.error('[heic] conversion failed:', err)
-        }
-      }
       const today = new Date().toISOString().slice(0, 10)
-      await uploadReceptionPhoto({
-        file,
-        dateStr:      today,
-        supplierName: '',
-        productName:  '',
-        categoryLabel: '',
-        fileName:     `${today}_photo.jpg`,
-      })
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('dateStr', today)
+      formData.append('supplierName', '')
+      formData.append('productName', '')
+      formData.append('categoryLabel', '')
+      const res = await fetch('/api/upload-photo', { method: 'POST', body: formData })
+      if (!res.ok) throw new Error((await res.json()).error ?? 'Erreur upload')
       await syncDrivePhotos()
       showToast?.('Photo ajoutée ✓', 'var(--color-success)')
     } catch (err) {
