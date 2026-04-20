@@ -166,8 +166,9 @@ export default function TraceabilityApp({ showToast, trCtx }) {
       const { data, error } = await supabase.functions.invoke('sync-drive-photos')
       if (error) throw error
       const msg = data?.message ?? 'Synchronisation terminée'
-      showToast?.(msg, data?.synced > 0 ? 'var(--color-success)' : null)
-      if (data?.synced > 0) await syncDrivePhotos()
+      const changed = (data?.synced ?? 0) + (data?.deleted ?? 0)
+      showToast?.(msg, changed > 0 ? 'var(--color-success)' : null)
+      if (changed > 0) await syncDrivePhotos()
     } catch (err) {
       showToast?.(`Erreur sync : ${err.message}`, 'var(--color-danger)')
     } finally {

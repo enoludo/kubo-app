@@ -216,11 +216,13 @@ Deno.serve(async (req) => {
       if (ok) permOk++
     }
 
-    // ── Nouveaux fichiers à insérer ───────────────────────────────────────────
+    // ── Sync bidirectionnelle ─────────────────────────────────────────────────
     const { data: existing } = await supabase.from('trace_photos').select('file_id')
-    const existingIds = new Set((existing ?? []).map((r: any) => r.file_id))
-    const newFiles    = imageFiles.filter(f => !existingIds.has(f.id))
+    const existingIds  = new Set((existing ?? []).map((r: any) => r.file_id))
+    const driveIds     = new Set(imageFiles.map((f: any) => f.id))
 
+    // Insertions
+    const newFiles = imageFiles.filter((f: any) => !existingIds.has(f.id))
     if (newFiles.length > 0) {
       const rows = newFiles.map(parseMetadata)
       const { error } = await supabase
@@ -229,15 +231,29 @@ Deno.serve(async (req) => {
       if (error) throw error
     }
 
-    console.log(`[sync-drive-photos] ${newFiles.length} nouvelles, ${permOk}/${imageFiles.length} permissions`)
+    // Suppressions — fichiers supprimés de Drive mais encore dans Supabase
+    const toDelete = (existing ?? [])
+      .map((r: any) => r.file_id)
+      .filter((id: string) => !driveIds.has(id))
+
+    if (toDelete.length > 0) {
+      const { error } = await supabase
+        .from('trace_photos')
+        .delete()
+        .in('file_id', toDelete)
+      if (error) throw error
+    }
+
+    console.log(`[sync-drive-photos] +${newFiles.length} -${toDelete.length}, ${permOk}/${imageFiles.length} permissions`)
     return Response.json(
       {
         synced:      newFiles.length,
+        deleted:     toDelete.length,
         permissions: permOk,
         total:       imageFiles.length,
-        message:     newFiles.length > 0
-          ? `${newFiles.length} nouvelle(s) photo(s) synchronisée(s)`
-          : `${imageFiles.length} photos vérifiées — permissions à jour`,
+        message:     newFiles.length > 0 || toDelete.length > 0
+          ? `+${newFiles.length} ajoutée(s), -${toDelete.length} supprimée(s)`
+          : `${imageFiles.length} photos vérifiées — à jour`,
       },
       { headers: CORS },
     )
