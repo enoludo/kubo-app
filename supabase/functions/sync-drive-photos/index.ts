@@ -79,9 +79,11 @@ async function getAccessToken(): Promise<string> {
 
 async function driveList(q: string, fields: string, token: string): Promise<any[]> {
   const url = new URL('https://www.googleapis.com/drive/v3/files')
-  url.searchParams.set('q',        q)
-  url.searchParams.set('fields',   `files(${fields})`)
-  url.searchParams.set('pageSize', '200')
+  url.searchParams.set('q',                      q)
+  url.searchParams.set('fields',                 `files(${fields})`)
+  url.searchParams.set('pageSize',               '200')
+  url.searchParams.set('supportsAllDrives',      'true')
+  url.searchParams.set('includeItemsFromAllDrives', 'true')
   const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } })
   if (!res.ok) {
     const e = await res.json().catch(() => ({})) as any
@@ -120,7 +122,7 @@ async function listImages(parentId: string, token: string): Promise<any[]> {
 
 async function setPublicPermission(fileId: string, token: string): Promise<boolean> {
   const res = await fetch(
-    `https://www.googleapis.com/drive/v3/files/${fileId}/permissions`,
+    `https://www.googleapis.com/drive/v3/files/${fileId}/permissions?supportsAllDrives=true`,
     {
       method:  'POST',
       headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
@@ -184,17 +186,13 @@ Deno.serve(async (req) => {
     const token = await getAccessToken()
 
     // ── Résolution dossier ────────────────────────────────────────────────────
-    // Recherche sans contrainte parent pour les dossiers partagés (pas dans "root")
-    const rootId = await findFolder('Kubo-Planning', null, token)
-    if (!rootId) return Response.json({ synced: 0, message: 'Dossier Kubo-Planning non trouvé — partagez-le avec le Service Account' }, { headers: CORS })
-
-    const traceId = await findFolder('Tracabilite', rootId, token)
-    if (!traceId) return Response.json({ synced: 0, message: 'Dossier Tracabilite non trouvé' }, { headers: CORS })
+    const rootId = Deno.env.get('KUBO_DRIVE_FOLDER_ID')
+    if (!rootId) return Response.json({ synced: 0, message: 'KUBO_DRIVE_FOLDER_ID manquant' }, { headers: CORS })
 
     // ── Collecte récursive YYYY/MM ────────────────────────────────────────────
-    const allFiles: any[] = await listImages(traceId, token)
+    const allFiles: any[] = await listImages(rootId, token)
 
-    const yearFolders = await listSubfolders(traceId, token)
+    const yearFolders = await listSubfolders(rootId, token)
     for (const yearId of yearFolders) {
       allFiles.push(...await listImages(yearId, token))
       const monthFolders = await listSubfolders(yearId, token)

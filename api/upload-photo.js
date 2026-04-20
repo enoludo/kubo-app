@@ -75,41 +75,9 @@ async function driveJson(url, opts) {
   return res.json()
 }
 
-async function findFolder(name, parentId, token) {
-  const parentClause = parentId ? ` and '${parentId}' in parents` : ''
-  const q   = `name='${name}' and mimeType='application/vnd.google-apps.folder' and trashed=false${parentClause}`
-  const url = new URL('https://www.googleapis.com/drive/v3/files')
-  url.searchParams.set('q', q)
-  url.searchParams.set('fields', 'files(id)')
-  url.searchParams.set('pageSize', '1')
-  const data = await driveJson(url, { headers: { Authorization: `Bearer ${token}` } })
-  return data.files?.[0]?.id ?? null
-}
-
-async function createFolder(name, parentId, token) {
-  const data = await driveJson('https://www.googleapis.com/drive/v3/files', {
-    method:  'POST',
-    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-    body:    JSON.stringify({ name, mimeType: 'application/vnd.google-apps.folder', ...(parentId ? { parents: [parentId] } : {}) }),
-  })
-  return data.id
-}
-
-async function findOrCreate(name, parentId, token) {
-  return (await findFolder(name, parentId, token)) ?? (await createFolder(name, parentId, token))
-}
-
-async function resolveFolderPath(dateStr, token) {
-  const [y, m] = dateStr.split('-')
-  const root  = await findOrCreate('Kubo-Planning', null,  token)
-  const trace = await findOrCreate('Tracabilite',   root,  token)
-  const year  = await findOrCreate(y,               trace, token)
-  return        await findOrCreate(m,               year,  token)
-}
-
 async function uploadFile({ buffer, mimeType, fileName, description, folderId, token }) {
-  const meta     = JSON.stringify({ name: fileName, description, parents: [folderId] })
-  const body     = Buffer.concat([
+  const meta = JSON.stringify({ name: fileName, description, parents: [folderId] })
+  const body = Buffer.concat([
     Buffer.from(`--${BOUNDARY}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${meta}\r\n`),
     Buffer.from(`--${BOUNDARY}\r\nContent-Type: ${mimeType}\r\n\r\n`),
     buffer,
@@ -167,9 +135,18 @@ export default async function handler(req, res) {
 
   if (!fileObj) return res.status(400).json({ error: 'Champ "file" manquant' })
 
-  const { GOOGLE_SERVICE_ACCOUNT_EMAIL, GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY } = process.env
+  const { GOOGLE_SERVICE_ACCOUNT_EMAIL, GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY, KUBO_DRIVE_FOLDER_ID, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY } = process.env
+
+  console.log('[upload] email:', GOOGLE_SERVICE_ACCOUNT_EMAIL)
+  console.log('[upload] key length:', GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY?.length)
+  console.log('[upload] key start:', GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY?.substring(0, 50))
+  console.log('[upload] folderId:', KUBO_DRIVE_FOLDER_ID)
+  console.log('[upload] file:', fileObj.originalFilename, '— size:', fileObj.size)
+
   if (!GOOGLE_SERVICE_ACCOUNT_EMAIL || !GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY)
     return res.status(500).json({ error: 'Service Account non configuré' })
+  if (!KUBO_DRIVE_FOLDER_ID)
+    return res.status(500).json({ error: 'KUBO_DRIVE_FOLDER_ID manquant' })
   if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY)
     return res.status(500).json({ error: 'Supabase non configuré' })
 
@@ -189,9 +166,8 @@ export default async function handler(req, res) {
     const description = `${categoryLabel} — ${productName} — ${d}/${m}/${y}`
 
     // ── Upload Drive ─────────────────────────────────────────────────────────
-    const token    = await getToken()
-    const folderId = await resolveFolderPath(dateStr, token)
-    const fileId   = await uploadFile({ buffer, mimeType, fileName, description, folderId, token })
+    const token  = await getToken()
+    const fileId = await uploadFile({ buffer, mimeType, fileName, description, folderId: KUBO_DRIVE_FOLDER_ID, token })
     await setPublicPermission(fileId, token)
 
     const url = `https://drive.google.com/uc?export=view&id=${fileId}`

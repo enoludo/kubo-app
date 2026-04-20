@@ -50,27 +50,6 @@ async function driveJson(url, opts) {
   return res.json()
 }
 
-async function findFolder(name, parentId, token) {
-  const parentClause = parentId ? ` and '${parentId}' in parents` : ''
-  const q = `name='${name}' and mimeType='application/vnd.google-apps.folder' and trashed=false${parentClause}`
-  const url = new URL('https://www.googleapis.com/drive/v3/files')
-  url.searchParams.set('q', q); url.searchParams.set('fields', 'files(id)'); url.searchParams.set('pageSize', '1')
-  const data = await driveJson(url, { headers: { Authorization: `Bearer ${token}` } })
-  return data.files?.[0]?.id ?? null
-}
-
-async function createFolder(name, parentId, token) {
-  const data = await driveJson('https://www.googleapis.com/drive/v3/files', {
-    method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name, mimeType: 'application/vnd.google-apps.folder', ...(parentId ? { parents: [parentId] } : {}) }),
-  })
-  return data.id
-}
-
-async function findOrCreate(name, parentId, token) {
-  return (await findFolder(name, parentId, token)) ?? (await createFolder(name, parentId, token))
-}
-
 function sanitize(str) {
   return (str ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-zA-Z0-9]/g, '_').replace(/_+/g, '_').slice(0, 40).replace(/^_|_$/g, '')
@@ -196,14 +175,15 @@ app.post('/api/upload-photo', async (req, res) => {
     const fileName    = `${y}-${m}-${d}_${sanitize(supplierName)}_${sanitize(productName)}.jpg`
     const description = `${categoryLabel} — ${productName} — ${d}/${m}/${y}`
 
-    const token    = await getSAToken()
-    const root     = await findOrCreate('Kubo-Planning', null,  token)
-    const trace    = await findOrCreate('Tracabilite',   root,  token)
-    const year     = await findOrCreate(y,               trace, token)
-    const folderId = await findOrCreate(m,               year,  token)
+    const { KUBO_DRIVE_FOLDER_ID } = process.env
+    if (!KUBO_DRIVE_FOLDER_ID) return res.status(500).json({ error: 'KUBO_DRIVE_FOLDER_ID manquant' })
 
-    const meta     = JSON.stringify({ name: fileName, description, parents: [folderId] })
-    const body     = Buffer.concat([
+    console.log('[proxy upload] folderId:', KUBO_DRIVE_FOLDER_ID)
+    console.log('[proxy upload] file:', fileObj.originalFilename, '— size:', fileObj.size)
+
+    const token = await getSAToken()
+    const meta  = JSON.stringify({ name: fileName, description, parents: [KUBO_DRIVE_FOLDER_ID] })
+    const body  = Buffer.concat([
       Buffer.from(`--${BOUNDARY}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${meta}\r\n`),
       Buffer.from(`--${BOUNDARY}\r\nContent-Type: ${mimeType}\r\n\r\n`),
       buffer,
