@@ -217,19 +217,24 @@ Deno.serve(async (req) => {
     }
 
     // ── Sync bidirectionnelle ─────────────────────────────────────────────────
-    // Sécurité : si Drive retourne 0 fichier alors qu'il en existe dans Supabase,
-    // c'est probablement une erreur d'accès — on abandonne plutôt que de tout supprimer.
     const { data: existing } = await supabase.from('trace_photos').select('file_id')
-    const supabaseCount = (existing ?? []).length
-    if (imageFiles.length === 0 && supabaseCount > 0) {
-      return Response.json(
-        { synced: 0, deleted: 0, total: 0, message: `Drive vide ou inaccessible — sync annulée (${supabaseCount} photos protégées)` },
-        { headers: CORS },
-      )
-    }
+    const existingIds = new Set((existing ?? []).map((r: any) => r.file_id))
+    const driveIds    = new Set(imageFiles.map((f: any) => f.id))
 
-    const existingIds  = new Set((existing ?? []).map((r: any) => r.file_id))
-    const driveIds     = new Set(imageFiles.map((f: any) => f.id))
+    // file_ids protégés — référencés dans photo_url d'un produit livré
+    // format url : https://drive.google.com/uc?export=view&id=FILE_ID
+    const { data: linkedProducts } = await supabase
+      .from('delivered_products')
+      .select('photo_url')
+      .not('photo_url', 'is', null)
+    const protectedIds = new Set(
+      (linkedProducts ?? [])
+        .map((r: any) => {
+          const m = (r.photo_url as string)?.match(/[?&]id=([-\w]+)/)
+          return m?.[1] ?? null
+        })
+        .filter(Boolean) as string[]
+    )
 
     // Insertions
     const newFiles = imageFiles.filter((f: any) => !existingIds.has(f.id))
@@ -241,10 +246,10 @@ Deno.serve(async (req) => {
       if (error) throw error
     }
 
-    // Suppressions — fichiers supprimés de Drive mais encore dans Supabase
+    // Suppressions — absents de Drive ET non protégés par une livraison
     const toDelete = (existing ?? [])
       .map((r: any) => r.file_id)
-      .filter((id: string) => !driveIds.has(id))
+      .filter((id: string) => !driveIds.has(id) && !protectedIds.has(id))
 
     if (toDelete.length > 0) {
       const { error } = await supabase
@@ -254,7 +259,7 @@ Deno.serve(async (req) => {
       if (error) throw error
     }
 
-    console.log(`[sync-drive-photos] +${newFiles.length} -${toDelete.length}, ${permOk}/${imageFiles.length} permissions`)
+    console.log(`[sync-drive-photos] +${newFiles.length} -${toDelete.length} (${protectedIds.size} protégées), ${permOk}/${imageFiles.length} permissions`)
     return Response.json(
       {
         synced:      newFiles.length,
