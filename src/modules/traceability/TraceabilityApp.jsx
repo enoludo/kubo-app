@@ -105,6 +105,7 @@ export default function TraceabilityApp({ showToast, trCtx }) {
   const photoInputRef  = useRef(null)
   const [photoUploading, setPhotoUploading] = useState(false)
   const [migrating,      setMigrating]      = useState(false)
+  const [syncing,        setSyncing]        = useState(false)
   const menuBtnRef  = useRef(null)
 
   const productSuggestions = useMemo(() => {
@@ -227,6 +228,23 @@ export default function TraceabilityApp({ showToast, trCtx }) {
     }
   }
 
+  // ── Synchronisation Drive → Supabase (Edge Function) ────────────────────────
+
+  async function handleSyncDrive() {
+    setSyncing(true)
+    try {
+      const { data, error } = await supabase.functions.invoke('sync-drive-photos')
+      if (error) throw error
+      const msg = data?.message ?? 'Synchronisation terminée'
+      showToast?.(msg, data?.synced > 0 ? 'var(--color-success)' : null)
+      if (data?.synced > 0) await syncDrivePhotos()
+    } catch (err) {
+      showToast?.(`Erreur sync : ${err.message}`, 'var(--color-danger)')
+    } finally {
+      setSyncing(false)
+    }
+  }
+
   // ── Migration Drive → Supabase (gérant, dev uniquement) ──────────────────────
 
   async function handleMigratePhotos() {
@@ -244,12 +262,29 @@ export default function TraceabilityApp({ showToast, trCtx }) {
         showToast?.('Aucune photo trouvée dans Drive', 'var(--color-grey-500)')
         return
       }
+      // Pose la permission "anyone reader" sur chaque fichier (nécessaire pour le proxy)
+      const token = getToken()
+      let permOk = 0
+      for (const photo of photos) {
+        try {
+          const r = await fetch(
+            `https://www.googleapis.com/drive/v3/files/${photo.fileId}/permissions`,
+            {
+              method:  'POST',
+              headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+              body:    JSON.stringify({ role: 'reader', type: 'anyone' }),
+            }
+          )
+          if (r.ok) permOk++
+        } catch { /* ignore */ }
+      }
+      console.log(`[migration] permissions posées : ${permOk}/${photos.length}`)
       const rows = photos.map(parsePhotoMetadata)
       const { error } = await supabase
         .from('trace_photos')
         .upsert(rows, { onConflict: 'file_id' })
       if (error) throw error
-      showToast?.(`${photos.length} photos migrées ✓`, 'var(--color-success)')
+      showToast?.(`${photos.length} photos migrées, ${permOk} permissions posées ✓`, 'var(--color-success)')
     } catch (err) {
       showToast?.(`Erreur migration : ${err.message}`, 'var(--color-danger)')
     } finally {
@@ -387,6 +422,9 @@ export default function TraceabilityApp({ showToast, trCtx }) {
           </a>
           <button onClick={() => { setMenuOpen(false); showToast?.('Export PDF — bientôt disponible', 'var(--color-grey-500)') }}>
             <span>Exporter PDF</span>
+          </button>
+          <button onClick={() => { setMenuOpen(false); handleSyncDrive() }} disabled={syncing}>
+            <span>{syncing ? 'Synchronisation…' : 'Synchroniser photos Drive'}</span>
           </button>
           {isManager && import.meta.env.DEV && (
             <button onClick={() => { setMenuOpen(false); handleMigratePhotos() }} disabled={migrating}>

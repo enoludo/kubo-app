@@ -102,6 +102,35 @@ app.get('/api/webflow-products', async (req, res) => {
   }
 })
 
+app.get('/api/drive-photo', async (req, res) => {
+  const { id } = req.query
+  if (!id || !/^[-\w]+$/.test(id)) return res.status(400).end()
+
+  const { GOOGLE_API_KEY } = process.env
+  if (!GOOGLE_API_KEY) {
+    console.error('[proxy] drive-photo — GOOGLE_API_KEY manquante')
+    return res.status(500).end()
+  }
+
+  try {
+    const driveRes = await fetch(
+      `https://www.googleapis.com/drive/v3/files/${id}?alt=media&key=${GOOGLE_API_KEY}`
+    )
+    if (!driveRes.ok) {
+      console.error('[proxy] drive-photo Drive error:', driveRes.status)
+      return res.status(driveRes.status).end()
+    }
+    const contentType = driveRes.headers.get('content-type') ?? 'image/jpeg'
+    res.setHeader('Content-Type', contentType)
+    res.setHeader('Cache-Control', 'public, max-age=86400, immutable')
+    const buf = Buffer.from(await driveRes.arrayBuffer())
+    res.send(buf)
+  } catch (err) {
+    console.error('[proxy] drive-photo error:', err.message)
+    res.status(502).end()
+  }
+})
+
 const server = app.listen(PORT, () => {
   console.log(`Webflow proxy prêt sur http://localhost:${PORT}`)
   console.log(`WEBFLOW_SITE_ID : ${process.env.WEBFLOW_SITE_ID ? 'OK' : 'MANQUANT'}`)
