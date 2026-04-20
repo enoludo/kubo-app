@@ -1,5 +1,5 @@
 // ─── Formulaire création / édition d'une réception ────────────────────────────
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 import Modal  from '../../../design-system/components/Modal/Modal'
 import Button from '../../../design-system/components/Button/Button'
 import { getSupplierColors } from '../utils/traceabilityColors'
@@ -15,7 +15,7 @@ const TEMP_WARN_MAX = 8     // au-dessus → alerte chaîne du froid
 const TEMP_WARN_MIN = -30   // en dessous → alerte
 
 function emptyProduct() {
-  return { _key: crypto.randomUUID(), name: '', qty: 1, unit: '', lot: '', dlc: '', photo_url: null }
+  return { _key: crypto.randomUUID(), name: '', qty: 1, unit: '', lot: '', dlc: '' }
 }
 
 function fmtDate(dateStr) {
@@ -40,76 +40,6 @@ function Stepper({ value, onChange, min, max, step, format, warn }) {
   )
 }
 
-// ── Sous-composant : photo pour un produit ────────────────────────────────────
-
-function ProductPhoto({ photoUrl, productName, supplier, dateStr, onUploaded, onRemove }) {
-  const inputRef                      = useRef(null)
-  const [uploading,    setUploading]  = useState(false)
-  const [uploadError,  setUploadError] = useState(null)
-  const [pendingFile,  setPendingFile] = useState(null)
-
-  async function doUpload(file) {
-    setUploading(true)
-    setUploadError(null)
-    try {
-      const formData = new FormData()
-      formData.append('file', file)
-      formData.append('dateStr', dateStr)
-      formData.append('supplierName', supplier.name)
-      formData.append('productName', productName.trim() || 'produit')
-      formData.append('categoryLabel', supplier.name)
-      const res = await fetch('/api/upload-photo', { method: 'POST', body: formData })
-      if (!res.ok) throw new Error((await res.json()).error ?? 'Erreur upload')
-      const { url } = await res.json()
-      onUploaded(url)
-      setPendingFile(null)
-    } catch (err) {
-      setPendingFile(file)
-      setUploadError(err.message ?? "Échec de l'upload")
-    } finally {
-      setUploading(false)
-    }
-  }
-
-  function handleFileChange(e) {
-    const file = e.target.files?.[0]
-    if (!file) return
-    doUpload(file)
-    e.target.value = ''
-  }
-
-  if (photoUrl) {
-    return (
-      <div className="tr-photo-container">
-        <img src={photoUrl} alt="Étiquette" className="tr-photo-thumb"
-          onClick={() => window.open(photoUrl, '_blank')} />
-        <button type="button" className="tr-photo-remove" onClick={onRemove} aria-label="Supprimer la photo">×</button>
-      </div>
-    )
-  }
-
-  return (
-    <div className="tr-photo-upload">
-      <input ref={inputRef} type="file" accept="image/*" capture="environment"
-        className="tr-photo-input" onChange={handleFileChange} aria-hidden="true" />
-      {uploading ? (
-        <div className="tr-upload-status">
-          <span className="tr-upload-spinner" aria-hidden="true" />
-          <span className="tr-upload-label">Upload en cours…</span>
-        </div>
-      ) : uploadError ? (
-        <div className="tr-upload-error">
-          <span className="tr-upload-error-msg">{uploadError}</span>
-          <button type="button" className="tr-upload-retry" onClick={() => pendingFile && doUpload(pendingFile)}>Réessayer</button>
-        </div>
-      ) : (
-        <button type="button" className="tr-photo-btn" onClick={() => inputRef.current?.click()}>
-          📷 Photo étiquette
-        </button>
-      )}
-    </div>
-  )
-}
 
 // ── Composant principal ───────────────────────────────────────────────────────
 
@@ -130,13 +60,12 @@ export default function TraceReceptionForm({ supplier, dateStr, reception, onSav
   const [products,      setProducts]      = useState(
     reception?.products?.length
       ? reception.products.map(p => ({
-          _key:      crypto.randomUUID(),
-          name:      p.name      ?? '',
-          qty:       p.qty       ?? 1,
-          unit:      p.unit      ?? '',
-          lot:       p.lot       ?? '',
-          dlc:       p.dlc       ?? '',
-          photo_url: p.photo_url ?? null,
+          _key: crypto.randomUUID(),
+          name: p.name ?? '',
+          qty:  p.qty  ?? 1,
+          unit: p.unit ?? '',
+          lot:  p.lot  ?? '',
+          dlc:  p.dlc  ?? '',
         }))
       : [emptyProduct()]
   )
@@ -179,12 +108,11 @@ export default function TraceReceptionForm({ supplier, dateStr, reception, onSav
     const cleanProducts = products
       .filter(p => p.name.trim())
       .map(({ _key, ...rest }) => ({
-        name:      rest.name.trim(),
-        qty:       rest.qty,
-        unit:      rest.unit.trim() || null,
-        lot:       rest.lot.trim()  || null,
-        dlc:       rest.dlc.trim()  || null,
-        photo_url: rest.photo_url   || null,
+        name: rest.name.trim(),
+        qty:  rest.qty,
+        unit: rest.unit.trim() || null,
+        lot:  rest.lot.trim()  || null,
+        dlc:  rest.dlc.trim()  || null,
       }))
 
     onSave({
@@ -314,15 +242,6 @@ export default function TraceReceptionForm({ supplier, dateStr, reception, onSav
                 </div>
               </div>
 
-              {/* Photo étiquette */}
-              <ProductPhoto
-                photoUrl={p.photo_url}
-                productName={p.name}
-                supplier={supplier}
-                dateStr={dateStr}
-                onUploaded={url => updateProduct(p._key, 'photo_url', url)}
-                onRemove={() => updateProduct(p._key, 'photo_url', null)}
-              />
             </div>
           ))}
         </div>

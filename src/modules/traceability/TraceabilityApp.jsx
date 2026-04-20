@@ -70,9 +70,7 @@ const VIEWS = [
 export default function TraceabilityApp({ showToast, trCtx }) {
   const week        = useWeek()
   const { photos: drivePhotos, sync: syncDrivePhotos } = useDrivePhotos()
-  const photoInputRef  = useRef(null)
-  const [photoUploading, setPhotoUploading] = useState(false)
-  const [syncing,        setSyncing]        = useState(false)
+  const [syncing, setSyncing] = useState(false)
   const menuBtnRef  = useRef(null)
 
   const productSuggestions = useMemo(() => {
@@ -158,32 +156,6 @@ export default function TraceabilityApp({ showToast, trCtx }) {
     trCtx.deleteSupplier(id)
     showToast?.('Fournisseur supprimé', 'var(--color-danger)')
     setSupplierForm(null)
-  }
-
-  // ── Handler upload photo directe ─────────────────────────────────────────────
-
-  async function handleAddPhotoFile(e) {
-    const file = e.target.files?.[0]
-    if (!file) return
-    e.target.value = ''
-    setPhotoUploading(true)
-    try {
-      const today = new Date().toISOString().slice(0, 10)
-      const formData = new FormData()
-      formData.append('file', file)
-      formData.append('dateStr', today)
-      formData.append('supplierName', '')
-      formData.append('productName', '')
-      formData.append('categoryLabel', '')
-      const res = await fetch('/api/upload-photo', { method: 'POST', body: formData })
-      if (!res.ok) throw new Error((await res.json()).error ?? 'Erreur upload')
-      await syncDrivePhotos()
-      showToast?.('Photo ajoutée ✓', 'var(--color-success)')
-    } catch (err) {
-      showToast?.(`Échec upload : ${err.message}`, 'var(--color-danger)')
-    } finally {
-      setPhotoUploading(false)
-    }
   }
 
   // ── Synchronisation Drive → Supabase (Edge Function) ────────────────────────
@@ -272,35 +244,17 @@ export default function TraceabilityApp({ showToast, trCtx }) {
           {/* Droite — menu actions */}
           <div className="header-nav-right">
             {view === 'gallery' && (
-              <>
-                <input
-                  ref={photoInputRef}
-                  type="file"
-                  accept="image/*,.heic,.heif"
-                  capture="environment"
-                  style={{ display: 'none' }}
-                  onChange={handleAddPhotoFile}
-                />
-                <button
-                  className="nav-btn"
-                  onClick={syncDrivePhotos}
-                  aria-label="Rafraîchir les photos"
-                  title="Rafraîchir les photos depuis Drive"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="23 4 23 10 17 10"/>
-                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
-                  </svg>
-                </button>
-                <button
-                  className="add-trigger add-trigger--labeled"
-                  onClick={() => photoInputRef.current?.click()}
-                  disabled={photoUploading}
-                  aria-label="Ajouter une photo"
-                >
-                  {photoUploading ? '…' : '+ Photo'}
-                </button>
-              </>
+              <button
+                className="nav-btn"
+                onClick={syncDrivePhotos}
+                aria-label="Rafraîchir les photos"
+                title="Rafraîchir les photos depuis Drive"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="23 4 23 10 17 10"/>
+                  <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+                </svg>
+              </button>
             )}
             <button
               ref={menuBtnRef}

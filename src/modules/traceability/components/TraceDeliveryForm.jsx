@@ -3,7 +3,6 @@ import { useState, useRef, useEffect } from 'react'
 import Modal  from '../../../design-system/components/Modal/Modal'
 import Button from '../../../design-system/components/Button/Button'
 import { getSupplierColors } from '../utils/traceabilityColors'
-import DriveImage from './DriveImage'
 
 const CONFORMITY_OPTIONS = [
   { value: 'compliant',     label: 'Conforme',     color: 'var(--tr-status-compliant-text)',     bg: 'var(--tr-status-compliant-bg)'     },
@@ -95,81 +94,6 @@ function Autocomplete({ value, onChange, suggestions, hasError, placeholder }) {
   )
 }
 
-// ── Photo étiquette ───────────────────────────────────────────────────────────
-
-function ProductPhoto({ photoUrl, productName, supplier, dateStr, onUploaded, onRemove }) {
-  const inputRef                       = useRef(null)
-  const [uploading,   setUploading]    = useState(false)
-  const [uploadError, setUploadError]  = useState(null)
-  const [pendingFile, setPendingFile]  = useState(null)
-
-  async function doUpload(file) {
-    setUploading(true)
-    setUploadError(null)
-    try {
-      const formData = new FormData()
-      formData.append('file', file)
-      formData.append('dateStr', dateStr)
-      formData.append('supplierName', supplier.name)
-      formData.append('productName', productName.trim() || 'produit')
-      formData.append('categoryLabel', supplier.name)
-      const res = await fetch('/api/upload-photo', { method: 'POST', body: formData })
-      if (!res.ok) throw new Error((await res.json()).error ?? 'Erreur upload')
-      const { url } = await res.json()
-      onUploaded(url)
-      setPendingFile(null)
-    } catch (err) {
-      setPendingFile(file)
-      setUploadError(err.message ?? "Échec de l'upload")
-    } finally {
-      setUploading(false)
-    }
-  }
-
-  function handleFileChange(e) {
-    const file = e.target.files?.[0]
-    if (!file) return
-    doUpload(file)
-    e.target.value = ''
-  }
-
-  if (photoUrl) {
-    return (
-      <div className="tr-photo-container">
-        <DriveImage
-          driveUrl={photoUrl}
-          alt="Étiquette"
-          className="tr-photo-thumb"
-          onClick={() => window.open(photoUrl, '_blank')}
-        />
-        <button type="button" className="tr-photo-remove" onClick={onRemove} aria-label="Supprimer la photo">×</button>
-      </div>
-    )
-  }
-
-  return (
-    <div className="tr-photo-upload">
-      <input ref={inputRef} type="file" accept="image/*" capture="environment"
-        className="tr-photo-input" onChange={handleFileChange} aria-hidden="true" />
-      {uploading ? (
-        <div className="tr-upload-status">
-          <span className="tr-upload-spinner" aria-hidden="true" />
-          <span className="tr-upload-label">Upload en cours…</span>
-        </div>
-      ) : uploadError ? (
-        <div className="tr-upload-error">
-          <span className="tr-upload-error-msg">{uploadError}</span>
-          <button type="button" className="tr-upload-retry"
-            onClick={() => pendingFile && doUpload(pendingFile)}>Réessayer</button>
-        </div>
-      ) : (
-        <button type="button" className="tr-photo-btn" onClick={() => inputRef.current?.click()}>
-          + Photo étiquette
-        </button>
-      )}
-    </div>
-  )
-}
 
 // ── Composant principal ───────────────────────────────────────────────────────
 
@@ -191,7 +115,6 @@ export default function TraceDeliveryForm({ supplier, dateStr, delivery, suggest
   const [temperature,       setTemperature]       = useState(delivery?.temperature       ?? TEMP_DEFAULT)
   const [conformity,        setConformity]        = useState(delivery?.conformity        ?? 'compliant')
   const [nonConformityNote, setNonConformityNote] = useState(delivery?.nonConformityNote ?? '')
-  const [photo_url,         setPhotoUrl]          = useState(delivery?.photo_url         ?? null)
   const [errors,            setErrors]            = useState({})
   const [confirmDelete,     setConfirmDelete]     = useState(false)
 
@@ -224,7 +147,6 @@ export default function TraceDeliveryForm({ supplier, dateStr, delivery, suggest
       temperature,
       conformity,
       nonConformityNote:  nonConformityNote.trim() || null,
-      photo_url:          photo_url || null,
     })
   }
 
@@ -330,19 +252,6 @@ export default function TraceDeliveryForm({ supplier, dateStr, delivery, suggest
           />
           {tempWarn && <span className="tr-temp-warn">⚠️ Hors plage chaîne du froid</span>}
         </div>
-      </div>
-
-      {/* ── Photo ── */}
-      <div className="tr-form-section">
-        <label className="tr-form-label">Photo étiquette <span className="tr-form-optional">(optionnel)</span></label>
-        <ProductPhoto
-          photoUrl={photo_url}
-          productName={productName}
-          supplier={supplier}
-          dateStr={dateStr}
-          onUploaded={setPhotoUrl}
-          onRemove={() => setPhotoUrl(null)}
-        />
       </div>
 
       {/* ── Note non-conformité ── */}
