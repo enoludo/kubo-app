@@ -43,7 +43,7 @@ export function getMissingSlots(readings) {
 
 // ── Hook ────────────────────────────────────────────────────────────────────
 
-export function useTemperatures() {
+export function useTemperatures({ onToast } = {}) {
   const [equipment, setEquipment] = useState([])
   const [readings,  setReadings]  = useState([])
 
@@ -105,7 +105,10 @@ export function useTemperatures() {
     ])
     const supabaseId = slugMap.current[equipmentId] ?? equipmentId
     saveReadingsSupabase(supabaseId, date, created)
-      .catch(err => console.error('[supabase] saveReadingsForDay:', err.message))
+      .catch(err => {
+        console.error('[supabase] saveReadingsForDay:', err.message)
+        onToast?.(`Erreur sauvegarde relevé : ${err.message}`, 'var(--color-danger)')
+      })
   }
 
   function deleteReading(id) {
@@ -131,7 +134,10 @@ export function useTemperatures() {
     setEquipment(prev => [...prev, newEq])
     upsertEquipments([newEq])
       .then(mapping => mapping.forEach(({ id, slug }) => { if (slug) slugMap.current[slug] = id }))
-      .catch(err => console.error('[supabase] addEquipment:', err.message))
+      .catch(err => {
+        console.error('[supabase] addEquipment:', err.message)
+        onToast?.(`Erreur ajout équipement : ${err.message}`, 'var(--color-danger)')
+      })
   }
 
   function updateEquipment(id, updates) {
@@ -142,14 +148,20 @@ export function useTemperatures() {
     ))
     const supabaseId = slugMap.current[id] ?? id
     updateEquipmentSupabase(supabaseId, updates)
-      .catch(err => console.error('[supabase] updateEquipment:', err.message))
+      .catch(err => {
+        console.error('[supabase] updateEquipment:', err.message)
+        onToast?.(`Erreur modification équipement : ${err.message}`, 'var(--color-danger)')
+      })
   }
 
   function archiveEquipment(id) {
     setEquipment(prev => prev.map(e => e.id === id ? { ...e, active: false } : e))
     const supabaseId = slugMap.current[id] ?? id
     updateEquipmentSupabase(supabaseId, { active: false })
-      .catch(err => console.error('[supabase] archiveEquipment:', err.message))
+      .catch(err => {
+        console.error('[supabase] archiveEquipment:', err.message)
+        onToast?.(`Erreur archivage équipement : ${err.message}`, 'var(--color-danger)')
+      })
   }
 
   const activeEquipment = [...equipment]

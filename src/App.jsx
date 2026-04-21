@@ -47,7 +47,7 @@ function AuthenticatedApp({ name, isManager }) {
   const schedule    = useSchedule()
   const teamCtx     = useTeam({ initialTeam, schedule, setDataSource, showToast })
   const cleanCtx    = useCleaning()
-  const tempCtx     = useTemperatures()
+  const tempCtx     = useTemperatures({ onToast: showToast })
   const trCtx       = useTraceability()
 
   // Auto-dismiss startup modal quand Webflow est connecté
