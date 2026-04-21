@@ -19,3 +19,6 @@ port = 54324
 
 [functions.export-to-sheets]
 verify_jwt = true
+
+[functions.sync-drive-photos]
+verify_jwt = false
