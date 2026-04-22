@@ -73,30 +73,56 @@ export function useProducts({ onToast } = {}) {
     fetchWebflowProducts().then(webflowProducts => {
       if (!webflowProducts.length) return
       setProducts(prev => {
+        const wfIdSet       = new Set(webflowProducts.map(p => p.webflowProductId))
         const existingWfIds = new Set(prev.filter(p => p.webflowProductId).map(p => p.webflowProductId))
-        const toAdd    = webflowProducts.filter(p => !existingWfIds.has(p.webflowProductId))
-        const toUpdate = webflowProducts.filter(p =>  existingWfIds.has(p.webflowProductId))
+        const toAdd         = webflowProducts.filter(p => !existingWfIds.has(p.webflowProductId))
 
+        let changed = false
         let next = prev.map(p => {
           if (!p.webflowProductId) return p
-          const wf = toUpdate.find(w => w.webflowProductId === p.webflowProductId)
-          if (!wf) return p
-          const updated = { ...p, name: wf.name, active: wf.active, sizes: wf.sizes, photoUrl: wf.photoUrl, updatedAt: new Date().toISOString() }
-          upsertProduct(updated).catch(err => console.error('[supabase] updateWebflowProduct:', err.message))
-          return updated
+
+          const wf = webflowProducts.find(w => w.webflowProductId === p.webflowProductId)
+
+          if (wf) {
+            // Produit présent dans Webflow → synchroniser active + nom + prix
+            const updated = { ...p, name: wf.name, active: wf.active, sizes: wf.sizes, photoUrl: wf.photoUrl, updatedAt: new Date().toISOString() }
+            upsertProduct(updated).catch(err => {
+              console.error('[supabase] updateWebflowProduct:', err.message)
+              onToast?.(`Erreur sync produit "${p.name}" : ${err.message}`, 'var(--color-danger)')
+            })
+            changed = true
+            return updated
+          }
+
+          // Produit absent de la réponse Webflow → archivé ou supprimé → désactiver
+          if (p.active) {
+            const deactivated = { ...p, active: false, updatedAt: new Date().toISOString() }
+            upsertProduct(deactivated).catch(err => {
+              console.error('[supabase] deactivateWebflowProduct:', err.message)
+              onToast?.(`Erreur désactivation "${p.name}" : ${err.message}`, 'var(--color-danger)')
+            })
+            changed = true
+            return deactivated
+          }
+          return p
         })
 
         if (toAdd.length) {
           next = [...next, ...toAdd]
-          upsertProducts(toAdd).catch(err => console.error('[supabase] addWebflowProducts:', err.message))
+          upsertProducts(toAdd).catch(err => {
+            console.error('[supabase] addWebflowProducts:', err.message)
+            onToast?.(`Erreur import produits Webflow : ${err.message}`, 'var(--color-danger)')
+          })
           onToast?.(`${toAdd.length} nouveau(x) produit(s) importé(s) depuis Webflow`, null)
+          changed = true
         }
 
-        if (next !== prev) localSave(next)
+        if (changed) localSave(next)
         return next
       })
     }).catch(err => {
       console.warn('[useProducts] Webflow sync échouée:', err.message)
+      onToast?.(`Sync Webflow échouée : ${err.message}`, 'var(--color-danger)')
     })
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
