@@ -285,7 +285,7 @@ function mapProduct(item) {
     photoUrl:          fd['image-01']?.url ?? null,
     active,
     sizes:             sizes.length ? sizes : [],
-    allergens:         resolveAllergens(fd['produits-allergene']),
+    allergens:         resolveAllergens(fd['produits-allergene'] ?? []),
     pregnancySafe:     'check',
     pregnancyNote:     null,
     ingredients:       [],
