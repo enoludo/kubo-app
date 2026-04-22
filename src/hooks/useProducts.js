@@ -34,57 +34,56 @@ export function useProducts({ onToast } = {}) {
     return saved ?? []
   })
 
-  // ── Chargement Supabase au montage ────────────────────────────────────────
+  // ── Chargement Supabase puis sync Webflow (séquentiel — évite la race condition) ──
 
   useEffect(() => {
-    fetchSupabaseProducts()
-      .then(supabaseProducts => {
+    async function init() {
+      // 1. Charger Supabase d'abord
+      let base = []
+      try {
+        const supabaseProducts = await fetchSupabaseProducts()
         if (supabaseProducts.length > 0) {
-          setProducts(prev => {
-            const supabaseIds   = new Set(supabaseProducts.map(p => p.id))
-            const supabaseWfIds = new Set(supabaseProducts.filter(p => p.webflowProductId).map(p => p.webflowProductId))
-            const localOnly = prev.filter(p =>
-              !supabaseIds.has(p.id) &&
-              !(p.webflowProductId && supabaseWfIds.has(p.webflowProductId))
-            )
-            if (localOnly.length > 0) {
-              upsertProducts(localOnly)
-                .catch(err => console.error('[supabase] seed local products:', err.message))
-            }
-            return [...supabaseProducts, ...localOnly]
-          })
-          console.log('[supabase] produits chargés:', supabaseProducts.length)
+          const supabaseIds   = new Set(supabaseProducts.map(p => p.id))
+          const supabaseWfIds = new Set(supabaseProducts.filter(p => p.webflowProductId).map(p => p.webflowProductId))
+          const localOnly = (localLoad() ?? []).filter(p =>
+            !supabaseIds.has(p.id) &&
+            !(p.webflowProductId && supabaseWfIds.has(p.webflowProductId))
+          )
+          if (localOnly.length > 0) {
+            upsertProducts(localOnly).catch(err => console.error('[supabase] seed local products:', err.message))
+          }
+          base = [...supabaseProducts, ...localOnly]
         } else {
-          setProducts(prev => {
-            if (prev.length > 0) {
-              upsertProducts(prev).catch(err => console.error('[supabase] seed products:', err.message))
-              console.log('[supabase] produits seedés:', prev.length)
-            }
-            return prev
-          })
+          const local = localLoad() ?? []
+          if (local.length > 0) {
+            upsertProducts(local).catch(err => console.error('[supabase] seed products:', err.message))
+          }
+          base = local
         }
-      })
-      .catch(err => console.error('[supabase] fetchProducts:', err.message))
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+        setProducts(base)
+        console.log('[supabase] produits chargés:', base.length)
+      } catch (err) {
+        console.error('[supabase] fetchProducts:', err.message)
+        base = localLoad() ?? []
+        setProducts(base)
+      }
 
-  // ── Sync Webflow au montage ────────────────────────────────────────────────
+      // 2. Sync Webflow sur la base Supabase (pas sur le localStorage)
+      try {
+        const webflowProducts = await fetchWebflowProducts()
+        if (!webflowProducts.length) return
 
-  useEffect(() => {
-    fetchWebflowProducts().then(webflowProducts => {
-      if (!webflowProducts.length) return
-      setProducts(prev => {
         const wfIdSet       = new Set(webflowProducts.map(p => p.webflowProductId))
-        const existingWfIds = new Set(prev.filter(p => p.webflowProductId).map(p => p.webflowProductId))
+        const existingWfIds = new Set(base.filter(p => p.webflowProductId).map(p => p.webflowProductId))
         const toAdd         = webflowProducts.filter(p => !existingWfIds.has(p.webflowProductId))
 
         let changed = false
-        let next = prev.map(p => {
+        let next = base.map(p => {
           if (!p.webflowProductId) return p
 
           const wf = webflowProducts.find(w => w.webflowProductId === p.webflowProductId)
 
           if (wf) {
-            // Produit présent dans Webflow → synchroniser active + nom + prix
             const updated = { ...p, name: wf.name, active: wf.active, sizes: wf.sizes, photoUrl: wf.photoUrl, updatedAt: new Date().toISOString() }
             upsertProduct(updated).catch(err => {
               console.error('[supabase] updateWebflowProduct:', err.message)
@@ -94,7 +93,7 @@ export function useProducts({ onToast } = {}) {
             return updated
           }
 
-          // Produit absent de la réponse Webflow → archivé ou supprimé → désactiver
+          // Absent de Webflow → archivé/supprimé → désactiver
           if (p.active) {
             const deactivated = { ...p, active: false, updatedAt: new Date().toISOString() }
             upsertProduct(deactivated).catch(err => {
@@ -117,15 +116,18 @@ export function useProducts({ onToast } = {}) {
           changed = true
         }
 
-        if (changed) localSave(next)
-        return next
-      })
-    }).catch(err => {
-      console.warn('[useProducts] Webflow sync échouée:', err.message)
-      onToast?.(`Sync Webflow échouée : ${err.message}`, 'var(--color-danger)')
-    })
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+        if (changed) {
+          setProducts(next)
+          localSave(next)
+        }
+      } catch (err) {
+        console.warn('[useProducts] Webflow sync échouée:', err.message)
+        onToast?.(`Sync Webflow échouée : ${err.message}`, 'var(--color-danger)')
+      }
+    }
+
+    init()
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Helpers internes ───────────────────────────────────────────────────────
 
